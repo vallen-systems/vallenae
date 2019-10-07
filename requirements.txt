@@ -1,0 +1,7 @@
+numpy
+matplotlib
+pandas
+soundfile
+pytest
+numba
+scipy

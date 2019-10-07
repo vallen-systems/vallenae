@@ -1,0 +1,37 @@
+# editor backups:
+*~
+
+.idea/**/*
+
+# any mypy stuff:
+.mypy_cache/
+
+*ignore_me*
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# pyenv
+.python-version
+
+# Environments
+venv/
+env/
+local_env/
+
+build/
+dist/
+
+vallenae.egg-info/

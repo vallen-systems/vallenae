@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Vallen_XML>
+  <DocumentProperties>
+    <Title>VisualAE Setup</Title>
+    <Version>01.00</Version>
+    <SaveInfo>
+      <SaveDate>2019-10-01T15:57:22.472Z</SaveDate>
+      <ApplicationInfo>
+        <Title>Vallen VisualAE</Title>
+        <Version>2019.0926</Version>
+      </ApplicationInfo>
+    </SaveInfo>
+  </DocumentProperties>
+  <VAESetup>
+    <ProjectSettings UpdOnlInterval="1000" UpdOffInterval="3000" TRFDisabled="False" ShowTimeMarkers="False" UseAbsFromRelTime="False" UseAbsTimeGap="False">
+      <PulseTracking TrackTimeMSec="15" TimeOutSec="10"/>
+      <PaxConversion>
+        <Input Channel="0" HWChannel="0" Available="False" Enabled="False" Name="PA0U" LongName="Par. 0 in user units" Description="Par. 0 in user units" Unit="[mV]" Offset="0" Factor="1" HighGain="False"/>
+        <Input Channel="1" HWChannel="0" Available="False" Enabled="False" Name="PA1U" LongName="Par. 1 in user units" Description="Par. 1 in user units" Unit="[mV]" Offset="0" Factor="1" HighGain="False"/>
+        <Input Channel="2" HWChannel="0" Available="False" Enabled="False" Name="PA2U" LongName="Par. 2 in user units" Description="Par. 2 in user units" Unit="[mV]" Offset="0" Factor="1" HighGain="False"/>
+        <Input Channel="3" HWChannel="0" Available="False" Enabled="False" Name="PA3U" LongName="Par. 3 in user units" Description="Par. 3 in user units" Unit="[mV]" Offset="0" Factor="1" HighGain="False"/>
+        <Input Channel="4" HWChannel="0" Available="False" Enabled="False" Name="PA4U" LongName="Par. 4 in user units" Description="Par. 4 in user units" Unit="[mV]" Offset="0" Factor="1" HighGain="False"/>
+        <Input Channel="5" HWChannel="0" Available="False" Enabled="False" Name="PA5U" LongName="Par. 5 in user units" Description="Par. 5 in user units" Unit="[mV]" Offset="0" Factor="1" HighGain="False"/>
+        <Input Channel="6" HWChannel="0" Available="False" Enabled="False" Name="PA6U" LongName="Par. 6 in user units" Description="Par. 6 in user units" Unit="[mV]" Offset="0" Factor="1" HighGain="False"/>
+        <Input Channel="7" HWChannel="0" Available="False" Enabled="False" Name="PA7U" LongName="Par. 7 in user units" Description="Par. 7 in user units" Unit="[mV]" Offset="0" Factor="1" HighGain="False"/>
+      </PaxConversion>
+    </ProjectSettings>
+    <DataStructure>
+      <DataSource ID="1" ServerID="-1" TreeID="AMSY-6: sample.pridb">
+        <Comment>
+          <Caption Visible="True" Align="2"/>
+          <Comment Visible="False" Align="0"/>
+        </Comment>
+      </DataSource>
+      <Diagram2DControl WantSubhit="False" PageIndex="1" PosIndex="1" ID="2" ServerID="1" TreeID="2D1: Peak Amp [dB] vs. Time [s]">
+        <PlaneMapperL IsoTropic="False">
+          <X Attr="Generic.Time.S" Scale="0" FixLo="False" FixHi="False" HideGrid="False" Invert="False" SlideLo="False" SlideHi="False"/>
+          <Y Attr="Hit.Amp.dB" Scale="0" FixLo="True" FixHi="True" UsLo="19" UsHi="100" HideGrid="False" Invert="False"/>
+          <Correlation>
+            <Planes>
+              <Plane BarStyle="0" DotStyle="8" ColIdx="1">
+                <Filter>
+                  <FilterPass>
+                    <Condition Attr="Generic.Channel" Rel="=" Val="1"/>
+                  </FilterPass>
+                  <Comment>
+                    <Caption Visible="True" Align="2" Text="=[Filter]"/>
+                    <Comment Visible="False" Align="0"/>
+                  </Comment>
+                </Filter>
+              </Plane>
+              <Plane BarStyle="0" DotStyle="2" ColIdx="2">
+                <Filter>
+                  <FilterPass>
+                    <Condition Attr="Generic.Channel" Rel="=" Val="2"/>
+                  </FilterPass>
+                  <Comment>
+                    <Caption Visible="True" Align="2" Text="=[Filter]"/>
+                    <Comment Visible="False" Align="0"/>
+                  </Comment>
+                </Filter>
+              </Plane>
+              <Plane BarStyle="0" DotStyle="4" ColIdx="3">
+                <Filter>
+                  <FilterPass>
+                    <Condition Attr="Generic.Channel" Rel="=" Val="3"/>
+                  </FilterPass>
+                  <Comment>
+                    <Caption Visible="True" Align="2" Text="=[Filter]"/>
+                    <Comment Visible="False" Align="0"/>
+                  </Comment>
+                </Filter>
+              </Plane>
+              <Plane BarStyle="0" DotStyle="3" ColIdx="4">
+                <Filter>
+                  <FilterPass>
+                    <Condition Attr="Generic.Channel" Rel="=" Val="4"/>
+                  </FilterPass>
+                  <Comment>
+                    <Caption Visible="True" Align="2" Text="=[Filter]"/>
+                    <Comment Visible="False" Align="0"/>
+                  </Comment>
+                </Filter>
+              </Plane>
+            </Planes>
+          </Correlation>
+          <Distribution Bins="600" BinWidth="1" FixWidth="False" Accumulation="0"/>
+        </PlaneMapperL>
+        <Legend Visible="True">
+          <HeaderLeft Caption="=[Y-AttrLongUnit]" Visible="True" Align="2"/>
+          <HeaderRight Caption="=[YR-AttrLongUnit]" Visible="False" Align="2"/>
+          <HeaderBottom Caption="=[X-AttrLongUnit]" Visible="True" Align="2"/>
+          <AxisTextX Visible="False" Align="0"/>
+          <AxisTextY Visible="False" Align="0"/>
+          <AxisTextZ Visible="False" Align="0"/>
+        </Legend>
+        <Comment>
+          <Caption Visible="False" Align="2" Text="=[Y-AttrLongUnit] vs. =[X-AttrLongUnit]"/>
+          <Comment Visible="False" Align="0"/>
+        </Comment>
+      </Diagram2DControl>
+      <Diagram2DControl WantSubhit="False" PageIndex="1" PosIndex="0" ID="3" ServerID="1" TreeID="2D2: Hits  vs. Channel ">
+        <PlaneMapperL IsoTropic="False">
+          <X Attr="Generic.Channel" Scale="0" FixLo="False" FixHi="False" HideGrid="False" Invert="False" SlideLo="False" SlideHi="False"/>
+          <Y Attr="Generic.Flag.Hit" Scale="0" FixLo="True" FixHi="False" UsLo="0" HideGrid="False" Invert="False"/>
+          <Distribution Bins="40" BinWidth="1" FixWidth="True" Accumulation="0">
+            <Planes>
+              <Plane BarStyle="2" DotStyle="0" ColIdx="1">
+                <Filter>
+                  <FilterPass/>
+                  <Comment>
+                    <Caption Visible="True" Align="2" Text="=[Filter]"/>
+                    <Comment Visible="False" Align="0"/>
+                  </Comment>
+                </Filter>
+              </Plane>
+            </Planes>
+          </Distribution>
+        </PlaneMapperL>
+        <Legend Visible="True">
+          <HeaderLeft Caption="=[Y-AttrLongUnit]" Visible="True" Align="2"/>
+          <HeaderRight Caption="=[YR-AttrLongUnit]" Visible="False" Align="2"/>
+          <HeaderBottom Caption="=[X-AttrLongUnit] =[BinWidth]" Visible="True" Align="2"/>
+          <AxisTextX Visible="False" Align="0"/>
+          <AxisTextY Visible="False" Align="0"/>
+          <AxisTextZ Visible="False" Align="0"/>
+        </Legend>
+        <Comment>
+          <Caption Visible="False" Align="2" Text="Hits  vs. Channel "/>
+          <Comment Visible="False" Align="0"/>
+        </Comment>
+      </Diagram2DControl>
+      <TRDiagramControl PageIndex="1" PosIndex="4" ID="4" ServerID="1" TreeID="TR1: Transient Waveform">
+        <TR HasClient="False" Offset="0" Range="96256" Display="0" Window="0" SetNo="3" FFTMinSamples="32" FFTMaxFreq="1250000" FFTMinFreq="0" FixScale="False" FixedChan="0" FixMax="33.995209">
+          <Client Offset="0" Range="0" Display="0" FixScale="False" FixMax="0"/>
+          <Filter Type="0" LoFreq="100000" HiFreq="500000" Slope="80"/>
+        </TR>
+        <Legend Visible="True">
+          <HeaderLeft Visible="False" Align="0"/>
+          <HeaderRight Visible="False" Align="0"/>
+          <HeaderBottom Visible="False" Align="0"/>
+          <AxisTextX Visible="False" Align="0"/>
+          <AxisTextY Visible="False" Align="0"/>
+          <AxisTextZ Visible="False" Align="0"/>
+        </Legend>
+        <Comment>
+          <Caption Visible="False" Align="2" Text="Transient Waveform"/>
+          <Comment Visible="False" Align="0"/>
+        </Comment>
+      </TRDiagramControl>
+      <LocationProcessor ID="5" ServerID="1" TreeID="Lc1: Location Processor">
+        <Location UserUnit="cm" Velocity="5" MaxDist="6">
+          <ChannelGroups>
+            <ChannelGroup Enabled="True" Radius="0.5" Velocity="5" OwnVelocity="False" MaxHits="7" ClipResults="False" ClipMargin="2" LocationType="LSetFuzzy2D">
+              <ChannelPos Chan="1" X="0.6" Y="0.6"/>
+              <ChannelPos Chan="2" X="0.15" Y="0.6"/>
+              <ChannelPos Chan="3" X="0.15" Y="0.15"/>
+              <ChannelPos Chan="4" X="0.6" Y="0.15"/>
+            </ChannelGroup>
+          </ChannelGroups>
+        </Location>
+        <EventBuilder DT1XMax="2" DTNXMax="2" FHCDT="2" AllowDuplicates="False">
+          <Channels>
+            <Channel Chan="1" Function="1"/>
+            <Channel Chan="2" Function="1"/>
+            <Channel Chan="3" Function="1"/>
+            <Channel Chan="4" Function="1"/>
+          </Channels>
+        </EventBuilder>
+        <Comment>
+          <Caption Visible="True" Align="2" Text="Location Processor"/>
+          <Comment Visible="False" Align="0"/>
+        </Comment>
+      </LocationProcessor>
+      <Diagram2DControl WantSubhit="False" PageIndex="1" PosIndex="3" ID="6" ServerID="5" TreeID="Lc1\2D3: Y-Loc. [cm] vs. X-Loc. [cm]">
+        <PlaneMapperL IsoTropic="True">
+          <X Attr="Location.X" Scale="0" FixLo="False" FixHi="False" HideGrid="False" Invert="False" SlideLo="False" SlideHi="False"/>
+          <Y Attr="Location.Y" Scale="0" FixLo="False" FixHi="False" HideGrid="False" Invert="False"/>
+          <Correlation>
+            <Planes>
+              <Plane BarStyle="0" DotStyle="8" ColIdx="1">
+                <Filter>
+                  <Comment>
+                    <Caption Visible="True" Align="2" Text="=[Filter]"/>
+                    <Comment Visible="False" Align="0"/>
+                  </Comment>
+                </Filter>
+              </Plane>
+            </Planes>
+          </Correlation>
+          <Distribution Bins="4000" BinWidth="1" FixWidth="False" Accumulation="0"/>
+        </PlaneMapperL>
+        <Legend Visible="True">
+          <HeaderLeft Caption="=[Y-AttrLongUnit]" Visible="True" Align="2"/>
+          <HeaderRight Caption="=[YR-AttrLongUnit]" Visible="False" Align="2"/>
+          <HeaderBottom Caption="=[X-AttrLongUnit]" Visible="True" Align="2"/>
+          <AxisTextX Visible="False" Align="0"/>
+          <AxisTextY Visible="False" Align="0"/>
+          <AxisTextZ Visible="False" Align="0"/>
+        </Legend>
+        <Comment>
+          <Caption Visible="False" Align="2" Text="=[Y-AttrLongUnit] vs. =[X-AttrLongUnit]"/>
+          <Comment Visible="False" Align="0"/>
+        </Comment>
+      </Diagram2DControl>
+      <ListControl WantHit="True" WantSubhit="True" WantPax="False" WantStatus="False" WantLabel="True" UseNAString="False" PageIndex="1" PosIndex="2" ID="7" ServerID="5" TreeID="Lc1\Ls1: Listing">
+        <Attributes>
+          <Attribute ID="Generic.Dataset.Number"/>
+          <Attribute ID="Generic.Channel"/>
+          <Attribute ID="Hit.Amp.dB"/>
+          <Attribute ID="Hit.RiseT"/>
+          <Attribute ID="Hit.Dur"/>
+          <Attribute ID="Hit.Counts"/>
+          <Attribute ID="Hit.EnyTE"/>
+          <Attribute ID="Hit.RMS"/>
+          <Attribute ID="Hit.Thr"/>
+          <Attribute ID="Pax.mV.0"/>
+          <Attribute ID="Hit.ListFlags"/>
+          <Attribute ID="Location.Lucy"/>
+          <Attribute ID="Event.Subhit.DT1X"/>
+        </Attributes>
+        <Legend Visible="True">
+          <HeaderLeft Visible="False" Align="0"/>
+          <HeaderRight Visible="False" Align="0"/>
+          <HeaderBottom Visible="False" Align="0"/>
+          <AxisTextX Visible="False" Align="0"/>
+          <AxisTextY Visible="False" Align="0"/>
+          <AxisTextZ Visible="False" Align="0"/>
+        </Legend>
+        <Comment>
+          <Caption Visible="False" Align="2" Text="Listing"/>
+          <Comment Visible="False" Align="0"/>
+        </Comment>
+      </ListControl>
+    </DataStructure>
+    <PageStructure ActivePageIndex="0">
+      <Page PageType="0" Layout="01000005" Name="Page 1">
+        <Comment>
+          <Caption Visible="False" Align="2"/>
+          <Comment Visible="False" Align="0"/>
+        </Comment>
+      </Page>
+    </PageStructure>
+  </VAESetup>
+</Vallen_XML>
