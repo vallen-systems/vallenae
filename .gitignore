@@ -3,6 +3,8 @@
 
 .idea/**/*
 
+.vscode/
+
 # any mypy stuff:
 .mypy_cache/
 
