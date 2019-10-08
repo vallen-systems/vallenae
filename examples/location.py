@@ -49,7 +49,7 @@ def lucy_error_fun(test_pos: np.ndarray,
     return lucy_val
 
 
-def main():
+if __name__ == '__main__':
 
     this_file_path = os.path.dirname(os.path.realpath(__file__))
     huge_int = int(1e6)
@@ -162,8 +162,3 @@ def main():
     # ------------------------------
 
     plt.show()
-
-
-if __name__ == '__main__':
-
-    main()
