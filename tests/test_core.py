@@ -3,10 +3,10 @@ import numpy as np
 import os
 import pandas as pd
 
-THIS_FILE_PATH = os.path.dirname(os.path.realpath(__file__))
-STEEL_PLATE_DIR = os.path.join(THIS_FILE_PATH, '../examples/steel_plate')
-PRI_FILE_PATH = os.path.join(STEEL_PLATE_DIR, 'sample.pridb')
-FLAC_TRA_FILE_PATH = os.path.join(STEEL_PLATE_DIR, 'sample.tradb')
+THIS_FILE_PATH      = os.path.dirname(os.path.realpath(__file__))
+STEEL_PLATE_DIR     = os.path.join(THIS_FILE_PATH, '../examples/steel_plate')
+PRI_FILE_PATH       = os.path.join(STEEL_PLATE_DIR, 'sample.pridb')
+FLAC_TRA_FILE_PATH  = os.path.join(STEEL_PLATE_DIR, 'sample.tradb')
 PLAIN_TRA_FILE_PATH = os.path.join(STEEL_PLATE_DIR, 'sample_plain.tradb')
 
 

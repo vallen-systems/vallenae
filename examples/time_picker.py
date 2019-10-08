@@ -51,8 +51,8 @@ if __name__ == '__main__':
     THIS_FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 
     MAX_TRA_IDX = 4
-    END_SAMPLE = 2000
-    WINDOW_LEN = 100
+    END_SAMPLE  = 2000
+    WINDOW_LEN  = 100
     CONVERT_SECS_2_USECS = 1000000
 
     tra_frame = vae.read_tra(
@@ -77,8 +77,8 @@ if __name__ == '__main__':
              ys[0:END_SAMPLE],
              color='g')
     ax1.tick_params(axis='y', labelcolor='g')
+    
     ax2 = ax1.twinx()
-
     ax2.set_ylabel('Energy Ratio [/]', color='r')
     ax2.plot(CONVERT_SECS_2_USECS * xs[0:END_SAMPLE],
              er_arr[0:END_SAMPLE],
