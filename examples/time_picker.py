@@ -1,11 +1,15 @@
 from __future__ import print_function, division, absolute_import
+
+import sys, os
+# find vallenae module in parent directory if not installed
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import math as m
 import matplotlib.pyplot as plt
 import matplotlib
 import numba as nb
 from numba import jit, f8, i4
 import numpy as np
-import os
 from typing import Tuple
 import time
 import vallenae.core as vae
@@ -47,8 +51,8 @@ if __name__ == '__main__':
     THIS_FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 
     MAX_TRA_IDX = 4
-    END_SAMPLE = 2000
-    WINDOW_LEN = 100
+    END_SAMPLE  = 2000
+    WINDOW_LEN  = 100
     CONVERT_SECS_2_USECS = 1000000
 
     tra_frame = vae.read_tra(
@@ -73,8 +77,8 @@ if __name__ == '__main__':
              ys[0:END_SAMPLE],
              color='g')
     ax1.tick_params(axis='y', labelcolor='g')
+    
     ax2 = ax1.twinx()
-
     ax2.set_ylabel('Energy Ratio [/]', color='r')
     ax2.plot(CONVERT_SECS_2_USECS * xs[0:END_SAMPLE],
              er_arr[0:END_SAMPLE],
