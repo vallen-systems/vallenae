@@ -1,11 +1,15 @@
 from __future__ import print_function, division, absolute_import
+
+import sys, os
+# find vallenae module in parent directory if not installed
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import math as m
 import matplotlib.pyplot as plt
 import matplotlib
 import numba as nb
 from numba import jit, f8, i4
 import numpy as np
-import os
 from typing import Tuple
 import time
 import vallenae.core as vae

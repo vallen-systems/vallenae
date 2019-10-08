@@ -1,6 +1,9 @@
+import sys, os
+# find vallenae module in parent directory if not installed
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import matplotlib.pyplot as plt
 import matplotlib
-import os
 import vallenae.core as vae
 import vallenae.helper as vh
 

@@ -1,10 +1,13 @@
+import sys, os
+# find vallenae module in parent directory if not installed
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import math
 import matplotlib.pyplot as plt
 from numba import jit, f8
 import numpy as np
 from numpy.linalg import norm
 from numpy import arange
-import os
 from scipy.optimize import differential_evolution
 import time
 import vallenae.core as vae
