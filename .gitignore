@@ -1,11 +1,9 @@
-# editor backups:
+# Editor
 *~
-
 .idea/**/*
-
 .vscode/
 
-# any mypy stuff:
+# mypy
 .mypy_cache/
 
 *ignore_me*
@@ -25,15 +23,16 @@ __pycache__/
 pip-log.txt
 pip-delete-this-directory.txt
 
-# pyenv
-.python-version
-
 # Environments
 venv/
 env/
 local_env/
+.direnv/
 
+# pyenv
+.python-version
+
+# Build files
 build/
 dist/
-
 vallenae.egg-info/
