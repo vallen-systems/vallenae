@@ -1,6 +1,7 @@
 import sys, os
+
 # find vallenae module in parent directory if not installed
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import matplotlib.pyplot as plt
 import matplotlib
@@ -12,35 +13,35 @@ import vallenae.helper as vh
 matplotlib.interactive(False)  # "True" means makes plt.show() is non-blocking
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
-    THIS_FILE_PATH  = os.path.dirname(os.path.realpath(__file__))
-    PLAIN_FNAME     = os.path.join(THIS_FILE_PATH, 'steel_plate/sample.tradb')
-    FLAC_FNAME      = os.path.join(THIS_FILE_PATH, 'steel_plate/sample_plain.tradb')
-    tra_frame_flac  = vae.read_tra(PLAIN_FNAME, 1, 100)
+    THIS_FILE_PATH = os.path.dirname(os.path.realpath(__file__))
+    PLAIN_FNAME = os.path.join(THIS_FILE_PATH, "steel_plate/sample.tradb")
+    FLAC_FNAME = os.path.join(THIS_FILE_PATH, "steel_plate/sample_plain.tradb")
+    tra_frame_flac = vae.read_tra(PLAIN_FNAME, 1, 100)
     tra_frame_plain = vae.read_tra(FLAC_FNAME, 1, 100)
-    tra_idx         = 4  # just an example, no magic here
+    tra_idx = 4  # just an example, no magic here
 
     ys1, xs = vae.extract_wave(tra_frame_flac, tra_idx)
-    ys1     = ys1 * 1000  # in mV
-    xs      = xs * 1000000  # for µs
-    ys2, _  = vae.extract_wave(tra_frame_plain, tra_idx)
-    ys2     = ys2 * 1000  # in mV
+    ys1 = ys1 * 1000  # in mV
+    xs = xs * 1000000  # for µs
+    ys2, _ = vae.extract_wave(tra_frame_plain, tra_idx)
+    ys2 = ys2 * 1000  # in mV
 
     _, ax = plt.subplots()
-    ax.set_xlabel('Time [us]')
-    ax.set_ylabel('Tansient Wave [mV]', color='g')
+    ax.set_xlabel("Time [us]")
+    ax.set_ylabel("Tansient Wave [mV]", color="g")
     ax.plot(xs, ys1)
-    plt.title('Transient Wave Plot From FLAC BLOB; TRAI=' + str(tra_idx))
+    plt.title("Transient Wave Plot From FLAC BLOB; TRAI=" + str(tra_idx))
     plt.show()
-    vh.save_figure(THIS_FILE_PATH, 'ignore_me_from_flac', 'png')
+    vh.save_figure(THIS_FILE_PATH, "ignore_me_from_flac", "png")
     plt.close()
 
     _, ax = plt.subplots()
-    ax.set_xlabel('Time [us]')
-    ax.set_ylabel('Tansient Wave [mV]', color='g')
+    ax.set_xlabel("Time [us]")
+    ax.set_ylabel("Tansient Wave [mV]", color="g")
     ax.plot(xs, ys2)
-    plt.title('Transient Wave Plot From Plain BLOB; TRAI=' + str(tra_idx))
+    plt.title("Transient Wave Plot From Plain BLOB; TRAI=" + str(tra_idx))
     plt.show()
-    vh.save_figure(THIS_FILE_PATH, 'ignore_me_from_plain', 'png')
+    vh.save_figure(THIS_FILE_PATH, "ignore_me_from_plain", "png")
     plt.close()

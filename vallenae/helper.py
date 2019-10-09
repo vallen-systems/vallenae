@@ -3,9 +3,7 @@ import os
 from typing import Union, Tuple
 
 
-def cm2inch(x_cm: float,
-            y_cm: float = None)\
-        -> Union[Tuple[float, float], float]:
+def cm2inch(x_cm: float, y_cm: float = None) -> Union[Tuple[float, float], float]:
     """
     Convert cm to inch. Cartesian coordinates are possible, therefore two
     arguments, e.g. like
@@ -23,11 +21,9 @@ def cm2inch(x_cm: float,
         return fac * x_cm
 
 
-def save_figure(image_dir: str,
-                file_name: str,
-                file_ending: str = 'png',
-                dpi: int = 300) \
-        -> None:
+def save_figure(
+    image_dir: str, file_name: str, file_ending: str = "png", dpi: int = 300
+) -> None:
     """
     Just saves the figure to the specified directory.
     Use it after some call to matplotlib.pyplot.plot(...)
@@ -39,13 +35,12 @@ def save_figure(image_dir: str,
     :param dpi: dips per inch of the graphic to be saved. Defaults to 300.
     """
     try:
-        file_path = os.path.join(image_dir,
-                                 file_name + '.' + file_ending)
+        file_path = os.path.join(image_dir, file_name + "." + file_ending)
         plt.savefig(file_path, format=file_ending, dpi=dpi)
     except Exception as e:
         raise e
     else:
-        print('Saved figure ' + file_ending, file_name)
+        print("Saved figure " + file_ending, file_name)
     return None
 
 
@@ -53,7 +48,7 @@ def assert_coll(coll):
     try:
         some_object_iterator = iter(coll)
     except TypeError as te:
-        raise AssertionError('is not iterable')
+        raise AssertionError("is not iterable")
 
 
 def assert_string_coll(coll):
@@ -61,7 +56,7 @@ def assert_string_coll(coll):
     try:
         some_object_iterator = iter(coll)
     except TypeError as te:
-        raise AssertionError('is not iterable')
+        raise AssertionError("is not iterable")
     assert type(coll) is list
     for item in coll:
         assert type(item) is str
@@ -80,4 +75,3 @@ def assert_int_paris_coll(some_list):
         assert len(sublist) == 2
         for item in sublist:
             assert type(item) is int
-
