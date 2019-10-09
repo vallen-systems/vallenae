@@ -1,0 +1,9 @@
+[MESSAGES CONTROL]
+disable=bad-continuation, # code style by black
+        missing-module-docstring,
+        missing-function-docstring
+
+[FORMAT]
+good-names=i,j,k,
+           sr, # sample rate
+           e # catch exceptions

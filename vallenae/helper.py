@@ -1,6 +1,6 @@
-import matplotlib.pyplot as plt
 import os
 from typing import Union, Tuple
+import matplotlib.pyplot as plt
 
 
 def cm2inch(x_cm: float, y_cm: float = None) -> Union[Tuple[float, float], float]:
@@ -17,8 +17,7 @@ def cm2inch(x_cm: float, y_cm: float = None) -> Union[Tuple[float, float], float
     fac = 1 / 2.54
     if y_cm:
         return fac * x_cm, fac * y_cm
-    else:
-        return fac * x_cm
+    return fac * x_cm
 
 
 def save_figure(
@@ -41,7 +40,6 @@ def save_figure(
         raise e
     else:
         print("Saved figure " + file_ending, file_name)
-    return None
 
 
 def assert_coll(coll):
@@ -52,26 +50,25 @@ def assert_coll(coll):
 
 
 def assert_string_coll(coll):
-
     try:
         iter(coll)
     except TypeError:
         raise AssertionError("is not iterable")
-    assert type(coll) is list
+    assert isinstance(coll, list)
     for item in coll:
-        assert type(item) is str
+        assert isinstance(item, str)
 
 
 def assert_int_coll(some_list):
-    assert type(some_list) is list
+    assert isinstance(some_list, list)
     for item in some_list:
-        assert type(item) is int
+        assert isinstance(item, int)
 
 
 def assert_int_paris_coll(some_list):
-    assert type(some_list) is list
+    assert isinstance(some_list, list)
     for sublist in some_list:
-        assert type(sublist) is list
+        assert isinstance(sublist, list)
         assert len(sublist) == 2
         for item in sublist:
-            assert type(item) is int
+            assert isinstance(item, int)

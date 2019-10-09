@@ -1,7 +1,7 @@
-from .context import vae
-import numpy as np
 import os
+import numpy as np
 import pandas as pd
+from .context import vae
 
 THIS_FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 STEEL_PLATE_DIR = os.path.join(THIS_FILE_PATH, "../examples/steel_plate")
@@ -13,7 +13,7 @@ PLAIN_TRA_FILE_PATH = os.path.join(STEEL_PLATE_DIR, "sample_plain.tradb")
 def test_read_pri():
 
     pri_frame = vae.read_pri(PRI_FILE_PATH, 1, 18)
-    assert type(pri_frame) is pd.DataFrame
+    assert isinstance(pri_frame, pd.DataFrame)
     val_set = {
         "SetType",
         "Time",
@@ -43,7 +43,7 @@ def test_read_pri():
 def test_read_tra():
 
     tra_frame = vae.read_tra(PLAIN_TRA_FILE_PATH, 1, 18)
-    assert type(tra_frame) is pd.DataFrame
+    assert isinstance(tra_frame, pd.DataFrame)
     val_set = {
         "SetID",
         "Time",
