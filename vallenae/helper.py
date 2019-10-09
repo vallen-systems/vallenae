@@ -46,16 +46,16 @@ def save_figure(
 
 def assert_coll(coll):
     try:
-        some_object_iterator = iter(coll)
-    except TypeError as te:
+        iter(coll)
+    except TypeError:
         raise AssertionError("is not iterable")
 
 
 def assert_string_coll(coll):
 
     try:
-        some_object_iterator = iter(coll)
-    except TypeError as te:
+        iter(coll)
+    except TypeError:
         raise AssertionError("is not iterable")
     assert type(coll) is list
     for item in coll:

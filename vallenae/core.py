@@ -115,10 +115,10 @@ def _read_db(
     # sql-injection in some way:
     if not TBL_NAME_PATTERN.match(tbl_name):
         raise Exception(
-            "Illegal table name "
-            + tbl_name
-            + "\n"
-            + "Should consist just of letters and underscores."
+            "Illegal table name {}.\n\
+             Should consist just of letters and underscores.".format(
+                tbl_name
+            )
         )
     query = "SELECT * FROM " + tbl_name + " WHERE SetID >= ? AND SetID <= ?"
     binding_params = (from_, to_)
