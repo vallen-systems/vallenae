@@ -3,20 +3,20 @@ from __future__ import print_function, unicode_literals, division
 import array as arr
 import contextlib as ctxlib
 import io
-import numpy as np
 import os
-import pandas as pd
 import re
-import soundfile as sf
 import sqlite3
 from typing import Tuple, Union
-from ._version import __version_tpl__
+import numpy as np
+import pandas as pd
+import soundfile as sf
+from ._version import __VERSION_TPL__
 
 TBL_NAME_PATTERN = re.compile("^([A-Z]|[a-z]|_)+$")
 FLAC_SPECIFIER = 2
 PLAIN_SPECIFIER = 0
 
-_version = __version_tpl__
+_VERSION = __VERSION_TPL__
 
 
 def read_pri(abs_file_name: str, from_: int, to_: int) -> pd.DataFrame:
@@ -200,10 +200,10 @@ def _extract_wave(
 
     if not do_create_time_vector:
         return result
-    else:
-        return (
-            result,
-            _create_time_vector(
-                nb_pretrigs=nb_pretrigs, nb_samples=nb_smpls, sample_rate=sr
-            ),
-        )
+
+    return (
+        result,
+        _create_time_vector(
+            nb_pretrigs=nb_pretrigs, nb_samples=nb_smpls, sample_rate=sr
+        ),
+    )

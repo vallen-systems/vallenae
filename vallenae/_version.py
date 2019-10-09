@@ -1,2 +1,2 @@
-__version_tpl__ = ("2019", "10", "02")
-__version__ = "-".join(__version_tpl__)
+__VERSION_TPL__ = ("2019", "10", "02")
+__version__ = "-".join(__VERSION_TPL__)
