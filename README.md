@@ -5,9 +5,21 @@ Python tools to extract and analyze data from Vallen Systeme database files, e.g
 Setup a virutal invironment, install the dependencies and run some
 samples like this:
 
-    python -m venv env
-    .\env\scripts\activate.bat  # an *.sh file under linux of course
+    # install venv
+    python -m venv env # use python3 if python is mapped to python2
+    
+    # activate env
+    # linux
+    source env/bin/activate
+    # windows cmd
+    .\env\scripts\activate.bat
+    # windows powershell
+    .\venv\Scripts\Activate.ps1
+    
+    # install dependencies
     pip install -r requirements.txt
+    
+    # execute random example
     python examples\read_and_plot.py
 
 ## Running the tests
