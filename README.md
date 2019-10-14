@@ -1,4 +1,7 @@
 # Vallen AE Python Tools
+
+[![Build Status](https://travis-ci.org/vallen-systems/pyVallenAE.svg?branch=master)](https://travis-ci.org/vallen-systems/pyVallenAE)
+
 Python tools to extract and analyze data from Vallen Systeme database files, e.g. files like sample.pridb or sample.tradb.
 
 ## Playing around
