@@ -3,8 +3,6 @@ language: python
 python:
   - "3.6"
   - "3.7"
-  - "pypy-3.6"
-  - "pypy-3.7"
 before_install:
   - sudo apt-get update
   - sudo apt-get install -y libsndfile1
