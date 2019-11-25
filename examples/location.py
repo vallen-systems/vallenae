@@ -11,7 +11,7 @@ from numpy.linalg import norm
 from numpy import arange
 from scipy.optimize import differential_evolution
 import time
-import vallenae.core as vae
+import vallenae as vae
 import xml.etree.ElementTree as ElementTree
 
 

@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 import matplotlib.pyplot as plt
 import matplotlib
-import vallenae.core as vae
+import vallenae as vae
 import vallenae.helper as vh
 
 # Set this to false in order to look a little
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     ax.plot(xs, ys1)
     plt.title("Transient Wave Plot From FLAC BLOB; TRAI=" + str(tra_idx))
     plt.show()
-    vh.save_figure(THIS_FILE_PATH, "ignore_me_from_flac", "png")
+    vae.helper.save_figure(THIS_FILE_PATH, "ignore_me_from_flac", "png")
     plt.close()
 
     _, ax = plt.subplots()
@@ -43,5 +43,5 @@ if __name__ == "__main__":
     ax.plot(xs, ys2)
     plt.title("Transient Wave Plot From Plain BLOB; TRAI=" + str(tra_idx))
     plt.show()
-    vh.save_figure(THIS_FILE_PATH, "ignore_me_from_plain", "png")
+    vae.helper.save_figure(THIS_FILE_PATH, "ignore_me_from_plain", "png")
     plt.close()

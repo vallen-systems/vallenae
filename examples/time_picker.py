@@ -13,7 +13,7 @@ from numba import jit, f8, i4
 import numpy as np
 from typing import Tuple
 import time
-import vallenae.core as vae
+import vallenae as vae
 
 # Set this to false in order to look a little
 # longer at the popup plots:
