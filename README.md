@@ -2,30 +2,26 @@
 
 [![Build Status](https://travis-ci.org/vallen-systems/pyVallenAE.svg?branch=master)](https://travis-ci.org/vallen-systems/pyVallenAE)
 
-Python tools to extract and analyze data from Vallen Systeme database files, e.g. files like sample.pridb or sample.tradb.
+Python tools to extract and analyze Acoustic Emission measurement data:
 
-## Playing around
-Setup a virutal invironment, install the dependencies and run some
-samples like this:
+- vallenae.**io**: Reading (and writing) of Vallen Systeme SQLite database files (*.pridb, *.tradb, *.trfdb)
+- vallenae.**features**: Extraction of Acoustic Emission features
+- vallenae.**timepicker**: Timepicking algorithms for arrival time estimations
 
-    # install venv
-    python -m venv env # use python3 if python is mapped to python2
-    
-    # activate env
-    # linux
-    source env/bin/activate
-    # windows cmd
-    .\env\scripts\activate.bat
-    # windows powershell
-    .\venv\Scripts\Activate.ps1
-    
-    # install dependencies
-    pip install -r requirements.txt
-    
-    # execute random example
-    python examples\read_and_plot.py
+## Documentation
 
-## Running the tests
-Simply type this in the root directory:
+See https://pyvallenae.readthedocs.io/en/latest/ for a complete reference manual and examples.
 
-    pytest
+## Installation
+
+Install the latest version for PyPI:
+
+```
+pip install vallenae
+```
+
+Alternatively, you can download or clone the repository and install it with pip:
+```
+git clone https://github.com/vallen-systems/pyVallenAE.git
+pip install -e pyVallenAE
+```
