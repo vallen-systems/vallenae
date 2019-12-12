@@ -1,6 +1,0 @@
-numpy
-matplotlib
-pandas
-soundfile
-numba
-scipy

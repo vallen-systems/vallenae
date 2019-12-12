@@ -1,9 +1,24 @@
 [MESSAGES CONTROL]
-disable=bad-continuation, # code style by black
-        missing-module-docstring,
-        missing-function-docstring
+disable = 
+    bad-continuation, # code style by black
+    missing-module-docstring,
+    missing-function-docstring,
 
 [FORMAT]
-good-names=i,j,k,
-           sr, # sample rate
-           e # catch exceptions
+max-line-length = 100
+good-names = 
+    logger,
+    i, j, k, n, m,
+    t, f,
+    x, y,
+    sr,  # sample rate
+    ax,  # matplotlib axes
+    df,  # pandas dataframe
+    e,  # catch exceptions
+    T,  # typing generics (TypeVar)
+
+[DESIGN]
+max-attributes = 10
+
+[SIMILARITIES]
+min-similarity-lines = 5
