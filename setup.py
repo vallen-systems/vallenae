@@ -26,7 +26,7 @@ EXTRAS_REQUIRE = {
     ],
     "tests": [
         "pytest",
-        "pytest-cov",
+        "coverage<5.0",
     ],
 }
 

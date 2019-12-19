@@ -1,12 +1,13 @@
 [MESSAGES CONTROL]
-disable = 
+disable =
+    import-error,  # run without install in tox
     bad-continuation, # code style by black
     missing-module-docstring,
     missing-function-docstring,
 
 [FORMAT]
 max-line-length = 100
-good-names = 
+good-names =
     logger,
     i, j, k, n, m,
     t, f,
