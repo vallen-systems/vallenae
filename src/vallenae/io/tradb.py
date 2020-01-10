@@ -56,10 +56,13 @@ class TraDatabase(Database):
 
     def read(self, **kwargs) -> pd.DataFrame:
         """
-        Read hits to Pandas DataFrame.
+        Read transient data to Pandas DataFrame.
 
         Args:
             **kwargs: Arguments passed to `iread`
+
+        Returns:
+            Pandas DataFrame with transient data
         """
         return iter_to_dataframe(
             self.iread(**kwargs), desc="Tra", index_column="trai",
