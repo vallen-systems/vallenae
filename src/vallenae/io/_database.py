@@ -46,7 +46,7 @@ class Database:
         self._connection = sqlite3.connect(
             "file:{:s}?mode={:s}".format(self._filename, "ro" if readonly else "rw"),
             uri=True,
-            check_same_thread=(False if readonly else True),
+            check_same_thread=(not readonly),  # allow multithreading only for readonly access
         )
         self._connected = True
 
