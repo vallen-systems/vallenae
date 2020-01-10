@@ -1,10 +1,9 @@
-from typing import Union, Sequence, Dict, Tuple
+from typing import Union, Sequence
 import pandas as pd
 
 from .types import SizedIterable
 from .datatypes import FeatureRecord
-from ._database import Database, require_write_access
-from ._dataframe import iter_to_dataframe
+from ._database import Database
 from ._sql import query_conditions, QueryIterable
 
 
@@ -33,7 +32,7 @@ class TrfDatabase(Database):
 
         Args:
             trai: Read data by TRAI (transient recorder index)
-        
+
         Returns:
             Pandas DataFrame with features
         """
