@@ -167,7 +167,7 @@ def create_new_database(filename: str, schema: str):
         con.executescript(schema)
 
 
-def insert_query_from_dict(table: str, row_dict: Dict[str, Any]):
+def insert_query_from_dict(table: str, row_dict: Dict[str, Any]) -> str:
     # drop columns with None values
     row_dict = {k: v for k, v in row_dict.items() if v is not None}
 
