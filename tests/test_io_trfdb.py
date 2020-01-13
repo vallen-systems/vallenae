@@ -1,7 +1,9 @@
+import os
 from pathlib import Path
 import pytest
 
 import vallenae as vae
+from vallenae.io import FeatureRecord, create_empty_trfdb
 
 STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"
 SAMPLE_TRFDB = STEEL_PLATE_DIR / "sample.trfdb"
@@ -32,14 +34,29 @@ def fixture_sample_trfdb() -> vae.io.TrfDatabase:
         yield trfdb
 
 
+@pytest.fixture(name="fresh_trfdb")
+def fixture_fresh_trfdb() -> vae.io.TrfDatabase:
+    filename = "test.trfdb"
+    create_empty_trfdb(filename)
+    trfdb = vae.io.TrfDatabase(filename, readonly=False)
+    yield trfdb
+    trfdb.close()
+    os.remove(filename)
+
+
 def test_read(sample_trfdb):
     df = sample_trfdb.read()
     assert set(df.columns) == {"FR", "Dur", "FFT_CoG", "CTP", "RT", "FFT_FoM", "FI", "PA"}
     print(sample_trfdb.read(trai=(1, 2)))
     print(sample_trfdb.columns())
-    assert False
+    # assert False
 
 # def test_iread(sample_trfdb):
 #     for x in sample_trfdb.iread():
 #         print(x)
 #     assert False
+
+def test_write(fresh_trfdb):
+    fresh_trfdb.write(FeatureRecord(trai=0, features={"Test": 11}))
+    fresh_trfdb.write(FeatureRecord(trai=0, features={"Test": 11}))
+    assert False
