@@ -167,13 +167,17 @@ def create_new_database(filename: str, schema: str):
         con.executescript(schema)
 
 
+def remove_none_values_from_dict(dictionary: Dict[Any, Any]):
+    """Helper function to remove None values from dict."""
+    return {k: v for k, v in dictionary.items() if v is not None}
+
+
 def insert_query_from_dict(table: str, row_dict: Dict[str, Any]) -> str:
-    # drop columns with None values
-    row_dict = {k: v for k, v in row_dict.items() if v is not None}
+    row_dict = remove_none_values_from_dict(row_dict)
+    columns = [*row_dict]  # unpacking faster than list(row_dict.keys())
 
     # generate query
     # e.g.: INSERT INTO ae_data (SetID, Time, Channel) VALUES (:SetID, :Time, :Channel)
-    columns = [*row_dict]  # unpacking faster than list(row_dict.keys())
     query = "INSERT INTO {table} ({columns}) VALUES ({placeholder})".format(
         table=table,
         columns=", ".join(columns),
@@ -185,9 +189,39 @@ def insert_query_from_dict(table: str, row_dict: Dict[str, Any]) -> str:
 def insert_from_dict(
     connection: sqlite3.Connection,
     table: str,
-    row_dict: Dict[str, Any]
+    row_dict: Dict[str, Any],
 ) -> int:
-    """INSERT dict of column names -> values in SQLite table."""
+    """INSERT row for given dict of column names -> values in SQLite table."""
     query = insert_query_from_dict(table, row_dict)
+    cur = connection.execute(query, row_dict)
+    return cur.lastrowid
+
+
+def update_query_from_dict(table: str, row_dict: Dict[str, Any], key_column: str):
+    row_dict = remove_none_values_from_dict(row_dict)
+    columns = [*row_dict]
+    try:
+        columns.remove(key_column)
+    except:
+        raise ValueError(f"Argument key_column '{key_column}' must be a key of row_dict")
+
+    # generate query
+    # e.g.: UPDATE ae_data SET Time = :Time, Channel = :Channel WHERE SetID == :SetID
+    query = "UPDATE {table} SET {set} WHERE {condition}".format(
+        table=table,
+        set=", ".join([f"{col} = :{col}" for col in columns]),
+        condition=f"{key_column} == :{key_column}",
+    )
+    return query
+
+
+def update_from_dict(
+    connection: sqlite3.Connection,
+    table: str,
+    row_dict: Dict[str, Any],
+    key_column: str,
+) -> int:
+    """UPDATE row for given key and dict of column names -> values in SQLite table."""
+    query = update_query_from_dict(table, row_dict, key_column)
     cur = connection.execute(query, row_dict)
     return cur.lastrowid
