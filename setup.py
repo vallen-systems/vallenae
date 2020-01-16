@@ -9,7 +9,7 @@ with open(path.join(HERE, "README.md"), encoding="utf-8") as f:
 INSTALL_REQUIRES = [
     "numpy",
     "scipy",
-    "pandas",
+    "pandas>=0.24",
     "matplotlib",
     "soundfile",
     "numba",
