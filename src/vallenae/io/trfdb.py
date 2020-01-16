@@ -10,6 +10,7 @@ from ._sql import (
     query_conditions,
     QueryIterable,
     insert_from_dict,
+    update_from_dict,
     create_new_database,
 )
 
@@ -44,7 +45,9 @@ class TrfDatabase(Database):
             Pandas DataFrame with features
         """
         query = "SELECT * FROM trf_data " + query_conditions(isin={"TRAI": trai})
-        return pd.read_sql(query, self.connection(), index_col="TRAI")
+        df = pd.read_sql(query, self.connection(), index_col="TRAI")
+        df.index.name = "trai"  # TRAI -> trai, as with pridb and tradb
+        return df
 
     def iread(
         self, *, trai: Union[None, int, Sequence[int]] = None
@@ -80,15 +83,13 @@ class TrfDatabase(Database):
                 return insert_from_dict(con, self._table_main, row_dict)
             except sqlite3.IntegrityError:  # UNIQUE constraint, TRAI already exists
                 # update instead
-                print("UPDATE...")
-                raise
+                return update_from_dict(con, self._table_main, row_dict, "TRAI")
         except sqlite3.OperationalError:  # missing column
             columns_expected = set(row_dict.keys())
             columns_create = columns_expected - set(self.columns())
             for column in columns_create:
                 con.execute(f"ALTER TABLE {self._table_main} ADD COLUMN {column} REAL")
-            return self.write(feature_set)
-
+            return self.write(feature_set)  # try again
 
 
 def create_empty_trfdb(filename: str):
