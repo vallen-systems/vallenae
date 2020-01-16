@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 import pytest
+from numpy import int64, float64, dtype
+from pandas import Int64Dtype
 
 import vallenae as vae
 from vallenae.io import HitRecord, MarkerRecord, ParametricRecord, StatusRecord
@@ -111,6 +113,13 @@ def test_read_markers(sample_pridb):
 
     assert len(markers) == len(LABELS_EXPECTED)
     assert markers.index.name == "set_id"
+    assert markers.index.dtype == int64
+    assert dict(markers.dtypes) == {
+        "time": float64,
+        "set_type": Int64Dtype(),
+        "number": Int64Dtype(),
+        "data": dtype("O"),
+    }
 
     labels = list(markers["data"])
     assert labels == LABELS_EXPECTED
@@ -145,6 +154,25 @@ def test_read_hits(sample_pridb):
 
     assert len(hits) == len(HITS_EXPECTED)
     assert hits.index.name == "set_id"
+    assert hits.index.dtype == int64
+    assert dict(hits.dtypes) == {
+        "time": float64,
+        "channel": Int64Dtype(),
+        "param_id": Int64Dtype(),
+        "threshold": float64,
+        "amplitude": float64,
+        "rise_time": float64,
+        "cascade_counts": Int64Dtype(),
+        "cascade_energy": float64,
+        "cascade_hits": Int64Dtype(),
+        "cascade_signal_strength": float64,
+        "counts": Int64Dtype(),
+        "duration": float64,
+        "energy": float64,
+        "rms": float64,
+        "signal_strength": float64,
+        "trai": Int64Dtype(),
+    }
 
 
 def test_iread_parametric(sample_pridb):
@@ -173,6 +201,42 @@ def test_read_parametric(sample_pridb):
 
     assert len(param) == len(PARAMETRIC_EXPECTED)
     assert param.index.name == "set_id"
+    assert param.index.dtype == int64
+    assert dict(param.dtypes) == {
+        "param_id": Int64Dtype(),
+        "time": float64,
+        "param_id": Int64Dtype(),
+        "pctd": Int64Dtype(),
+        "pcta": Int64Dtype(),
+    }
+
+
+def test_read(sample_pridb):
+    df = sample_pridb.read()
+
+    assert df.index.name == "set_id"
+    assert df.index.dtype == int64
+    assert dict(df.dtypes) == {
+        "set_type": int64,
+        "time": float64,
+        "channel": Int64Dtype(),
+        "param_id": Int64Dtype(),
+        "threshold": float64,
+        "amplitude": float64,
+        "rise_time": float64,
+        "cascade_counts": Int64Dtype(),
+        "cascade_energy": float64,
+        "cascade_hits": Int64Dtype(),
+        "cascade_signal_strength": float64,
+        "counts": Int64Dtype(),
+        "duration": float64,
+        "energy": float64,
+        "rms": float64,
+        "signal_strength": float64,
+        "trai": Int64Dtype(),
+        "pctd": Int64Dtype(),
+        "pcta": Int64Dtype(),
+    }
 
 
 def test_write_readonly(sample_pridb):
