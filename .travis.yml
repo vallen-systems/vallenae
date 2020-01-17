@@ -2,25 +2,16 @@ dist: bionic
 
 language: python
 
-matrix:
-  include:
-    - python: 3.7
-      env: TOXENV=pylint
-    - python: 3.7
-      env: TOXENV=mypy
-    - python: 3.6
-      env: TOXENV=py36
-    - python: 3.7
-      env: TOXENV=py37
-    - python: 3.7
-      env: TOXENV=coveralls
+python:
+  - "3.6"
+  - "3.7"
 
 before_install:
   - sudo apt-get update
   - sudo apt-get install -y libsndfile1
 
 install:
-  - pip install tox
+  - pip install tox-travis
 
 script:
   - tox
