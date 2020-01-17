@@ -63,8 +63,8 @@ def query_conditions(
             if value is None:
                 continue
             if isinstance(value, str):
-                value = "'{:s}'".format(value)  # add quotation marks
-            cond.append("{:s} {:s} {}".format(key, comp_operator, value))
+                value = f"'{value}'"  # add quotation marks
+            cond.append(f"{key} {comp_operator} {value}")
 
     return "WHERE " + " AND ".join(cond) if cond else ""
 
@@ -93,7 +93,7 @@ def read_sql_generator(
 
 
 def count_sql_results(connection: sqlite3.Connection, query: str) -> int:
-    count_query = "SELECT COUNT(*) FROM ({:s})".format(query)
+    count_query = f"SELECT COUNT(*) FROM ({query})"
     cur = connection.execute(count_query)
     return cur.fetchone()[0]
 
@@ -122,17 +122,15 @@ def sql_binary_search(
 
     def get_value(index):
         cur = connection.execute(
-            "SELECT {:s} FROM {:s} WHERE {:s} == {:d}".format(
-                col_value, table, col_index, index
-            )
+            f"SELECT {col_value} FROM {table} WHERE {col_index} == {index}"
         )
         return cur.fetchone()[0]
 
     i_min = connection.execute(
-        "SELECT MIN({:s}) FROM {:s}".format(col_index, table)
+        f"SELECT MIN({col_index}) FROM {table}"
     ).fetchone()[0]
     i_max = connection.execute(
-        "SELECT MAX({:s}) FROM {:s}".format(col_index, table)
+        f"SELECT MAX({col_index}) FROM {table}"
     ).fetchone()[0]
 
     while True:
@@ -162,7 +160,7 @@ def create_new_database(filename: str, schema: str):
 
     # open database in read-write-create mode
     with contextlib.closing(
-        sqlite3.connect("file:{:s}?mode=rwc".format(filename), uri=True)
+        sqlite3.connect(f"file:{filename}?mode=rwc", uri=True)
     ) as con:
         con.executescript(schema)
 

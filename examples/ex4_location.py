@@ -144,7 +144,7 @@ def main():
         mutation=1.3,
     )
     end = time.perf_counter()
-    print("Runtime for 1 call to differential_evolution(): {:0.4} s".format(end - start))
+    print(f"Runtime for 1 call to differential_evolution(): {(end - start):0.4} s")
     print(location_result)
 
     # Plot location result
@@ -161,7 +161,7 @@ def main():
 
     # Plot sensor positions
     for channel, (x, y) in pos_dict.items():
-        text = "S{:d} (x={:0.2f}m | y={:0.2f}m)".format(channel, x, y)
+        text = f"S{channel} (x={x:0.2f}m | y={y:0.2f}m)"
         plt.scatter(x, y, marker="o", color="w")
         plt.text(x + text_delta_x, y + text_delta_y, text, fontsize=9, color="w")
 
