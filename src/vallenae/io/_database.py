@@ -46,7 +46,6 @@ class Database:
         self._connection = sqlite3.connect(
             "file:{:s}?mode={:s}".format(self._filename, "ro" if readonly else "rw"),
             uri=True,
-            check_same_thread=(not readonly),  # allow multithreading only for readonly access
         )
         self._connected = True
 
@@ -138,7 +137,7 @@ class Database:
             self.connection().execute(
                 """
                 UPDATE {prefix}_globalinfo
-                SET Value = (SELECT MAX(rowid) FROM {prefix}_data)
+                SET Value = (SELECT MAX(SetID) FROM {prefix}_data)
                 WHERE Key == "ValidSets"
                 """.format(prefix=self._table_prefix)
             )
