@@ -65,7 +65,7 @@ def fixture_signal_tradb_flac() -> vae.io.PriDatabase:
 
 
 @pytest.fixture(name="fresh_tradb")
-def fixture_fresh_tradb() -> vae.io.PriDatabase:
+def fixture_fresh_tradb() -> vae.io.TraDatabase:
     filename = "test.tradb"
     create_empty_tradb(filename)
     tradb = vae.io.TraDatabase(filename, readonly=False)
