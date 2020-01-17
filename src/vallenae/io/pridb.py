@@ -69,9 +69,6 @@ class PriDatabase(Database):
 
         Args:
             **kwargs: Arguments passed to `iread_hits`
-
-        Returns:
-            Pandas DataFrame with hit data
         """
         return iter_to_dataframe(
             self.iread_hits(**kwargs), desc="Hits", index_column="set_id",
@@ -83,9 +80,6 @@ class PriDatabase(Database):
 
         Args:
             **kwargs: Arguments passed to `iread_markers`
-
-        Returns:
-            Pandas DataFrame with marker data
         """
         return iter_to_dataframe(
             self.iread_markers(**kwargs), desc="Marker", index_column="set_id",
@@ -97,9 +91,6 @@ class PriDatabase(Database):
 
         Args:
             **kwargs: Arguments passed to `iread_parametric`
-
-        Returns:
-            Pandas DataFrame with parametric data
         """
         return iter_to_dataframe(
             self.iread_parametric(**kwargs), desc="Parametric", index_column="set_id",
@@ -111,9 +102,6 @@ class PriDatabase(Database):
 
         Args:
             **kwargs: Arguments passed to `iread_status`
-
-        Returns:
-            Pandas DataFrame with status data
         """
         return iter_to_dataframe(
             self.iread_status(**kwargs), desc="Status", index_column="set_id",
@@ -396,7 +384,6 @@ class PriDatabase(Database):
         Todo:
             Status flag
         """
-        parameter = self._parameter(parametric.param_id)
         return insert_from_dict(
             self.connection(),
             self._table_main,
@@ -407,8 +394,6 @@ class PriDatabase(Database):
                 "ParamID": parametric.param_id,
                 "PCTD": parametric.pctd,
                 "PCTA": parametric.pcta,
-                "PA0": int(parametric.pa0 / parameter["PA0_mV"]) if parametric.pa0 else None,
-                "PA1": int(parametric.pa1 / parameter["PA1_mV"]) if parametric.pa1 else None,
             },
         )
 
