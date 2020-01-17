@@ -34,7 +34,7 @@ EXTRAS_REQUIRE["dev"] = EXTRAS_REQUIRE["tests"] + EXTRAS_REQUIRE["docs"]
 
 setup(
     name="vallenae",
-    version="0.1.0",
+    version="0.1",
     description="Extract and analyze Acoustic Emission measurement data",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
