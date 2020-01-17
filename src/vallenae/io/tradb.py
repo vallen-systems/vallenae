@@ -1,5 +1,6 @@
 from typing import Set, Optional, Union, Tuple, Sequence
 from pathlib import Path
+from functools import lru_cache
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -16,10 +17,9 @@ from ._sql import (
 from .compression import encode_data_blob
 from .datatypes import TraRecord
 from .types import SizedIterable
-from .._cache import cache
 
 
-@cache()
+@lru_cache(maxsize=32, typed=True)
 def _create_time_vector(
     samples: int, samplerate: int, pretrigger: int = 0
 ) -> np.ndarray:
