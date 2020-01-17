@@ -87,13 +87,9 @@ class PriDatabase(Database):
         Returns:
             Pandas DataFrame with marker data
         """
-        df = iter_to_dataframe(
+        return iter_to_dataframe(
             self.iread_markers(**kwargs), desc="Marker", index_column="set_id",
         )
-        # set column dtypes
-        df.number = df.number.astype(pd.Int64Dtype())
-        df.data = df.data.astype(str)
-        return df
 
     def read_parametric(self, **kwargs) -> pd.DataFrame:
         """
@@ -150,22 +146,9 @@ class PriDatabase(Database):
         # drop additional marker columns
         df_markers.drop(columns=["number", "data"], inplace=True)
 
-        # dict to restore original data types
-        dtypes = {
-            **dict(df_hits.dtypes),
-            **dict(df_markers.dtypes),
-            **dict(df_parametric.dtypes),
-            **dict(df_status.dtypes),
-        }
-
-        # concat all dataframes, restore types and sort by index
-        df = (
-            pd.concat(
-                [df_markers, df_hits, df_status, df_parametric], sort=False, copy=False
-            )
-            .apply(lambda x: x.astype(dtypes[x.name]))
-            .sort_index()
-            .rename_axis(df_hits.index.name)
+        # concat all dataframes
+        df = pd.concat(
+            [df_markers, df_hits, df_status, df_parametric], sort=False, copy=False
         )
         return df
 
