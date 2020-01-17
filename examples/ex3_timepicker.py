@@ -44,7 +44,7 @@ def plot(t, y, y_picker, index_picker, name_picker):
     ax1.tick_params(axis="y", labelcolor="g")
 
     ax2 = ax1.twinx()
-    ax2.set_ylabel(f"{name_picker}", color="r")
+    ax2.set_ylabel("{:s}".format(name_picker), color="r")
     ax2.plot(t, y_picker, color="r")
     ax2.tick_params(axis="y", labelcolor="r")
 
@@ -106,7 +106,7 @@ timer_results = {
 }
 
 for name, time in timer_results.items():
-    print(f"{name}: {time:0.3f} µs")
+    print("{:s}: {:0.3f} µs".format(name, time))
 
 plt.figure(figsize=(8, 3), tight_layout=True)
 plt.bar(timer_results.keys(), timer_results.values())

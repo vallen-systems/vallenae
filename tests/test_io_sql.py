@@ -20,7 +20,7 @@ def fixture_memory_abc():
     # add 10 rows of dummy data
     for i in range(10):
         con.execute(
-            f"INSERT INTO abc (a, b, c) VALUES ({i}, {10 + i}, {20 + i})"
+            "INSERT INTO abc (a, b, c) VALUES ({:d}, {:d}, {:d})".format(i, 10 + i, 20 + i)
         )
     yield con
     con.close()

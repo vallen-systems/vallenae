@@ -32,9 +32,9 @@ def check_monotonic_time(func):
         max_time = get_max_time(self)
         if record.time < max_time:
             raise ValueError(
-                (
-                    f"Time column has to be monotonic increasing."
-                    f"Time of current / last row: {record.time} / {max_time} s"
+                "Time column has to be monotonic increasing. \
+                 Time of current / last row: {:0.2f} / {:0.2f} s".format(
+                    record.time, max_time
                 )
             )
         return func(self, record, *args, **kwargs)

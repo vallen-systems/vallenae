@@ -44,7 +44,7 @@ All database classes implement two different interfaces to access data:
 
     >>> pridb = vae.io.PriDatabase("./examples/steel_plate/sample.pridb")
     >>> for hit in pridb.iread_hits():
-    ...     print(f"time: {hit.time:0.4f}, channel: {hit.channel}")
+    ...     print("time: {:0.4f}, channel: {:d}".format(hit.time, hit.channel))
     ...
     time: 3.9928,   channel: 3
     time: 3.9928,   channel: 2

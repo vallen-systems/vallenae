@@ -37,15 +37,14 @@ class Database:
             file_ext = Path(self._filename).suffix[1:]
             if file_ext.lower() != required_file_ext.lower():
                 raise ValueError(
-                    f"File extension '{file_ext}' must match '{required_file_ext}'"
+                    "File extension '{:s}' must match '{:s}'".format(
+                        file_ext, required_file_ext,
+                    )
                 )
 
         self._connected: bool = False
         self._connection = sqlite3.connect(
-            "file:{filename}?mode={mode}".format(
-                filename=self._filename,
-                mode="ro" if readonly else "rw",
-            ),
+            "file:{:s}?mode={:s}".format(self._filename, "ro" if readonly else "rw"),
             uri=True,
             check_same_thread=(not readonly),  # allow multithreading only for readonly access
         )
@@ -62,15 +61,14 @@ class Database:
             )
 
         self._table_prefix: str = table_prefix
-        self._table_main: str = f"{table_prefix}_data"
-        self._table_fieldinfo: str = f"{table_prefix}_fieldinfo"
-        self._table_globalinfo: str = f"{table_prefix}_globalinfo"
-        self._table_params: str = f"{table_prefix}_params"
+        self._table_main: str = "{:s}_data".format(table_prefix)
+        self._table_globalinfo: str = "{:s}_globalinfo".format(table_prefix)
+        self._table_params: str = "{:s}_params".format(table_prefix)
 
         # check if main table (<prefix>_data) exists
         if self._table_main not in self.tables():
             raise ValueError(
-                f"Main table '{self._table_main}' does not exist in database"
+                "Main table '{:s}' does not exist in database".format(self._table_main)
             )
 
     @property
@@ -102,14 +100,14 @@ class Database:
     def rows(self) -> int:
         """Number of rows in data table."""
         con = self.connection()
-        cur = con.execute(f"SELECT COUNT(*) FROM {self._table_main}")
+        cur = con.execute("SELECT COUNT(*) FROM {:s}".format(self._table_main))
         return cur.fetchone()[0]
 
     def columns(self) -> Tuple[str, ...]:
         """Columns of data table."""
         con = self.connection()
         # empty dummy query
-        cur = con.execute(f"SELECT * FROM {self._table_main} LIMIT 0")
+        cur = con.execute("SELECT * FROM {:s} LIMIT 0".format(self._table_main))
         return tuple(str(column[0]) for column in cur.description)
 
     def tables(self) -> Set[str]:
@@ -127,7 +125,7 @@ class Database:
             except SyntaxError:
                 return str(value)
         con = self.connection()
-        cur = con.execute(f"SELECT Key, Value FROM {self._table_globalinfo}")
+        cur = con.execute("SELECT Key, Value FROM {:s}".format(self._table_globalinfo))
         return {
             row[0]: try_convert_string(str(row[1])) for row in cur.fetchall()
         }
@@ -158,7 +156,7 @@ class Database:
         def parameter_by_id():
             for row in read_sql_generator(
                 self.connection(),
-                f"SELECT * FROM {self._table_params}",
+                "SELECT * FROM {:s}".format(self._table_params),
             ):
                 param_id = row.pop("ID")
                 yield (param_id, row)
@@ -170,7 +168,9 @@ class Database:
             return self._parameter_table()[param_id]
         except KeyError:
             raise ValueError(
-                f"Parameter ID {param_id} not found in {self._table_params}"
+                "Parameter ID {:d} not found in {:s}".format(
+                    param_id, self._table_params
+                )
             )
 
     def close(self):

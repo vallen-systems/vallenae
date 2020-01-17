@@ -109,7 +109,7 @@ def test_write(fresh_trfdb):
     def get_by_trai(trai):
         gen = read_sql_generator(
             fresh_trfdb.connection(),
-            f"SELECT * FROM trf_data WHERE TRAI == {trai}",
+            "SELECT * FROM trf_data WHERE TRAI == {:d}".format(trai),
         )
         return list(gen)[0]
 
