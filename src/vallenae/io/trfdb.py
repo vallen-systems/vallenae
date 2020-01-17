@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Union, Sequence
+from typing import Union, Sequence, Set
 import sqlite3
 import pandas as pd
 
@@ -64,6 +64,12 @@ class TrfDatabase(Database):
         query = "SELECT * FROM trf_data " + query_conditions(isin={"TRAI": trai})
         return QueryIterable(self.connection(), query, FeatureRecord.from_sql)
 
+    def _add_columns(self, columns: Union[Set[str], Sequence[str]], dtype: str = "REAL"):
+        con = self.connection()
+        columns_create = set(columns) - set(self.columns())
+        for column in columns_create:
+            con.execute(f"ALTER TABLE {self._table_main} ADD COLUMN {column} {dtype}")
+
     @require_write_access
     def write(self, feature_set: FeatureRecord) -> int:
         """
@@ -84,11 +90,8 @@ class TrfDatabase(Database):
             except sqlite3.IntegrityError:  # UNIQUE constraint, TRAI already exists
                 # update instead
                 return update_from_dict(con, self._table_main, row_dict, "TRAI")
-        except sqlite3.OperationalError:  # missing column
-            columns_expected = set(row_dict.keys())
-            columns_create = columns_expected - set(self.columns())
-            for column in columns_create:
-                con.execute(f"ALTER TABLE {self._table_main} ADD COLUMN {column} REAL")
+        except sqlite3.OperationalError:  # missing column(s)
+            self._add_columns(set(row_dict.keys()))
             return self.write(feature_set)  # try again
 
 
