@@ -8,6 +8,8 @@ from vallenae.io._sql import (
     QueryIterable,
     insert_query_from_dict,
     insert_from_dict,
+    update_query_from_dict,
+    update_from_dict,
 )
 
 
@@ -20,7 +22,6 @@ def fixture_memory_abc():
         con.execute(
             "INSERT INTO abc (a, b, c) VALUES ({:d}, {:d}, {:d})".format(i, 10 + i, 20 + i)
         )
-
     yield con
     con.close()
 
@@ -31,6 +32,15 @@ def fixture_memory_id_abc():
     con.execute("CREATE TABLE abc (id INT UNIQUE NOT NULL, a INT, b INT, c INT)")
     yield con
     con.close()
+
+
+def get_row_by_id(connection, table, row_id):
+    cur = connection.execute(f"SELECT * FROM {table} WHERE id == {row_id}")
+    columns = [column[0] for column in cur.description]
+    values = cur.fetchone()
+    if values is None:
+        return None
+    return dict(zip(columns, values))
 
 
 def test_sql_query_conditions():
@@ -133,16 +143,42 @@ def test_insert_query_from_dict():
 
 
 def test_insert_from_dict(memory_id_abc):
-    def get_row_by_id(row_id: int):
-        cur = memory_id_abc.execute("SELECT * FROM abc WHERE id == {:d}".format(row_id))
-        columns = [column[0] for column in cur.description]
-        values = cur.fetchone()
-        return dict(zip(columns, values))
+    row_by_id = lambda row_id: get_row_by_id(memory_id_abc, "abc", row_id)
 
-    insert_from_dict(memory_id_abc, "abc", {"id": 1, "a": 1})
-    insert_from_dict(memory_id_abc, "abc", {"id": 2, "a": 2, "b": 1})
-    insert_from_dict(memory_id_abc, "abc", {"id": 3, "a": 3, "b": 2, "c": 1})
+    assert insert_from_dict(memory_id_abc, "abc", {"id": 1, "a": 1}) == 1
+    assert insert_from_dict(memory_id_abc, "abc", {"id": 2, "a": 2, "b": 1}) == 2
+    assert insert_from_dict(memory_id_abc, "abc", {"id": 3, "a": 3, "b": 2, "c": 1}) == 3
 
-    assert get_row_by_id(1) == {"id": 1, "a": 1, "b": None, "c": None}
-    assert get_row_by_id(2) == {"id": 2, "a": 2, "b": 1, "c": None}
-    assert get_row_by_id(3) == {"id": 3, "a": 3, "b": 2, "c": 1}
+    assert row_by_id(1) == {"id": 1, "a": 1, "b": None, "c": None}
+    assert row_by_id(2) == {"id": 2, "a": 2, "b": 1, "c": None}
+    assert row_by_id(3) == {"id": 3, "a": 3, "b": 2, "c": 1}
+
+    with pytest.raises(sqlite3.OperationalError):
+        insert_from_dict(memory_id_abc, "abc", {"not_existing_column": 111})
+
+
+def test_update_query_from_dict():
+    row_dict = {"a": 1, "b": None, "c": 3, "d": 4}
+    assert update_query_from_dict("abc", row_dict, "a") == "UPDATE abc SET c = :c, d = :d WHERE a == :a"
+
+    with pytest.raises(ValueError):
+        update_query_from_dict("abc", row_dict, "xyz")  # xyz not key of row_dict
+
+
+def test_update_from_dict(memory_id_abc):
+    row_by_id = lambda row_id: get_row_by_id(memory_id_abc, "abc", row_id)
+
+    memory_id_abc.execute("INSERT INTO abc (id, a, b, c) VALUES (1, 11, 22, 33)")
+    assert row_by_id(1) == {"id": 1, "a": 11, "b": 22, "c": 33}
+
+    assert update_from_dict(memory_id_abc, "abc", {"id": 1, "a": 0, "b": 0, "c": 0}, "id") == 1
+    assert row_by_id(1) == {"id": 1, "a": 0, "b": 0, "c": 0}
+
+    assert update_from_dict(memory_id_abc, "abc", {"id": 1, "a": 100}, "id") == 1
+    assert row_by_id(1) == {"id": 1, "a": 100, "b": 0, "c": 0}
+
+    with pytest.raises(ValueError):
+        update_from_dict(memory_id_abc, "abc", {"a": 100}, "id")  # id not in dict
+
+    with pytest.raises(sqlite3.OperationalError):
+        update_from_dict(memory_id_abc, "abc", {"id": 1, "not_existing_column": 111}, "id")
