@@ -16,9 +16,9 @@ CREATE TABLE tr_data (
 );
 
 CREATE TABLE tr_fieldinfo (
-    "field",
-    "Unit",
-    "Parameter"
+    field,
+    Unit,
+    Parameter
 );
 
 CREATE TABLE tr_globalinfo (

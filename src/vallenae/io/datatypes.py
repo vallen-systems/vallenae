@@ -201,19 +201,3 @@ class TraRecord(NamedTuple):
             data=decode_data_blob(row["Data"], row["DataFormat"], row["TR_mV"]),
             trai=row["TRAI"],
         )
-
-
-class FeatureRecord(NamedTuple):
-    """
-    Transient feature record in trfdb.
-    """
-
-    trai: int  #: Transient recorder index
-    features: Dict[str, float]  #: Feature dictionary (feature name -> value)
-
-    @classmethod
-    def from_sql(cls, row: Dict[str, Any]) -> "FeatureRecord":
-        return FeatureRecord(
-            trai=row.pop("TRAI"),
-            features=row,
-        )

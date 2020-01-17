@@ -7,7 +7,7 @@ Read/write Vallen Systeme database and setup files.
 Database classes
 ----------------
 
-Classes to read/write pridb, tradb and trfdb database files.
+Classes to read/write pridb and tradb database files.
 
 .. warning:: Writing is still experimental
 
@@ -16,7 +16,6 @@ Classes to read/write pridb, tradb and trfdb database files.
 
     PriDatabase
     TraDatabase
-    TrfDatabase
 
 All database classes implement two different interfaces to access data:
 
@@ -93,6 +92,5 @@ from .types import *
 from .compression import *
 from .pridb import *
 from .tradb import *
-from .trfdb import *
 
 __all__ = [_ for _ in dir() if not _.startswith("_")]
