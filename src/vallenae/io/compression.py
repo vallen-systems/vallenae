@@ -1,16 +1,6 @@
 import io
 import numpy as np
-
-try:
-    import soundfile as sf
-    _FLAC_CODEC = True
-except OSError:
-    _FLAC_CODEC = False
-
-
-def _check_flac_codec():
-    if not _FLAC_CODEC:
-        raise ValueError("FLAC library not found. Please install libsndfile.")
+import soundfile as sf
 
 
 def decode_data_blob(
@@ -36,7 +26,6 @@ def decode_data_blob(
         factor = 1e-3 * factor_millivolts
         return np.multiply(data, factor, dtype=np.float32)
     if data_format == 2:  # flac
-        _check_flac_codec()
         data, _ = sf.read(io.BytesIO(data_blob), dtype=np.float32)
         factor_libsoundfile = 2 ** 15  # libsoundfile normalizes to +-1
         factor = 1e-3 * factor_millivolts * factor_libsoundfile
@@ -70,7 +59,6 @@ def encode_data_blob(
     if data_format == 0:  # uncompressed
         return data_int16.tobytes()
     if data_format == 2:  # flac
-        _check_flac_codec()
         buffer = io.BytesIO()
         sf.write(buffer, data_int16, 1, format="FLAC")  # samplerate = 1
         return buffer.getvalue()
