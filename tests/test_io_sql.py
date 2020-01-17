@@ -6,9 +6,9 @@ from vallenae.io._sql import (
     count_sql_results,
     read_sql_generator,
     QueryIterable,
-    insert_query_from_dict,
+    generate_insert_query,
     insert_from_dict,
-    update_query_from_dict,
+    generate_update_query,
     update_from_dict,
 )
 
@@ -134,12 +134,9 @@ def test_query_iterable(memory_abc):
         assert row == (index, 10 + index, 20 + index)
 
 
-def test_insert_query_from_dict():
-    row_dict = {"a": 1, "b": 2, "c": 3}
-    assert insert_query_from_dict("abc", row_dict) == "INSERT INTO abc (a, b, c) VALUES (:a, :b, :c)"
-
-    row_dict = {"a": 1, "b": None, "c": 3}
-    assert insert_query_from_dict("abc", row_dict) == "INSERT INTO abc (a, c) VALUES (:a, :c)"
+def test_generate_insert_query():
+    assert generate_insert_query("abc", ("a")) == "INSERT INTO abc (a) VALUES (:a)"
+    assert generate_insert_query("abc", ("a", "b", "c")) == "INSERT INTO abc (a, b, c) VALUES (:a, :b, :c)"
 
 
 def test_insert_from_dict(memory_id_abc):
@@ -157,12 +154,12 @@ def test_insert_from_dict(memory_id_abc):
         insert_from_dict(memory_id_abc, "abc", {"not_existing_column": 111})
 
 
-def test_update_query_from_dict():
-    row_dict = {"a": 1, "b": None, "c": 3, "d": 4}
-    assert update_query_from_dict("abc", row_dict, "a") == "UPDATE abc SET c = :c, d = :d WHERE a == :a"
+def test_generate_update_query():
+    assert generate_update_query("abc", ("a", "b"), "a") == "UPDATE abc SET b = :b WHERE a == :a"
+    assert generate_update_query("abc", ("a", "b", "c"), "a") == "UPDATE abc SET b = :b, c = :c WHERE a == :a"
 
     with pytest.raises(ValueError):
-        update_query_from_dict("abc", row_dict, "xyz")  # xyz not key of row_dict
+        generate_update_query("abc", ("a"), "xyz")  # xyz not a column
 
 
 def test_update_from_dict(memory_id_abc):

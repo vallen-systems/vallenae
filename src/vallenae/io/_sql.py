@@ -1,6 +1,7 @@
 import contextlib
 import sqlite3
-from typing import Dict, Optional, Union, Sequence, Iterator, Any, TypeVar, Callable
+from functools import lru_cache
+from typing import Dict, Optional, Union, Sequence, Iterator, Any, TypeVar, Callable, Tuple
 from pathlib import Path
 
 from .types import SizedIterable
@@ -170,12 +171,21 @@ def remove_none_values_from_dict(dictionary: Dict[Any, Any]):
     return {k: v for k, v in dictionary.items() if v is not None}
 
 
-def insert_query_from_dict(table: str, row_dict: Dict[str, Any]) -> str:
-    row_dict = remove_none_values_from_dict(row_dict)
-    columns = [*row_dict]  # unpacking faster than list(row_dict.keys())
+@lru_cache(maxsize=128, typed=True)
+def generate_insert_query(table: str, columns: Tuple[str, ...]) -> str:
+    """
+    Generate INSERT query with named placeholders.
 
-    # generate query
-    # e.g.: INSERT INTO ae_data (SetID, Time, Channel) VALUES (:SetID, :Time, :Channel)
+    e.g.: INSERT INTO ae_data (SetID, Time, Channel) VALUES (:SetID, :Time, :Channel)
+
+    Args:
+        table: Table name
+        columns: Tuple of column names
+            (must be of type tuple to be hashable for caching)
+
+    Returns:
+        Query string with named placeholders
+    """
     query = "INSERT INTO {table} ({columns}) VALUES ({placeholder})".format(
         table=table,
         columns=", ".join(columns),
@@ -190,24 +200,38 @@ def insert_from_dict(
     row_dict: Dict[str, Any],
 ) -> int:
     """INSERT row for given dict of column names -> values in SQLite table."""
-    query = insert_query_from_dict(table, row_dict)
+    row_dict = remove_none_values_from_dict(row_dict)
+    columns = tuple(row_dict.keys())
+    query = generate_insert_query(table, columns)
     cur = connection.execute(query, row_dict)
     return cur.lastrowid
 
 
-def update_query_from_dict(table: str, row_dict: Dict[str, Any], key_column: str):
-    row_dict = remove_none_values_from_dict(row_dict)
-    columns = [*row_dict]
+@lru_cache(maxsize=128, typed=True)
+def generate_update_query(table: str, columns: Tuple[str, ...], key_column: str) -> str:
+    """
+    Generate UPDATE query with named placeholders.
+
+    e.g.: UPDATE ae_data SET Time = :Time, Channel = :Channel WHERE SetID == :SetID
+
+    Args:
+        table: Table name
+        columns: Tuple of column names
+            (must be of type tuple to be hashable for caching)
+        key_column: Column name for WHERE clause
+
+    Returns:
+        Query string with named placeholders
+    """
+    columns_list = list(columns)
     try:
-        columns.remove(key_column)
+        columns_list.remove(key_column)
     except:
         raise ValueError(f"Argument key_column '{key_column}' must be a key of row_dict")
 
-    # generate query
-    # e.g.: UPDATE ae_data SET Time = :Time, Channel = :Channel WHERE SetID == :SetID
     query = "UPDATE {table} SET {set} WHERE {condition}".format(
         table=table,
-        set=", ".join([f"{col} = :{col}" for col in columns]),
+        set=", ".join([f"{col} = :{col}" for col in columns_list]),
         condition=f"{key_column} == :{key_column}",
     )
     return query
@@ -220,6 +244,8 @@ def update_from_dict(
     key_column: str,
 ) -> int:
     """UPDATE row for given key and dict of column names -> values in SQLite table."""
-    query = update_query_from_dict(table, row_dict, key_column)
+    row_dict = remove_none_values_from_dict(row_dict)
+    columns = tuple(row_dict.keys())
+    query = generate_update_query(table, columns, key_column)
     cur = connection.execute(query, row_dict)
     return cur.lastrowid
