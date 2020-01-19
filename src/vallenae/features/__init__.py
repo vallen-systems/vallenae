@@ -37,6 +37,5 @@ Conversion
 
 from .acoustic_emission import *
 from .conversion import *
-from .spectral import *
 
 __all__ = [_ for _ in dir() if not _.startswith("_")]
