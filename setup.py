@@ -10,11 +10,10 @@ INSTALL_REQUIRES = [
     "numpy",
     "scipy",
     "pandas>=0.24",
-    "matplotlib",
     "soundfile",
     "numba",
     "tqdm",
-    "typing-extensions",
+    "typing_extensions",
 ]
 
 EXTRAS_REQUIRE = {
@@ -23,6 +22,7 @@ EXTRAS_REQUIRE = {
         "sphinx-autodoc-typehints",
         "sphinx-rtd-theme",
         "sphinx-gallery",
+        "matplotlib",  # used in examples
     ],
     "tests": [
         "pytest",
@@ -44,7 +44,6 @@ setup(
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Science/Research",
-        "Intended Audience :: Customer Service",
         "Topic :: Scientific/Engineering",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
@@ -56,7 +55,7 @@ setup(
     keywords="vallen acoustic-emission amsy sqlite pridb tradb",
     packages=find_packages("src"),
     package_dir={"": "src"},
-    python_requires=">=3.5",
+    python_requires=">=3.6",
     install_requires=INSTALL_REQUIRES,
     extras_require=EXTRAS_REQUIRE,
     package_data={
