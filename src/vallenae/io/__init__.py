@@ -71,6 +71,7 @@ row dictionary (column name: value).
     StatusRecord
     ParametricRecord
     TraRecord
+    FeatureRecord
 
 Compression
 -----------
