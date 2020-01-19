@@ -1,9 +1,9 @@
 # Vallen AE Python Tools
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/vallen-systems/pyVallenAE.svg?branch=master)](https://travis-ci.org/vallen-systems/pyVallenAE)
-[![Coverage Status](https://coveralls.io/repos/github/vallen-systems/pyVallenAE/badge.svg?branch=dev)](https://coveralls.io/github/vallen-systems/pyVallenAE)
 [![Documentation Status](https://readthedocs.org/projects/pyvallenae/badge/?version=latest)](https://pyvallenae.readthedocs.io/en/latest/?badge=latest)
+[![Coverage Status](https://coveralls.io/repos/github/vallen-systems/pyVallenAE/badge.svg?branch=dev)](https://coveralls.io/github/vallen-systems/pyVallenAE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 Python tools to extract and analyze Acoustic Emission measurement data:
@@ -18,7 +18,7 @@ See https://pyvallenae.readthedocs.io/en/latest/ for a complete reference manual
 
 ## Installation
 
-Install the latest version for PyPI:
+Install the latest version from PyPI:
 
 ```
 pip install vallenae
