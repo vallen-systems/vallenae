@@ -73,6 +73,9 @@ class Database:
                 f"Main table '{self._table_main}' does not exist in database"
             )
 
+        # cached results
+        self._parameter_table_cached: Dict[int, Dict[str, Any]] = {}
+
     @property
     def filename(self) -> str:
         """Filename of database."""
@@ -162,7 +165,10 @@ class Database:
             ):
                 param_id = row.pop("ID")
                 yield (param_id, row)
-        return dict(parameter_by_id())
+
+        if not self._parameter_table_cached:
+            self._parameter_table_cached = dict(parameter_by_id())
+        return self._parameter_table_cached
 
     def _parameter(self, param_id: int) -> Dict[str, Any]:
         """Read parameters from *_params by ID."""
