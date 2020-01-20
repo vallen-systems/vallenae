@@ -359,3 +359,10 @@ def test_check_monotonic_time(fresh_pridb):
     fresh_pridb.write_marker(generate_marker(1.0))
     with pytest.raises(ValueError):
         fresh_pridb.write_marker(generate_marker(0.9))
+
+
+def test_read_empty_pridb(fresh_pridb):
+    # dtype conversion might fail because of missing columns
+    df = fresh_pridb.read()
+    assert len(df) == 0
+    assert list(df.columns) == []

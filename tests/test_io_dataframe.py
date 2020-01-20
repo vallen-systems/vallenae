@@ -1,7 +1,7 @@
 import pandas as pd
 from numpy import dtype
 
-from vallenae.io._dataframe import convert_to_nullable_types
+from vallenae.io._dataframe import _convert_to_nullable_types
 
 
 def test_convert_to_nullable_types():
@@ -21,7 +21,7 @@ def test_convert_to_nullable_types():
         dtype("bool"),
     ]
 
-    df_converted = convert_to_nullable_types(df)
+    df_converted = _convert_to_nullable_types(df)
 
     assert list(df_converted.dtypes) == [
         pd.Int32Dtype(),

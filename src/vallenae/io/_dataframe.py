@@ -1,24 +1,24 @@
 from typing import Optional, Tuple
 import pandas as pd
-from numpy import int32, int64
 from tqdm import tqdm
 
 from .types import SizedIterable
 
 
-def convert_to_nullable_types(df: pd.DataFrame):
-    df_convert = df
-
-    def convert_column(column, dtype):
-        df_convert[column] = df_convert[column].astype(dtype)
-
-    for name, dtype in dict(df.dtypes).items():
-        if dtype == int32:
-            convert_column(name, pd.Int32Dtype())
-        elif dtype == int64:
-            convert_column(name, pd.Int64Dtype())
-
-    return df_convert
+def _convert_to_nullable_types(df: pd.DataFrame):
+    # types not hashable -> use str repr
+    dtype_mapping = {
+        "int32": pd.Int32Dtype(),
+        "int64": pd.Int64Dtype(),
+    }
+    return df.apply(
+        lambda x: x.astype(
+            dtype_mapping.get(
+                str(x.dtype),  # try get new dtype
+                x.dtype,  # return original dtype if key not found
+            )
+        )
+    )
 
 
 def iter_to_dataframe(
@@ -45,5 +45,5 @@ def iter_to_dataframe(
         df = df.dropna(axis="columns", how="all")  # drop empty columns
         if index_column is not None:
             df = df.set_index(index_column)
-    df = convert_to_nullable_types(df)
+    df = _convert_to_nullable_types(df)
     return df
