@@ -1,8 +1,10 @@
+import os
 from pathlib import Path
 import sqlite3
 import pytest
 
 from vallenae.io._database import Database
+from vallenae.io.pridb import create_empty_pridb
 
 
 STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"
@@ -22,6 +24,17 @@ def fixture_sample_tradb():
     database = Database(TRADB_FILE_PATH, table_prefix="tr")
     yield database
     database.close()
+
+
+@pytest.fixture(name="empty_pridb")
+def fixture_empty_pridb():
+    filename = "test.pridb"
+    try:
+        create_empty_pridb(filename)
+        with Database(filename, table_prefix="ae", readonly=False) as db:
+            yield db
+    finally:
+        os.remove(filename)
 
 
 def test_init():
@@ -140,3 +153,54 @@ def test_parameter(sample_pridb):
         sample_pridb._parameter(0)
     with pytest.raises(ValueError):
         sample_pridb._parameter(6)
+
+
+def test_fieldinfo_tradb(sample_tradb):
+    result = sample_tradb.fieldinfo()
+
+    assert list(result.keys()) == ["Time", "Thr", "SampleRate", "Data"]
+
+    assert result["Time"] == {"Unit": "[s]", "Parameter": None}
+    assert result["Thr"] == {"Unit": "[µV]", "Parameter": "ADC_µV"}
+    assert result["SampleRate"] == {"Unit": "[Hz]", "Parameter": None}
+    assert result["Data"] == {"Unit": None, "Parameter": "TR_mV"}
+
+
+def test_fieldinfo_mixed_types(sample_pridb):
+    result = sample_pridb.fieldinfo()
+
+    assert result["Dur"] == {
+        "Unit": "[µs]",
+        "SetTypes": 4,
+        "Parameter": None,
+        "Factor": 0.1,
+    }
+
+
+def test_write_fieldinfo(empty_pridb):
+    def assert_unique_fields():
+        con = empty_pridb.connection()
+        cur = con.execute("SELECT COUNT(field), COUNT(DISTINCT(field)) FROM ae_fieldinfo")
+        total, distinct = cur.fetchone()
+        assert total == distinct
+
+    assert empty_pridb.fieldinfo() == {}
+
+    # insert
+    empty_pridb.write_fieldinfo("Time", {"Unit": "[µs]"})
+    assert empty_pridb.fieldinfo()["Time"]["Unit"] == "[µs]"
+    assert_unique_fields()
+
+    # update
+    empty_pridb.write_fieldinfo("Time", {"Unit": "[s]"})
+    assert empty_pridb.fieldinfo()["Time"]["Unit"] == "[s]"
+    assert_unique_fields()
+
+    # write new column
+    empty_pridb.write_fieldinfo("Time", {"XYZ": 11})
+    assert empty_pridb.fieldinfo()["Time"]["XYZ"] == 11
+    assert_unique_fields()
+
+    # try write field, that doesn't correspond to column in data table
+    with pytest.raises(ValueError):
+        empty_pridb.write_fieldinfo("NotAColumn", {"Unit": "[Hz]"})
