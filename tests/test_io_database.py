@@ -1,26 +1,25 @@
-import os
+from pathlib import Path
 import sqlite3
 import pytest
 
 from vallenae.io._database import Database
 
 
-THIS_FILE_PATH = os.path.dirname(os.path.realpath(__file__))
-STEEL_PLATE_DIR = os.path.join(THIS_FILE_PATH, "../examples/steel_plate")
-PRI_FILE_PATH = os.path.join(STEEL_PLATE_DIR, "sample.pridb")
-TRA_FILE_PATH = os.path.join(STEEL_PLATE_DIR, "sample.tradb")
+STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"
+PRIDB_FILE_PATH = STEEL_PLATE_DIR / "sample.pridb"
+TRADB_FILE_PATH = STEEL_PLATE_DIR / "sample.tradb"
 
 
 @pytest.fixture(name="sample_pridb")
 def fixture_sample_pridb():
-    database = Database(PRI_FILE_PATH, table_prefix="ae")
+    database = Database(PRIDB_FILE_PATH, table_prefix="ae")
     yield database
     database.close()
 
 
 @pytest.fixture(name="sample_tradb")
 def fixture_sample_tradb():
-    database = Database(TRA_FILE_PATH, table_prefix="tr")
+    database = Database(TRADB_FILE_PATH, table_prefix="tr")
     yield database
     database.close()
 
@@ -31,7 +30,7 @@ def test_init():
         Database("file_does_not_exist.database", table_prefix="ae")
 
     # open existing database
-    database = Database(PRI_FILE_PATH, table_prefix="ae")
+    database = Database(PRIDB_FILE_PATH, table_prefix="ae")
     assert database.connected
     database.close()
     assert not database.connected
@@ -39,11 +38,11 @@ def test_init():
 
     # require file extension
     with pytest.raises(ValueError):
-        Database(PRI_FILE_PATH, table_prefix="ae", required_file_ext="nonsense")
+        Database(PRIDB_FILE_PATH, table_prefix="ae", required_file_ext="nonsense")
 
 
 def test_context():
-    with Database(PRI_FILE_PATH, table_prefix="ae") as database:
+    with Database(PRIDB_FILE_PATH, table_prefix="ae") as database:
         # check if connection is opened with __enter__
         assert database.connected
     # check if connection is closed with __exit__
@@ -53,7 +52,7 @@ def test_context():
 def test_main_table_not_existing():
     # exception is thrown, if main table doesn"t exist
     with pytest.raises(ValueError):
-        Database(PRI_FILE_PATH, table_prefix="tr")
+        Database(PRIDB_FILE_PATH, table_prefix="tr")
 
 
 def test_tables_pridb(sample_pridb):
