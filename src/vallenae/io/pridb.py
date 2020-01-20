@@ -87,13 +87,16 @@ class PriDatabase(Database):
         Returns:
             Pandas DataFrame with marker data
         """
-        df = iter_to_dataframe(
-            self.iread_markers(**kwargs), desc="Marker", index_column="set_id",
+        dtypes = {
+            "number": pd.Int64Dtype(),
+            "data": str,
+        }
+        return (
+            iter_to_dataframe(
+                self.iread_markers(**kwargs), desc="Marker", index_column="set_id",
+            )
+            .apply(lambda x: x.astype(dtypes.get(x.name, x.dtype)))
         )
-        # set column dtypes
-        df.number = df.number.astype(pd.Int64Dtype())
-        df.data = df.data.astype(str)
-        return df
 
     def read_parametric(self, **kwargs) -> pd.DataFrame:
         """
@@ -143,12 +146,15 @@ class PriDatabase(Database):
 
         # add missing set_types
         column_set_type = 0
-        df_hits.insert(column_set_type, "set_type", 2)
-        df_parametric.insert(column_set_type, "set_type", 1)
-        df_status.insert(column_set_type, "set_type", 3)
+        if not df_hits.empty:
+            df_hits.insert(column_set_type, "set_type", 2)
+        if not df_parametric.empty:
+            df_parametric.insert(column_set_type, "set_type", 1)
+        if not df_status.empty:
+            df_status.insert(column_set_type, "set_type", 3)
 
         # drop additional marker columns
-        df_markers.drop(columns=["number", "data"], inplace=True)
+        df_markers.drop(columns=["number", "data"], inplace=True, errors="ignore")
 
         # dict to restore original data types
         dtypes = {
