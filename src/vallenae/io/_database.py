@@ -1,10 +1,14 @@
 from pathlib import Path
 import sqlite3
 from functools import wraps
-from typing import Optional, Set, Tuple, Dict, Any
+from typing import Optional, Set, Tuple, Dict, Any, Union, Sequence
 from ast import literal_eval
 
-from ._sql import read_sql_generator
+from ._sql import (
+    read_sql_generator,
+    insert_from_dict,
+    update_from_dict,
+)
 
 
 def require_write_access(func):
@@ -121,8 +125,55 @@ class Database:
         tables = {result[0] for result in cur.fetchall()}
         return tables
 
+    def fieldinfo(self) -> Dict[str, Dict[str, Any]]:
+        """
+        Read fieldinfo table.
+
+        The fieldinfo table stores informations about columns of the data table (like units).
+
+        Returns:
+            Dict of column names and informations (again a dict)
+        """
+        con = self.connection()
+        query = f"SELECT * FROM {self._table_fieldinfo}"
+        return {row.pop("field"): row for row in read_sql_generator(con, query)}
+
+    @require_write_access
+    def write_fieldinfo(self, field: str, info: Dict[str, Any]):
+        """
+        Write to fieldinfo table.
+
+        Args:
+            field: Column name of data table
+            info: Dict of properties and values, e.g. {"Unit": "[Hz]"}
+
+        Raises:
+            ValueError: If field is not a column of data table
+        """
+        if field not in self.columns():
+            raise ValueError(f"Field {field} must be a column of data table")
+
+        con = self.connection()
+        def add_columns(columns: Union[str, Set[str], Sequence[str]]):
+            for column in set(columns):
+                try:
+                    con.execute(f"ALTER TABLE {self._table_fieldinfo} ADD COLUMN {column}")
+                except sqlite3.OperationalError:  # duplicate column name
+                    pass
+
+        row_dict = info
+        row_dict["field"] = field
+        try:
+            if field in self.fieldinfo().keys():
+                update_from_dict(con, self._table_fieldinfo, row_dict, "field")
+            else:
+                insert_from_dict(con, self._table_fieldinfo, row_dict)
+        except sqlite3.OperationalError:  # missing column(s)
+            add_columns(set(row_dict.keys()))
+            self.write_fieldinfo(field, info)  # try again
+
     def globalinfo(self) -> Dict[str, Any]:
-        """Content from globalinfo table."""
+        """Read globalinfo table."""
         def try_convert_string(value: str) -> Any:
             try:
                 return literal_eval(value)
