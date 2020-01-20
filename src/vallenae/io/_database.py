@@ -67,11 +67,10 @@ class Database:
         self._table_globalinfo: str = f"{table_prefix}_globalinfo"
         self._table_params: str = f"{table_prefix}_params"
 
-        # check if main table (<prefix>_data) exists
-        if self._table_main not in self.tables():
-            raise ValueError(
-                f"Main table '{self._table_main}' does not exist in database"
-            )
+        # check if required tables exist
+        for table in (self._table_main, self._table_fieldinfo, self._table_globalinfo):
+            if table not in self.tables():
+                raise ValueError(f"Required table {table} not found in database")
 
         # cached results
         self._parameter_table_cached: Dict[int, Dict[str, Any]] = {}
