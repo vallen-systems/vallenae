@@ -197,6 +197,6 @@ def rms(data: np.ndarray) -> float:
         Add exception
 
     References:
-        http://en.wikipedia.org/wiki/Root_mean_square
+        https://en.wikipedia.org/wiki/Root_mean_square
     """
     return math.sqrt(np.sum(data ** 2) / len(data))
