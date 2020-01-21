@@ -102,8 +102,8 @@ def count_sql_results(connection: sqlite3.Connection, query: str) -> int:
 def sql_binary_search(
     connection: sqlite3.Connection,
     table: str,
-    col_value: str,
-    col_index: str,
+    column_value: str,
+    column_index: str,
     fun_compare: Callable[[float], bool],
 ) -> Optional[int]:
     """
@@ -116,30 +116,34 @@ def sql_binary_search(
     Args:
         connection: SQLite connection
         table: Table name
-        col_value: Name of the relevant column, e.g. Time
-        col_index: Name of the index column
+        column_value: Name of the sorted column, e.g. Time
+        column_index: Name of the indexed column
         fun_compare: Lambda function of the condition, e.g. `lambda t: t > 10` (Time > 10)
     """
 
     def get_value(index):
         cur = connection.execute(
-            f"SELECT {col_value} FROM {table} WHERE {col_index} == {index}"
+            f"SELECT {column_value} FROM {table} WHERE {column_index} == {index}"
         )
         return cur.fetchone()[0]
 
     i_min = connection.execute(
-        f"SELECT MIN({col_index}) FROM {table}"
+        f"SELECT MIN({column_index}) FROM {table}"
     ).fetchone()[0]
     i_max = connection.execute(
-        f"SELECT MAX({col_index}) FROM {table}"
+        f"SELECT MAX({column_index}) FROM {table}"
     ).fetchone()[0]
 
     while True:
-        c_min = fun_compare(get_value(i_min))
-        c_max = fun_compare(get_value(i_max))
+        v_min = get_value(i_min)
+        v_max = get_value(i_max)
+        if v_min > v_max:
+            raise ValueError(f"Value column {column_value} not sorted")
+        c_min = fun_compare(v_min)
+        c_max = fun_compare(v_max)
 
         if c_min and c_max:
-            return None  # condition true for both limits
+            return i_min  # condition true for both limits, return smaller index
         if not c_min and not c_max:
             return None  # condition false for both limits
 
