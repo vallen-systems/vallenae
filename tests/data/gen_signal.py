@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import numpy as np
 
 SIGNALFILE = Path(__file__).resolve().parent / "signal.txt"

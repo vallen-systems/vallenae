@@ -1,17 +1,12 @@
 import math
 from pathlib import Path
+
 import numpy as np
-from numpy.testing import assert_allclose
 import pytest
+from numpy.testing import assert_allclose
 
 from vallenae.io import TraDatabase
-from vallenae.timepicker import (
-    hinkley,
-    aic,
-    energy_ratio,
-    modified_energy_ratio,
-)
-
+from vallenae.timepicker import aic, energy_ratio, hinkley, modified_energy_ratio
 
 STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"
 SAMPLE_TRADB = STEEL_PLATE_DIR / "sample.tradb"

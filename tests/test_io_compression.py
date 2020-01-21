@@ -1,5 +1,5 @@
-import pytest
 import numpy as np
+import pytest
 from numpy.testing import assert_allclose, assert_array_equal
 
 from vallenae.io import decode_data_blob, encode_data_blob

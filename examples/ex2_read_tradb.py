@@ -4,10 +4,10 @@ Read and plot transient data
 """
 
 import os
+
 import matplotlib.pyplot as plt
 
 import vallenae as vae
-
 
 HERE = os.path.dirname(__file__) if "__file__" in locals() else os.getcwd()
 TRADB = os.path.join(HERE, "steel_plate/sample_plain.tradb")  # uncompressed

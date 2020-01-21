@@ -1,7 +1,9 @@
 import math
 from typing import Tuple
+
 import numpy as np
 from numba import njit
+
 
 @njit
 def hinkley(arr: np.ndarray, alpha: int = 5) -> Tuple[np.ndarray, int]:

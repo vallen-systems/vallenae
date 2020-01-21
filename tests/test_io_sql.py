@@ -1,16 +1,17 @@
 import sqlite3
 from math import sin
+
 import pytest
 
 from vallenae.io._sql import (
-    query_conditions,
-    count_sql_results,
-    read_sql_generator,
     QueryIterable,
-    sql_binary_search,
+    count_sql_results,
     generate_insert_query,
-    insert_from_dict,
     generate_update_query,
+    insert_from_dict,
+    query_conditions,
+    read_sql_generator,
+    sql_binary_search,
     update_from_dict,
 )
 

@@ -1,6 +1,7 @@
-from typing import Set, Optional, Union, Tuple, Sequence
-from pathlib import Path
 from functools import lru_cache
+from pathlib import Path
+from typing import Optional, Sequence, Set, Tuple, Union
+
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -9,10 +10,10 @@ from ._database import Database, require_write_access
 from ._dataframe import iter_to_dataframe
 from ._sql import (
     QueryIterable,
+    create_new_database,
+    insert_from_dict,
     query_conditions,
     sql_binary_search,
-    insert_from_dict,
-    create_new_database,
 )
 from .compression import encode_data_blob
 from .datatypes import TraRecord

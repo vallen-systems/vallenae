@@ -1,13 +1,13 @@
 import os
 from pathlib import Path
+
 import numpy as np
-from numpy.testing import assert_allclose
 import pytest
+from numpy.testing import assert_allclose
 
 import vallenae as vae
 from vallenae.io import TraRecord
 from vallenae.io.tradb import create_empty_tradb
-
 
 STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"
 SAMPLE_TRADB = STEEL_PLATE_DIR / "sample.tradb"

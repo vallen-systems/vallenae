@@ -3,19 +3,19 @@ Localisation
 ============
 """
 
+import math
 import os
 import time
-import math
-from typing import Dict, Tuple, Optional
 import xml.etree.ElementTree as ElementTree
+from typing import Dict, Optional, Tuple
+
 import matplotlib.pyplot as plt
 import numpy as np
-from numba import njit, f8
+from numba import f8, njit
 from numpy.linalg import norm
 from scipy.optimize import differential_evolution
 
 import vallenae as vae
-
 
 HERE = os.path.dirname(__file__) if "__file__" in locals() else os.getcwd()
 SETUP = os.path.join(HERE, "steel_plate/sample.vaex")

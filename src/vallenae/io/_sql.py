@@ -1,15 +1,12 @@
 import contextlib
 import sqlite3
 from functools import lru_cache
-from typing import Dict, Optional, Union, Sequence, Iterator, Any, TypeVar, Callable, Tuple
 from pathlib import Path
+from typing import Any, Callable, Dict, Iterator, Optional, Sequence, Tuple, TypeVar, Union
 
 from .types import SizedIterable
 
-
 T = TypeVar("T")
-
-
 class QueryIterable(SizedIterable[T]):
     """Sized iterable to query results from SQLite as dictionaries."""
 

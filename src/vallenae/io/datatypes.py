@@ -1,4 +1,5 @@
-from typing import NamedTuple, Optional, Dict, Any
+from typing import Any, Dict, NamedTuple, Optional
+
 import numpy as np
 
 from .compression import decode_data_blob
