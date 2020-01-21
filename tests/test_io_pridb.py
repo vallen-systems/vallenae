@@ -71,23 +71,22 @@ def fixture_sample_pridb() -> vae.io.PriDatabase:
 @pytest.fixture(name="fresh_pridb")
 def fixture_fresh_pridb() -> vae.io.PriDatabase:
     filename = "test.pridb"
-    create_empty_pridb(filename)
-    pridb = vae.io.PriDatabase(filename, readonly=False)
-    # add parameter
-    con = pridb.connection()
-    con.execute(
-        """
-        INSERT INTO ae_params (
-            ID, SetupID, Chan, ADC_µV, ADC_TE, ADC_SS
-        ) VALUES (
-            1, 1, 1, 1, 1, 1
-        )
-        """
-    )
-    assert pridb.rows() == 0
-    yield pridb
-    pridb.close()
-    os.remove(filename)
+    try:
+        create_empty_pridb(filename)
+        with vae.io.PriDatabase(filename, readonly=False) as pridb:
+            con = pridb.connection()
+            con.execute(
+                """
+                INSERT INTO ae_params (
+                    ID, SetupID, Chan, ADC_µV, ADC_TE, ADC_SS
+                ) VALUES (
+                    1, 1, 1, 1, 1, 1
+                )
+                """
+            )
+            yield pridb
+    finally:
+        os.remove(filename)
 
 
 def test_init():

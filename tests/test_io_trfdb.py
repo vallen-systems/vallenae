@@ -75,11 +75,12 @@ def fixture_sample_trfdb() -> vae.io.TrfDatabase:
 @pytest.fixture(name="fresh_trfdb")
 def fixture_fresh_trfdb() -> vae.io.TrfDatabase:
     filename = "test.trfdb"
-    create_empty_trfdb(filename)
-    trfdb = vae.io.TrfDatabase(filename, readonly=False)
-    yield trfdb
-    trfdb.close()
-    os.remove(filename)
+    try:
+        create_empty_trfdb(filename)
+        with vae.io.TrfDatabase(filename, readonly=False) as trfdb:
+            yield trfdb
+    finally:
+        os.remove(filename)
 
 
 def test_iread(sample_trfdb):
