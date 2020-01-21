@@ -239,7 +239,7 @@ class TraDatabase(Database):
 
 def create_empty_tradb(filename: str):
     file_schema = Path(__file__).resolve().parent / "schema_templates/tradb.sql"
-    with open(file_schema, "r") as file:
+    with open(file_schema, "r", encoding="utf-8") as file:
         schema = file.read()
     schema = schema.format(timebase=int(1e7))  # fill placeholder / constants
     create_new_database(filename, schema)

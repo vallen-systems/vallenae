@@ -92,6 +92,6 @@ class TrfDatabase(Database):
 
 def create_empty_trfdb(filename: str):
     file_schema = Path(__file__).resolve().parent / "schema_templates/trfdb.sql"
-    with open(file_schema, "r") as file:
+    with open(file_schema, "r", encoding="utf-8") as file:
         schema = file.read()
     create_new_database(filename, schema)
