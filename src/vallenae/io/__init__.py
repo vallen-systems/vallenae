@@ -89,11 +89,11 @@ Following functions convert between BLOBs and arrays of voltage values.
 
 # flake8: noqa
 
-from .datatypes import *
-from .types import *
 from .compression import *
+from .datatypes import *
 from .pridb import *
 from .tradb import *
 from .trfdb import *
+from .types import *
 
 __all__ = [_ for _ in dir() if not _.startswith("_")]

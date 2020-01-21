@@ -1,19 +1,14 @@
 from functools import wraps
-from typing import Set, Optional, Union, Sequence
 from pathlib import Path
+from typing import Optional, Sequence, Set, Union
+
 import pandas as pd
 
 from ._database import Database, require_write_access
 from ._dataframe import iter_to_dataframe
-from ._sql import (
-    QueryIterable,
-    query_conditions,
-    create_new_database,
-    insert_from_dict,
-)
+from ._sql import QueryIterable, create_new_database, insert_from_dict, query_conditions
 from .datatypes import HitRecord, MarkerRecord, ParametricRecord, StatusRecord
 from .types import SizedIterable
-
 
 RecordType = Union[HitRecord, MarkerRecord, ParametricRecord, StatusRecord]
 

@@ -1,22 +1,22 @@
 import random
 from typing import Optional, Tuple
-import pytest
+
 import numpy as np
+import pytest
 from scipy import stats
 
 from vallenae.features import (
     amplitude_to_db,
+    counts,
     db_to_amplitude,
+    energy,
+    first_threshold_crossing,
+    is_above_threshold,
     peak_amplitude,
     peak_amplitude_index,
-    is_above_threshold,
-    first_threshold_crossing,
     rise_time,
-    energy,
     signal_strength,
-    counts,
 )
-
 
 LEN: int = 100
 SAMPLERATES: Tuple[int] = (1, 10, int(1e6))

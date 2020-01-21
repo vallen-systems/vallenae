@@ -1,11 +1,11 @@
 import os
-from pathlib import Path
 import sqlite3
+from pathlib import Path
+
 import pytest
 
 from vallenae.io._database import Database
 from vallenae.io.pridb import create_empty_pridb
-
 
 STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"
 PRIDB_FILE_PATH = STEEL_PLATE_DIR / "sample.pridb"

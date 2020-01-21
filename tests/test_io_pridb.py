@@ -1,13 +1,13 @@
 import os
 from pathlib import Path
+
 import pytest
-from numpy import int64, float64, dtype
+from numpy import dtype, float64, int64
 from pandas import Int64Dtype
 
 import vallenae as vae
 from vallenae.io import HitRecord, MarkerRecord, ParametricRecord, StatusRecord
 from vallenae.io.pridb import create_empty_pridb
-
 
 STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"
 PRIDB_FILE_PATH = STEEL_PLATE_DIR / "sample.pridb"

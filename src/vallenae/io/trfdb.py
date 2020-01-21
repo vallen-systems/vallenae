@@ -1,18 +1,19 @@
-from pathlib import Path
-from typing import Union, Sequence
 import sqlite3
+from pathlib import Path
+from typing import Sequence, Union
+
 import pandas as pd
 
-from .types import SizedIterable
-from .datatypes import FeatureRecord
 from ._database import Database, require_write_access
 from ._sql import (
-    query_conditions,
     QueryIterable,
-    insert_from_dict,
-    update_from_dict,
     create_new_database,
+    insert_from_dict,
+    query_conditions,
+    update_from_dict,
 )
+from .datatypes import FeatureRecord
+from .types import SizedIterable
 
 
 class TrfDatabase(Database):

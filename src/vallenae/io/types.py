@@ -1,6 +1,6 @@
-from typing import TypeVar, Generic, Iterator
-from typing_extensions import Protocol
+from typing import Generic, Iterator, TypeVar
 
+from typing_extensions import Protocol
 
 T = TypeVar("T", covariant=True)
 class SizedIterable(Protocol, Generic[T]):  # noqa: E302

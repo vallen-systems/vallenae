@@ -1,14 +1,10 @@
-from pathlib import Path
 import sqlite3
-from functools import wraps
-from typing import Optional, Set, Tuple, Dict, Any, Union, Sequence
 from ast import literal_eval
+from functools import wraps
+from pathlib import Path
+from typing import Any, Dict, Optional, Sequence, Set, Tuple, Union
 
-from ._sql import (
-    read_sql_generator,
-    insert_from_dict,
-    update_from_dict,
-)
+from ._sql import insert_from_dict, read_sql_generator, update_from_dict
 
 
 def require_write_access(func):

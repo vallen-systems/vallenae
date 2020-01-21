@@ -7,6 +7,8 @@ For more informations, please refer to the functions documentation (`vallenae.ti
 """
 
 import os
+import time
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -90,7 +92,6 @@ plot(t, y, mer_arr, mer_index, "Modified Energy Ratio")
 # To compare the performance to a native or numpy implementation,
 # the average of multiple executions should be compared.
 
-import time
 
 def timeit(callable, loops=100):
     time_start = time.perf_counter()
