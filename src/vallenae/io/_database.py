@@ -111,12 +111,30 @@ class Database:
         cur = con.execute(f"SELECT COUNT(*) FROM {self._table_main}")
         return cur.fetchone()[0]
 
+    def _columns(self, table: str) -> Tuple[str, ...]:
+        """Columns of specified table."""
+        con = self.connection()
+        cur = con.execute(f"SELECT * FROM {table} LIMIT 0")  # empty dummy query
+        return tuple(str(column[0]) for column in cur.description)
+
     def columns(self) -> Tuple[str, ...]:
         """Columns of data table."""
+        return self._columns(self._table_main)
+
+    @require_write_access
+    def _add_columns(
+        self,
+        table: str,
+        columns: Union[str, Set[str], Sequence[str]],
+        dtype: Optional[str] = None,
+    ):
+        """Add columns to specified table."""
+        if dtype is None:
+            dtype = ""
         con = self.connection()
-        # empty dummy query
-        cur = con.execute(f"SELECT * FROM {self._table_main} LIMIT 0")
-        return tuple(str(column[0]) for column in cur.description)
+        columns_create = set(columns) - set(self._columns(table))
+        for column in columns_create:
+            con.execute(f"ALTER TABLE {table} ADD COLUMN {column} {dtype}")
 
     def tables(self) -> Set[str]:
         """Get table names."""
@@ -154,13 +172,6 @@ class Database:
             raise ValueError(f"Field {field} must be a column of data table")
 
         con = self.connection()
-        def add_columns(columns: Union[str, Set[str], Sequence[str]]):
-            for column in set(columns):
-                try:
-                    con.execute(f"ALTER TABLE {self._table_fieldinfo} ADD COLUMN {column}")
-                except sqlite3.OperationalError:  # duplicate column name
-                    pass
-
         row_dict = info
         row_dict["field"] = field
         try:
@@ -169,7 +180,7 @@ class Database:
             else:
                 insert_from_dict(con, self._table_fieldinfo, row_dict)
         except sqlite3.OperationalError:  # missing column(s)
-            add_columns(set(row_dict.keys()))
+            self._add_columns(self._table_fieldinfo, set(row_dict.keys()))
             self.write_fieldinfo(field, info)  # try again
 
     def globalinfo(self) -> Dict[str, Any]:
