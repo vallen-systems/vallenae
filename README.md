@@ -14,7 +14,7 @@ Python tools to extract and analyze Acoustic Emission measurement data:
 
 ## Documentation
 
-See https://pyvallenae.readthedocs.io/en/latest/ for a complete reference manual and examples.
+For full documentation and examples, please visit http://pyvallenae.rtfd.io.
 
 ## Installation
 
@@ -24,8 +24,31 @@ Install the latest version from PyPI:
 pip install vallenae
 ```
 
-Alternatively, you can download or clone the repository and install it with pip:
+Please note, that `vallenae` requires Python 3.6 or newer. On Linux systems, `pip` is usually mapped to Python 2, so use `pip<version>` (e.g. `pip3` or `pip3.7`) instead. Alternatively, you can run `pip` from your specific Python version with `python<version> -m pip`.
+
+## Contributing
+
+Feature requests, bug reports and fixes are always welcome!
+
+After cloning the repository, you can easily install the development environment and tools 
+([pylint](https://www.pylint.org), [mypy](http://mypy-lang.org), [pytest](https://pytest.org), [tox](https://tox.readthedocs.io))
+with:
+
 ```
 git clone https://github.com/vallen-systems/pyVallenAE.git
-pip install -e pyVallenAE
+cd pyVallenAE
+pip install -e .[dev]
+```
+
+And run the test suite with tox:
+
+```
+tox
+```
+
+The documentation is built with [sphinx](https://www.sphinx-doc.org):
+
+```
+cd docs
+sphinx-build . _build
 ```

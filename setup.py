@@ -28,9 +28,14 @@ EXTRAS_REQUIRE = {
         "pytest",
         "coverage<5.0",
     ],
+    "tools": [
+        "tox",
+        "pylint",
+        "mypy",
+    ]
 }
 
-EXTRAS_REQUIRE["dev"] = EXTRAS_REQUIRE["tests"] + EXTRAS_REQUIRE["docs"]
+EXTRAS_REQUIRE["dev"] = EXTRAS_REQUIRE["docs"] + EXTRAS_REQUIRE["tests"] + EXTRAS_REQUIRE["tools"]
 
 setup(
     name="vallenae",
