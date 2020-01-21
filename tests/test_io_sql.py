@@ -1,4 +1,5 @@
 import sqlite3
+from math import sin
 import pytest
 
 from vallenae.io._sql import (
@@ -6,6 +7,7 @@ from vallenae.io._sql import (
     count_sql_results,
     read_sql_generator,
     QueryIterable,
+    sql_binary_search,
     generate_insert_query,
     insert_from_dict,
     generate_update_query,
@@ -119,6 +121,45 @@ def test_read_sql_generator(memory_abc):
         assert row_dict["a"] == index
         assert row_dict["b"] == 10 + index
         assert row_dict["c"] == 20 + index
+
+
+def test_sql_binary_search():
+    con = sqlite3.connect(":memory:")
+    con.execute("CREATE TABLE squares (id INTEGER PRIMARY KEY, value REAL)")
+    con.execute("CREATE TABLE consts (id INTEGER PRIMARY KEY, value INT)")
+    con.execute("CREATE TABLE sin (id INTEGER PRIMARY KEY, value REAL)")
+    for i in range(100):
+        con.execute("INSERT INTO squares (id, value) VALUES (?, ?)", (i, i**2))
+        con.execute("INSERT INTO consts (id, value) VALUES (?, ?)", (i, 11))
+        con.execute("INSERT INTO sin (id, value) VALUES (?, ?)", (i, sin(i)))
+
+    # squares table
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 0) == None
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x > 99**2) == None
+
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x > 9) == 4
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 9) == 3
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 9) == 2
+
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x > 256) == 17
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 256) == 16
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 256) == 15
+
+    # consts table
+    assert sql_binary_search(con, "consts", "value", "id", lambda x: x < 11) == None
+    assert sql_binary_search(con, "consts", "value", "id", lambda x: x > 11) == None
+
+    # condition true for all values, expect first matching index (0)
+    assert sql_binary_search(con, "consts", "value", "id", lambda x: x >= 11) == 0
+    assert sql_binary_search(con, "consts", "value", "id", lambda x: x == 11) == 0
+    assert sql_binary_search(con, "consts", "value", "id", lambda x: x <= 11) == 0
+
+    # sin table, not sorted -> expect exception
+    with pytest.raises(ValueError):
+        for limit in (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9):
+            sql_binary_search(con, "sin", "value", "id", lambda x: x >= limit)
+
+    con.close()
 
 
 def test_query_iterable(memory_abc):
