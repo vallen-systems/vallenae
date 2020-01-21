@@ -67,23 +67,22 @@ def fixture_signal_tradb_flac() -> vae.io.PriDatabase:
 @pytest.fixture(name="fresh_tradb")
 def fixture_fresh_tradb() -> vae.io.TraDatabase:
     filename = "test.tradb"
-    create_empty_tradb(filename)
-    tradb = vae.io.TraDatabase(filename, readonly=False)
-    # add parameter
-    con = tradb.connection()
-    con.execute(
-        """
-        INSERT INTO tr_params (
-            ID, SetupID, Chan, ADC_µV, TR_mV
-        ) VALUES (
-            1, 1, 1, 1, 1
-        )
-        """
-    )
-
-    yield tradb
-    tradb.close()
-    os.remove(filename)
+    try:
+        create_empty_tradb(filename)
+        with vae.io.TraDatabase(filename, readonly=False) as tradb:
+            con = tradb.connection()
+            con.execute(
+                """
+                INSERT INTO tr_params (
+                    ID, SetupID, Chan, ADC_µV, TR_mV
+                ) VALUES (
+                    1, 1, 1, 1, 1
+                )
+                """
+            )
+            yield tradb
+    finally:
+        os.remove(filename)
 
 
 def test_init():
