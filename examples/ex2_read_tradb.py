@@ -29,7 +29,7 @@ def main():
     plt.plot(t, y)
     plt.xlabel("Time [µs]")
     plt.ylabel("Amplitude [mV]")
-    plt.title("Transient Wave Plot; TRAI=" + str(TRAI))
+    plt.title(f"Transient Wave Plot; trai = {TRAI}")
     plt.show()
 
 
