@@ -76,8 +76,17 @@ class TrfDatabase(Database):
         Returns:
             Index (trai) of inserted row
         """
+        def convert(value):
+            try:
+                return float(value)
+            except (ValueError, TypeError):
+                return None
+
         con = self.connection()
-        row_dict = feature_set.features
+        row_dict = {
+            key: convert(value)
+            for key, value in feature_set.features.items()
+        }
         row_dict["TRAI"] = feature_set.trai
         try:
             try:
