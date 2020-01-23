@@ -35,6 +35,7 @@ def iter_to_dataframe(
         iterable: Iterable generating `NamedTuple`s
         show_progress: Show progress bar. Default: `True`
         desc: Description shown left to the progress bar
+        index_column: Set column as index. Default: `None`
     Returns:
         Pandas DataFrame
     """

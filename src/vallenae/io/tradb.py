@@ -119,7 +119,7 @@ class TraDatabase(Database):
 
     def read_wave(
         self, trai: int, time_axis: bool = True,
-    ) -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:
+    ) -> Union[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, int]]:
         """
         Read transient signal for a given TRAI (transient recorder index).
 
@@ -159,7 +159,7 @@ class TraDatabase(Database):
         time_axis: bool = True,
         show_progress: bool = True,
         **kwargs,
-    ) -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:
+    ) -> Union[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, int]]:
         """
         Read transient signal of specified channel to a single, continuous array.
 

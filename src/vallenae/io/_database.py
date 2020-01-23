@@ -223,7 +223,7 @@ class Database:
                 f"SELECT * FROM {self._table_params}",
             ):
                 param_id = row.pop("ID")
-                yield (param_id, row)
+                yield param_id, row
 
         if not self._parameter_table_cached:
             self._parameter_table_cached = dict(parameter_by_id())

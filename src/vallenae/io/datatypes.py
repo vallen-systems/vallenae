@@ -36,7 +36,7 @@ class HitRecord(NamedTuple):
     set_id: Optional[int] = None  #: Unique identifier for data set in pridb
     threshold: Optional[float] = None  #: Threshold amplitude in volts
     rise_time: Optional[float] = None  #: Rise time in seconds
-    counts: Optional[int] = None  #: Number of possitive threshold crossings
+    counts: Optional[int] = None  #: Number of positive threshold crossings
     trai: Optional[int] = None  #: Transient recorder index (foreign key between pridb and tradb)
     cascade_hits: Optional[int] = None  #: Total number of hits in the same hit-cascade
     cascade_counts: Optional[int] = None  #: Summed counts of hits in the same hit-cascade
