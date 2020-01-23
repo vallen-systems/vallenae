@@ -218,6 +218,9 @@ class TraDatabase(Database):
 
         Returns:
             Index (SetID) of inserted row
+
+        Todo:
+            Status flag
         """
         # self._validate_and_update_time(tra.time)
         parameter = self._parameter(tra.param_id)
@@ -226,16 +229,16 @@ class TraDatabase(Database):
             self._table_main,
             {
                 "Time": int(tra.time * self._timebase),
-                "Chan": tra.channel,
+                "Chan": int(tra.channel),
                 "Status": 32768,
-                "ParamID": tra.param_id,
-                "Pretrigger": tra.pretrigger,
+                "ParamID": int(tra.param_id),
+                "Pretrigger": int(tra.pretrigger),
                 "Thr": int(tra.threshold * 1e6 / parameter["ADC_µV"]),
-                "SampleRate": tra.samplerate,
-                "Samples": tra.samples,
-                "DataFormat": self._data_format,
+                "SampleRate": int(tra.samplerate),
+                "Samples": int(tra.samples),
+                "DataFormat": int(self._data_format),
                 "Data": encode_data_blob(tra.data, self._data_format, parameter["TR_mV"]),
-                "TRAI": tra.trai,
+                "TRAI": int(tra.trai) if tra.trai else None,
             },
         )
 
