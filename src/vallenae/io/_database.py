@@ -12,7 +12,7 @@ def require_write_access(func):
     def wrapper(self: "Database", *args, **kwargs):
         if self.readonly:
             raise ValueError(
-                "Can not write to database in read-only mode. Open database with readonly=False"
+                "Can not write to database in read-only mode. Open database with mode='rw'"
             )
         return func(self, *args, **kwargs)
     return wrapper
@@ -24,30 +24,32 @@ class Database:
     def __init__(
         self,
         filename: str,
+        mode: str = "ro",
         *,
         table_prefix: str,
-        readonly: bool = True,
         required_file_ext: Optional[str] = None,
     ):
         # forced str conversion (e.g. for pathlib.Path)
         self._filename: str = str(filename)
-        self._readonly: bool = readonly
+
+        # check mode
+        valid_modes = ("ro", "rw", "rwc")
+        if mode not in valid_modes:
+            raise ValueError(f"Invalid access mode '{mode}', use: {valid_modes}")
+        if mode == "rwc":
+            raise NotImplementedError("Database creation not implemented yet")
+        self._readonly: bool = (mode == "ro")
 
         if required_file_ext is not None:
             file_ext = Path(self._filename).suffix[1:]
             if file_ext.lower() != required_file_ext.lower():
-                raise ValueError(
-                    f"File extension '{file_ext}' must match '{required_file_ext}'"
-                )
+                raise ValueError(f"File extension '{file_ext}' must match '{required_file_ext}'")
 
         self._connected: bool = False
         self._connection = sqlite3.connect(
-            "file:{filename}?mode={mode}".format(
-                filename=self._filename,
-                mode="ro" if readonly else "rw",
-            ),
+            f"file:{self._filename}?mode={mode}",
             uri=True,
-            check_same_thread=(not readonly),  # allow multithreading only for readonly access
+            check_same_thread=(not self._readonly),  # allow multithreading in read-only mode
         )
         self._connected = True
 

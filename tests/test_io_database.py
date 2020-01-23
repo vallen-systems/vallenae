@@ -31,7 +31,7 @@ def fixture_empty_pridb():
     filename = "test.pridb"
     try:
         create_empty_pridb(filename)
-        with Database(filename, table_prefix="ae", readonly=False) as db:
+        with Database(filename, mode="rw", table_prefix="ae") as db:
             yield db
     finally:
         os.remove(filename)

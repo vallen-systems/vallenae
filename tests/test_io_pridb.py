@@ -73,7 +73,7 @@ def fixture_fresh_pridb() -> vae.io.PriDatabase:
     filename = "test.pridb"
     try:
         create_empty_pridb(filename)
-        with vae.io.PriDatabase(filename, readonly=False) as pridb:
+        with vae.io.PriDatabase(filename, mode="rw") as pridb:
             con = pridb.connection()
             con.execute(
                 """

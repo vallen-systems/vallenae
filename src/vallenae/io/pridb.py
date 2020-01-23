@@ -39,16 +39,19 @@ def check_monotonic_time(func):
 class PriDatabase(Database):
     """IO Wrapper for pridb database file."""
 
-    def __init__(self, filename: str, *, readonly: bool = True):
+    def __init__(self, filename: str, mode: str = "ro"):
         """
         Open pridb database file.
 
         Args:
             filename: Path to pridb database file
-            readonly: Open database in read-only mode (`True`) or read-write mode (`False`)
+            mode: Define database access:
+                **"ro"** (read-only),
+                **"rw"** (read-write),
+                **"rwc"** (read-write and create empty database if it does not exist)
         """
         super().__init__(
-            filename, table_prefix="ae", readonly=readonly, required_file_ext="pridb",
+            filename, mode=mode, table_prefix="ae", required_file_ext="pridb",
         )
         self._timebase = self.globalinfo()["TimeBase"]
 
