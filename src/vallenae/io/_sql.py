@@ -28,25 +28,30 @@ class QueryIterable(SizedIterable[T]):
             yield self._dict_to_type(row)
 
 
+TIsIn = Dict[str, Union[float, Sequence[float], None]]
+TComparison = Dict[str, Optional[float]]
+
+
 def query_conditions(
     *,
-    isin: Dict[str, Union[float, Sequence[float], None]] = {},
-    equal: Dict[str, Optional[float]] = {},
-    less: Dict[str, Optional[float]] = {},
-    less_equal: Dict[str, Optional[float]] = {},
-    greater: Dict[str, Optional[float]] = {},
-    greater_equal: Dict[str, Optional[float]] = {},
+    isin: Optional[TIsIn] = None,
+    equal: Optional[TComparison] = None,
+    less: Optional[TComparison] = None,
+    less_equal: Optional[TComparison] = None,
+    greater: Optional[TComparison] = None,
+    greater_equal: Optional[TComparison] = None,
 ) -> str:
     cond = []
 
-    for key, values in isin.items():
-        if values is None:
-            continue
-        if not isinstance(values, Sequence):
-            values = (values,)
-        cond.append(
-            "{:s} IN ({:s})".format(key, ", ".join(str(value) for value in values))
-        )
+    if isin is not None:
+        for key, values in isin.items():
+            if values is None:
+                continue
+            if not isinstance(values, Sequence):
+                values = (values,)
+            cond.append(
+                "{:s} IN ({:s})".format(key, ", ".join(str(value) for value in values))
+            )
 
     comparison = {
         "==": equal,
@@ -57,12 +62,13 @@ def query_conditions(
     }
 
     for comp_operator, comp_dict in comparison.items():
-        for key, value in comp_dict.items():
-            if value is None:
-                continue
-            if isinstance(value, str):
-                value = f"'{value}'"  # add quotation marks
-            cond.append(f"{key} {comp_operator} {value}")
+        if comp_dict is not None:
+            for key, value in comp_dict.items():
+                if value is None:
+                    continue
+                if isinstance(value, str):
+                    value = f"'{value}'"  # add quotation marks
+                cond.append(f"{key} {comp_operator} {value}")
 
     return "WHERE " + " AND ".join(cond) if cond else ""
 
@@ -74,8 +80,8 @@ def read_sql_generator(
     Generator to query data from a SQLite connection as a dictionary.
 
     Args:
-        filename: Filename of the database
-        query: SQL Query
+        connection: SQLite3 connection object
+        query: SELECT Query
 
     Yields:
         Row of the query result set as namedtuple
@@ -227,7 +233,7 @@ def generate_update_query(table: str, columns: Tuple[str, ...], key_column: str)
     columns_list = list(columns)
     try:
         columns_list.remove(key_column)
-    except:
+    except ValueError:
         raise ValueError(f"Argument key_column '{key_column}' must be a key of row_dict")
 
     query = "UPDATE {table} SET {set} WHERE {condition}".format(

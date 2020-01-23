@@ -14,7 +14,7 @@ def peak_amplitude(data: np.ndarray) -> float:
         data: Input array
 
     Returns:
-        Peak amplitde of the input array
+        Peak amplitude of the input array
     """
     max_amplitude = 0
     for sample in data:

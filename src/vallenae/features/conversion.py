@@ -20,7 +20,7 @@ def db_to_amplitude(amplitude_db: float, reference: float = 1e-6) -> float:
     Convert amplitude from decibel (dB) to volts.
 
     Args:
-        amplitude: Amplitude in dB
+        amplitude_db: Amplitude in dB
         reference: Reference amplitude. Defaults to 1 µV for dB(AE)
 
     Returns:
