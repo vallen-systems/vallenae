@@ -18,11 +18,6 @@ Acoustic Emission
     counts
     rms
 
-Spectral
------------
-
-.. note:: Work in progress
-
 Conversion
 ----------
 
