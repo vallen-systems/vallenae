@@ -321,18 +321,18 @@ class PriDatabase(Database):
             {
                 "SetType": 2,
                 "Time": int(hit.time * self._timebase),
-                "Chan": hit.channel,
+                "Chan": int(hit.channel),
                 "Status": 0,
-                "ParamID": hit.param_id,
-                "Thr": int(hit.threshold * 1e6 / parameter["ADC_µV"]),
+                "ParamID": int(hit.param_id),
+                "Thr": int(hit.threshold * 1e6 / parameter["ADC_µV"]) if hit.threshold else None,
                 "Amp": int(hit.amplitude * 1e6 / parameter["ADC_µV"]),
-                "RiseT": int(hit.rise_time * self._timebase),
+                "RiseT": int(hit.rise_time * self._timebase) if hit.rise_time else None,
                 "Dur": int(hit.duration * self._timebase),
                 "Eny": int(hit.energy / parameter["ADC_TE"]),
                 "SS": int(hit.signal_strength / parameter["ADC_SS"]),
                 "RMS": int(hit.rms * 1e6 / parameter["ADC_µV"] / 0.0065536),
-                "Counts": hit.counts,
-                "TRAI": hit.trai,
+                "Counts": int(hit.counts) if hit.counts else None,
+                "TRAI": int(hit.trai) if hit.trai else None,
             },
         )
 
@@ -363,7 +363,7 @@ class PriDatabase(Database):
             "ae_markers",
             {
                 "SetID": set_id,
-                "Number": marker.number,
+                "Number": int(marker.number),
                 "Data": marker.data,
             },
         )
@@ -382,6 +382,9 @@ class PriDatabase(Database):
 
         Returns:
             Index (SetID) of inserted row
+
+        Todo:
+            Status flag
         """
         parameter = self._parameter(status.param_id)
         return insert_from_dict(
@@ -390,10 +393,13 @@ class PriDatabase(Database):
             {
                 "SetType": 3,
                 "Time": int(status.time * self._timebase),
-                "Chan": status.channel,
+                "Chan": int(status.channel),
                 "Status": 0,
-                "ParamID": status.param_id,
-                "Thr": int(status.threshold * 1e6 / parameter["ADC_µV"]),
+                "ParamID": int(status.param_id),
+                "Thr": (
+                    int(status.threshold * 1e6 / parameter["ADC_µV"])
+                    if status.threshold else None
+                ),
                 "Eny": int(status.energy / parameter["ADC_TE"]),
                 "SS": int(status.signal_strength / parameter["ADC_SS"]),
                 "RMS": int(status.rms * 1e6 / parameter["ADC_µV"] / 0.0065536),
@@ -425,11 +431,17 @@ class PriDatabase(Database):
                 "SetType": 1,
                 "Time": int(parametric.time * self._timebase),
                 "Status": 0,
-                "ParamID": parametric.param_id,
-                "PCTD": parametric.pctd,
-                "PCTA": parametric.pcta,
+                "ParamID": int(parametric.param_id),
+                "PCTD": int(parametric.pctd) if parametric.pctd else None,
+                "PCTA": int(parametric.pcta) if parametric.pcta else None,
                 "PA0": int(parametric.pa0 / parameter["PA0_mV"]) if parametric.pa0 else None,
                 "PA1": int(parametric.pa1 / parameter["PA1_mV"]) if parametric.pa1 else None,
+                "PA2": int(parametric.pa2 / parameter["PA2_mV"]) if parametric.pa2 else None,
+                "PA3": int(parametric.pa3 / parameter["PA3_mV"]) if parametric.pa3 else None,
+                "PA4": int(parametric.pa4 / parameter["PA4_mV"]) if parametric.pa4 else None,
+                "PA5": int(parametric.pa5 / parameter["PA5_mV"]) if parametric.pa5 else None,
+                "PA6": int(parametric.pa6 / parameter["PA6_mV"]) if parametric.pa6 else None,
+                "PA7": int(parametric.pa7 / parameter["PA7_mV"]) if parametric.pa7 else None,
             },
         )
 
