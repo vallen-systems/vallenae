@@ -118,10 +118,15 @@ def aic(arr: np.ndarray) -> Tuple[np.ndarray, int]:
         l_variance = (1 / l_len) * l_squaresum - ((1 / l_len) * l_sum) ** 2
         r_variance = (1 / r_len) * r_squaresum - ((1 / r_len) * r_sum) ** 2
 
+        # catch negative and very small values < safety_eps
+        l_variance = max(l_variance, safety_eps)
+        r_variance = max(r_variance, safety_eps)
+
         result[i] = (
-            i * math.log(l_variance + safety_eps) / math.log(10)
-            + (n - i - 1) * math.log(r_variance + safety_eps) / math.log(10)
+            i * math.log(l_variance) / math.log(10) +
+            (n - i - 1) * math.log(r_variance) / math.log(10)
         )
+
         if result[i] < min_value:
             min_value = result[i]
             min_index = i
