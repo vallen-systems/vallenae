@@ -69,7 +69,7 @@ def fixture_fresh_tradb() -> vae.io.TraDatabase:
     filename = "test.tradb"
     try:
         create_empty_tradb(filename)
-        with vae.io.TraDatabase(filename, readonly=False) as tradb:
+        with vae.io.TraDatabase(filename, mode="rw") as tradb:
             con = tradb.connection()
             con.execute(
                 """

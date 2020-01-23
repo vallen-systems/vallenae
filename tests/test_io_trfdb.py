@@ -77,7 +77,7 @@ def fixture_fresh_trfdb() -> vae.io.TrfDatabase:
     filename = "test.trfdb"
     try:
         create_empty_trfdb(filename)
-        with vae.io.TrfDatabase(filename, readonly=False) as trfdb:
+        with vae.io.TrfDatabase(filename, mode="rw") as trfdb:
             yield trfdb
     finally:
         os.remove(filename)

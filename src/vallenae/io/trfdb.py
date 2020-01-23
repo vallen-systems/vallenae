@@ -19,18 +19,19 @@ from .types import SizedIterable
 class TrfDatabase(Database):
     """IO Wrapper for trfdb (transient feature) database file."""
 
-    def __init__(
-        self, filename: str, *, readonly: bool = True,
-    ):
+    def __init__(self, filename: str, mode: str = "ro"):
         """
         Open trfdb database file.
 
         Args:
             filename: Path to trfdb database file
-            readonly: Open database in read-only mode (`True`) or read-write mode (`False`)
+            mode: Define database access:
+                **"ro"** (read-only),
+                **"rw"** (read-write),
+                **"rwc"** (read-write and create empty database if it does not exist)
         """
         super().__init__(
-            filename, table_prefix="trf", readonly=readonly, required_file_ext="trfdb",
+            filename, mode=mode, table_prefix="trf", required_file_ext="trfdb",
         )
 
     def read(

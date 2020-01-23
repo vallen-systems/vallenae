@@ -33,18 +33,21 @@ class TraDatabase(Database):
     """IO Wrapper for tradb database file."""
 
     def __init__(
-        self, filename: str, *, readonly: bool = True, compression: bool = False,
+        self, filename: str, mode: str = "ro", *, compression: bool = False,
     ):
         """
         Open tradb database file.
 
         Args:
             filename: Path to tradb database file
-            readonly: Open database in read-only mode (`True`) or read-write mode (`False`)
+            mode: Define database access:
+                **"ro"** (read-only),
+                **"rw"** (read-write),
+                **"rwc"** (read-write and create empty database if it does not exist)
             compression: Enable/disable FLAC compression data BLOBs for writing
         """
         super().__init__(
-            filename, table_prefix="tr", readonly=readonly, required_file_ext="tradb",
+            filename, mode=mode, table_prefix="tr", required_file_ext="tradb",
         )
         self._data_format = 2 if compression else 0
         self._timebase = self.globalinfo()["TimeBase"]

@@ -26,7 +26,7 @@ TRFDB_TMP = os.path.join(gettempdir(), "sample.trfdb")
 copyfile(TRFDB, TRFDB_TMP)  # copy trfdb, so we don't overwrite it
 
 tradb = vae.io.TraDatabase(TRADB)
-trfdb = vae.io.TrfDatabase(TRFDB_TMP, readonly=False)  # allow writing
+trfdb = vae.io.TrfDatabase(TRFDB_TMP, mode="rw")  # allow writing
 
 #%%
 # Read current trfdb
