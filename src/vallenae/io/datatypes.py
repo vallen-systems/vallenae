@@ -84,9 +84,9 @@ class MarkerRecord(NamedTuple):
 
     time: float  #: Time in seconds
     set_type: int  #: Marker type (see above)
-    number: int  #: Number of marker (unique? asc?)
     data: str  #: Content of marker (label text or datetime)
     # optional for creating:
+    number: Optional[int] = None  #: Marker number
     set_id: Optional[int] = None  #: Unique identifier for data set in pridb
 
     @classmethod
