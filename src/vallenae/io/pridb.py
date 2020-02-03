@@ -362,8 +362,8 @@ class PriDatabase(Database):
             self.connection(),
             "ae_markers",
             {
-                "SetID": set_id,
-                "Number": int(marker.number),
+                "SetID": int(set_id),
+                "Number": int(marker.number) if marker.number else None,
                 "Data": marker.data,
             },
         )
