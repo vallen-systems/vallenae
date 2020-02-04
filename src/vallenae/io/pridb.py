@@ -434,14 +434,15 @@ class PriDatabase(Database):
                 "ParamID": int(parametric.param_id),
                 "PCTD": int(parametric.pctd) if parametric.pctd else None,
                 "PCTA": int(parametric.pcta) if parametric.pcta else None,
-                "PA0": int(parametric.pa0 / parameter["PA0_mV"]) if parametric.pa0 else None,
-                "PA1": int(parametric.pa1 / parameter["PA1_mV"]) if parametric.pa1 else None,
-                "PA2": int(parametric.pa2 / parameter["PA2_mV"]) if parametric.pa2 else None,
-                "PA3": int(parametric.pa3 / parameter["PA3_mV"]) if parametric.pa3 else None,
-                "PA4": int(parametric.pa4 / parameter["PA4_mV"]) if parametric.pa4 else None,
-                "PA5": int(parametric.pa5 / parameter["PA5_mV"]) if parametric.pa5 else None,
-                "PA6": int(parametric.pa6 / parameter["PA6_mV"]) if parametric.pa6 else None,
-                "PA7": int(parametric.pa7 / parameter["PA7_mV"]) if parametric.pa7 else None,
+                # Try to fetch PAx_mV conversion parameter, otherwise don't scale
+                "PA0": int(parametric.pa0 / parameter.get("PA0_mV", 1)) if parametric.pa0 else None,
+                "PA1": int(parametric.pa1 / parameter.get("PA1_mV", 1)) if parametric.pa1 else None,
+                "PA2": int(parametric.pa2 / parameter.get("PA2_mV", 1)) if parametric.pa2 else None,
+                "PA3": int(parametric.pa3 / parameter.get("PA3_mV", 1)) if parametric.pa3 else None,
+                "PA4": int(parametric.pa4 / parameter.get("PA4_mV", 1)) if parametric.pa4 else None,
+                "PA5": int(parametric.pa5 / parameter.get("PA5_mV", 1)) if parametric.pa5 else None,
+                "PA6": int(parametric.pa6 / parameter.get("PA6_mV", 1)) if parametric.pa6 else None,
+                "PA7": int(parametric.pa7 / parameter.get("PA7_mV", 1)) if parametric.pa7 else None,
             },
         )
 
