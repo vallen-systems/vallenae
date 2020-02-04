@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 import vallenae as vae
-from vallenae.io import FeatureRecord, create_empty_trfdb
+from vallenae.io import FeatureRecord
 from vallenae.io._sql import read_sql_generator
 
 STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"
@@ -76,9 +76,25 @@ def fixture_sample_trfdb() -> vae.io.TrfDatabase:
 def fixture_fresh_trfdb() -> vae.io.TrfDatabase:
     filename = "test.trfdb"
     try:
-        create_empty_trfdb(filename)
-        with vae.io.TrfDatabase(filename, mode="rw") as trfdb:
+        with vae.io.TrfDatabase(filename, mode="rwc") as trfdb:
             yield trfdb
+    finally:
+        os.remove(filename)
+
+
+def test_init():
+    trfdb = vae.io.TrfDatabase(SAMPLE_TRFDB)
+    trfdb.close()
+
+
+def test_create():
+    filename = "empty.trfdb"
+    try:
+        vae.io.TrfDatabase.create(filename)
+        with vae.io.TrfDatabase(filename) as trfdb:
+            assert trfdb.tables() == {
+                "trf_data", "trf_fieldinfo", "trf_globalinfo",
+            }
     finally:
         os.remove(filename)
 

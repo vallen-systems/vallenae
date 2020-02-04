@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from vallenae.io._database import Database
-from vallenae.io.pridb import create_empty_pridb
+from vallenae.io import PriDatabase
 
 STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"
 PRIDB_FILE_PATH = STEEL_PLATE_DIR / "sample.pridb"
@@ -30,7 +30,7 @@ def fixture_sample_tradb():
 def fixture_empty_pridb():
     filename = "test.pridb"
     try:
-        create_empty_pridb(filename)
+        PriDatabase.create(filename)
         with Database(filename, mode="rw", table_prefix="ae") as db:
             yield db
     finally:
@@ -67,6 +67,13 @@ def test_main_table_not_existing():
     with pytest.raises(ValueError):
         Database(PRIDB_FILE_PATH, table_prefix="tr")
 
+
+def test_create():
+    with pytest.raises(NotImplementedError):
+        Database.create("test.db")
+
+    with pytest.raises(NotImplementedError):
+        Database("test.db", mode="rwc", table_prefix="")
 
 def test_tables_pridb(sample_pridb):
     assert sample_pridb._table_main == "ae_data"

@@ -55,6 +55,20 @@ class PriDatabase(Database):
         )
         self._timebase = self.globalinfo()["TimeBase"]
 
+    @staticmethod
+    def create(filename: str):
+        """
+        Create empty pridb.
+
+        Args:
+            filename: Path to new pridb database file
+        """
+        file_schema = Path(__file__).resolve().parent / "schema_templates/pridb.sql"
+        with open(file_schema, "r", encoding="utf-8") as file:
+            schema_pridb = file.read()
+        schema_pridb = schema_pridb.format(timebase=int(1e7))  # fill placeholder / constants
+        create_new_database(filename, schema_pridb)
+
     def channel(self) -> Set[int]:
         """Get list of channels."""
         con = self.connection()
@@ -445,11 +459,3 @@ class PriDatabase(Database):
                 "PA7": int(parametric.pa7 / parameter.get("PA7_mV", 1)) if parametric.pa7 else None,
             },
         )
-
-
-def create_empty_pridb(filename: str):
-    file_schema = Path(__file__).resolve().parent / "schema_templates/pridb.sql"
-    with open(file_schema, "r", encoding="utf-8") as file:
-        schema = file.read()
-    schema = schema.format(timebase=int(1e7))  # fill placeholder / constants
-    create_new_database(filename, schema)

@@ -1,4 +1,5 @@
 import sqlite3
+from abc import ABCMeta, abstractmethod
 from ast import literal_eval
 from functools import wraps
 from pathlib import Path
@@ -21,6 +22,8 @@ def require_write_access(func):
 class Database:
     """Database base class for pridb, tradb and trfdb."""
 
+    __metaclass__ = ABCMeta
+
     def __init__(
         self,
         filename: str,
@@ -32,19 +35,22 @@ class Database:
         # forced str conversion (e.g. for pathlib.Path)
         self._filename: str = str(filename)
 
-        # check mode
-        valid_modes = ("ro", "rw", "rwc")
-        if mode not in valid_modes:
-            raise ValueError(f"Invalid access mode '{mode}', use: {valid_modes}")
-        if mode == "rwc":
-            raise NotImplementedError("Database creation not implemented yet")
-        self._readonly: bool = (mode == "ro")
-
+        # check file extension
         if required_file_ext is not None:
             file_ext = Path(self._filename).suffix[1:]
             if file_ext.lower() != required_file_ext.lower():
                 raise ValueError(f"File extension '{file_ext}' must match '{required_file_ext}'")
 
+        # check mode
+        valid_modes = ("ro", "rw", "rwc")
+        if mode not in valid_modes:
+            raise ValueError(f"Invalid access mode '{mode}', use: {valid_modes}")
+        if mode == "rwc":
+            if not Path(filename).exists():
+                self.create(filename)  # call abstract method (implemented by child class)
+        self._readonly: bool = (mode == "ro")
+
+        # open sqlite connection
         self._connected: bool = False
         self._connection = sqlite3.connect(
             f"file:{self._filename}?mode={mode}",
@@ -76,6 +82,16 @@ class Database:
 
         # cached results
         self._parameter_table_cached: Dict[int, Dict[str, Any]] = {}
+
+    @staticmethod
+    @abstractmethod
+    def create(filename: str):
+        """
+        Create empty database.
+
+        Static method has to be implemented by child classes.
+        """
+        raise NotImplementedError("Database creation not implemented")
 
     @property
     def filename(self) -> str:

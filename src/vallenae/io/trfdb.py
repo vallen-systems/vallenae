@@ -34,6 +34,19 @@ class TrfDatabase(Database):
             filename, mode=mode, table_prefix="trf", required_file_ext="trfdb",
         )
 
+    @staticmethod
+    def create(filename: str):
+        """
+        Create empty trfdb.
+
+        Args:
+            filename: Path to new trfdb database file
+        """
+        file_schema = Path(__file__).resolve().parent / "schema_templates/trfdb.sql"
+        with open(file_schema, "r", encoding="utf-8") as file:
+            schema_trfdb = file.read()
+        create_new_database(filename, schema_trfdb)
+
     def read(
         self, *, trai: Union[None, int, Sequence[int]] = None
     ) -> pd.DataFrame:
@@ -98,10 +111,3 @@ class TrfDatabase(Database):
         except sqlite3.OperationalError:  # missing column(s)
             self._add_columns(self._table_main, set(row_dict.keys()), "REAL")
             return self.write(feature_set)  # try again
-
-
-def create_empty_trfdb(filename: str):
-    file_schema = Path(__file__).resolve().parent / "schema_templates/trfdb.sql"
-    with open(file_schema, "r", encoding="utf-8") as file:
-        schema = file.read()
-    create_new_database(filename, schema)
