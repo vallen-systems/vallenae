@@ -52,6 +52,20 @@ class TraDatabase(Database):
         self._data_format = 2 if compression else 0
         self._timebase = self.globalinfo()["TimeBase"]
 
+    @staticmethod
+    def create(filename: str):
+        """
+        Create empty tradb.
+
+        Args:
+            filename: Path to new tradb database file
+        """
+        file_schema = Path(__file__).resolve().parent / "schema_templates/tradb.sql"
+        with open(file_schema, "r", encoding="utf-8") as file:
+            schema_tradb = file.read()
+        schema_tradb = schema_tradb.format(timebase=int(1e7))  # fill placeholder / constants
+        create_new_database(filename, schema_tradb)
+
     def channel(self) -> Set[int]:
         """Get list of channels."""
         con = self.connection()
@@ -241,11 +255,3 @@ class TraDatabase(Database):
                 "TRAI": int(tra.trai) if tra.trai else None,
             },
         )
-
-
-def create_empty_tradb(filename: str):
-    file_schema = Path(__file__).resolve().parent / "schema_templates/tradb.sql"
-    with open(file_schema, "r", encoding="utf-8") as file:
-        schema = file.read()
-    schema = schema.format(timebase=int(1e7))  # fill placeholder / constants
-    create_new_database(filename, schema)

@@ -7,7 +7,6 @@ from numpy.testing import assert_allclose
 
 import vallenae as vae
 from vallenae.io import TraRecord
-from vallenae.io.tradb import create_empty_tradb
 
 STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"
 SAMPLE_TRADB = STEEL_PLATE_DIR / "sample.tradb"
@@ -38,7 +37,7 @@ SIGNAL_TRADB_FLAC = DATA_DIR / "signal-flac.tradb"
 
 
 @pytest.fixture(name="sample_tradb")
-def fixture_sample_tradb() -> vae.io.PriDatabase:
+def fixture_sample_tradb() -> vae.io.TraDatabase:
     with vae.io.TraDatabase(SAMPLE_TRADB) as tradb:
         yield tradb
 
@@ -53,13 +52,13 @@ def fixture_signal_txt():
 
 
 @pytest.fixture(name="signal_tradb_raw")
-def fixture_signal_tradb_raw() -> vae.io.PriDatabase:
+def fixture_signal_tradb_raw() -> vae.io.TraDatabase:
     with vae.io.TraDatabase(SIGNAL_TRADB_RAW) as tradb:
         yield tradb
 
 
 @pytest.fixture(name="signal_tradb_flac")
-def fixture_signal_tradb_flac() -> vae.io.PriDatabase:
+def fixture_signal_tradb_flac() -> vae.io.TraDatabase:
     with vae.io.TraDatabase(SIGNAL_TRADB_FLAC) as tradb:
         yield tradb
 
@@ -68,8 +67,7 @@ def fixture_signal_tradb_flac() -> vae.io.PriDatabase:
 def fixture_fresh_tradb() -> vae.io.TraDatabase:
     filename = "test.tradb"
     try:
-        create_empty_tradb(filename)
-        with vae.io.TraDatabase(filename, mode="rw") as tradb:
+        with vae.io.TraDatabase(filename, mode="rwc") as tradb:
             con = tradb.connection()
             con.execute(
                 """
@@ -86,8 +84,20 @@ def fixture_fresh_tradb() -> vae.io.TraDatabase:
 
 
 def test_init():
-    pridb = vae.io.TraDatabase(SAMPLE_TRADB)
-    pridb.close()
+    tradb = vae.io.TraDatabase(SAMPLE_TRADB)
+    tradb.close()
+
+
+def test_create():
+    filename = "empty.tradb"
+    try:
+        vae.io.TraDatabase.create(filename)
+        with vae.io.TraDatabase(filename) as tradb:
+            assert tradb.tables() == {
+                "tr_data", "tr_fieldinfo", "tr_params", "tr_globalinfo",
+            }
+    finally:
+        os.remove(filename)
 
 
 def test_channel(sample_tradb):

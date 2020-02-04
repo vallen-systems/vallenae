@@ -7,7 +7,6 @@ from pandas import Int64Dtype
 
 import vallenae as vae
 from vallenae.io import HitRecord, MarkerRecord, ParametricRecord, StatusRecord
-from vallenae.io.pridb import create_empty_pridb
 
 STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"
 PRIDB_FILE_PATH = STEEL_PLATE_DIR / "sample.pridb"
@@ -72,8 +71,7 @@ def fixture_sample_pridb() -> vae.io.PriDatabase:
 def fixture_fresh_pridb() -> vae.io.PriDatabase:
     filename = "test.pridb"
     try:
-        create_empty_pridb(filename)
-        with vae.io.PriDatabase(filename, mode="rw") as pridb:
+        with vae.io.PriDatabase(filename, mode="rwc") as pridb:
             con = pridb.connection()
             con.execute(
                 """
@@ -92,6 +90,19 @@ def fixture_fresh_pridb() -> vae.io.PriDatabase:
 def test_init():
     pridb = vae.io.PriDatabase(PRIDB_FILE_PATH)
     pridb.close()
+
+
+def test_create():
+    filename = "empty.pridb"
+    try:
+        vae.io.PriDatabase.create(filename)
+        with vae.io.PriDatabase(filename) as pridb:
+            assert pridb.tables() == {
+                "acq_setup", "ae_data", "ae_fieldinfo", "ae_globalinfo",
+                "ae_markers", "ae_params", "data_integrity",
+            }
+    finally:
+        os.remove(filename)
 
 
 def test_channel(sample_pridb):
