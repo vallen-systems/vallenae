@@ -140,16 +140,17 @@ class Database:
     def _add_columns(
         self,
         table: str,
-        columns: Union[str, Set[str], Sequence[str]],
+        columns: Union[str, Sequence[str]],
         dtype: Optional[str] = None,
     ):
         """Add columns to specified table."""
         if dtype is None:
             dtype = ""
         con = self.connection()
-        columns_create = set(columns) - set(self._columns(table))
-        for column in columns_create:
-            con.execute(f"ALTER TABLE {table} ADD COLUMN {column} {dtype}")
+        columns_exist = self._columns(table)
+        for column in columns:  # keep order of columns
+            if column not in columns_exist:
+                con.execute(f"ALTER TABLE {table} ADD COLUMN {column} {dtype}")
 
     def tables(self) -> Set[str]:
         """Get table names."""
@@ -195,7 +196,7 @@ class Database:
             else:
                 insert_from_dict(con, self._table_fieldinfo, row_dict)
         except sqlite3.OperationalError:  # missing column(s)
-            self._add_columns(self._table_fieldinfo, set(row_dict.keys()))
+            self._add_columns(self._table_fieldinfo, list(row_dict.keys()))
             self.write_fieldinfo(field, info)  # try again
 
     def globalinfo(self) -> Dict[str, Any]:
