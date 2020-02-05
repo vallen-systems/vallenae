@@ -51,7 +51,7 @@ class PriDatabase(Database):
                 **"rwc"** (read-write and create empty database if it does not exist)
         """
         super().__init__(
-            filename, mode=mode, table_prefix="ae", required_file_ext="pridb",
+            filename, mode=mode, table_prefix="ae", required_file_ext=".pridb",
         )
         self._timebase = self.globalinfo()["TimeBase"]
 

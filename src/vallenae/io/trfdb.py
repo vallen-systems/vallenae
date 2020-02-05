@@ -31,7 +31,7 @@ class TrfDatabase(Database):
                 **"rwc"** (read-write and create empty database if it does not exist)
         """
         super().__init__(
-            filename, mode=mode, table_prefix="trf", required_file_ext="trfdb",
+            filename, mode=mode, table_prefix="trf", required_file_ext=".trfdb",
         )
 
     @staticmethod

@@ -51,7 +51,7 @@ def test_init():
 
     # require file extension
     with pytest.raises(ValueError):
-        Database(PRIDB_FILE_PATH, table_prefix="ae", required_file_ext="nonsense")
+        Database(PRIDB_FILE_PATH, table_prefix="ae", required_file_ext=".nonsense")
 
 
 def test_context():
