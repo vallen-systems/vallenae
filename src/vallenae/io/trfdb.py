@@ -109,5 +109,5 @@ class TrfDatabase(Database):
                 # update instead
                 return update_from_dict(con, self._table_main, row_dict, "TRAI")
         except sqlite3.OperationalError:  # missing column(s)
-            self._add_columns(self._table_main, set(row_dict.keys()), "REAL")
+            self._add_columns(self._table_main, list(row_dict.keys()), "REAL")
             return self.write(feature_set)  # try again
