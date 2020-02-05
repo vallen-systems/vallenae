@@ -47,7 +47,7 @@ class TraDatabase(Database):
             compression: Enable/disable FLAC compression data BLOBs for writing
         """
         super().__init__(
-            filename, mode=mode, table_prefix="tr", required_file_ext="tradb",
+            filename, mode=mode, table_prefix="tr", required_file_ext=".tradb",
         )
         self._data_format = 2 if compression else 0
         self._timebase = self.globalinfo()["TimeBase"]

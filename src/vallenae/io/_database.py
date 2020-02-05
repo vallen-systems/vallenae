@@ -32,14 +32,16 @@ class Database:
         table_prefix: str,
         required_file_ext: Optional[str] = None,
     ):
-        # forced str conversion (e.g. for pathlib.Path)
-        self._filename: str = str(filename)
+        self._connected: bool = False
+        self._filename: str = str(filename)  # forced str conversion (e.g. for pathlib.Path)
 
         # check file extension
         if required_file_ext is not None:
-            file_ext = Path(self._filename).suffix[1:]
+            file_ext = Path(self._filename).suffix
             if file_ext.lower() != required_file_ext.lower():
-                raise ValueError(f"File extension '{file_ext}' must match '{required_file_ext}'")
+                raise ValueError(
+                    f"File extension {required_file_ext} required. Please valide file: {filename}"
+                )
 
         # check mode
         valid_modes = ("ro", "rw", "rwc")
@@ -51,7 +53,6 @@ class Database:
         self._readonly: bool = (mode == "ro")
 
         # open sqlite connection
-        self._connected: bool = False
         self._connection = sqlite3.connect(
             f"file:{self._filename}?mode={mode}",
             uri=True,
