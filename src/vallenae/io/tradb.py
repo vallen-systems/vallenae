@@ -169,10 +169,11 @@ class TraDatabase(Database):
     def read_continuous_wave(
         self,
         channel: int,
+        time_start: Optional[float] = None,
+        time_stop: Optional[float] = None,
         *,
         time_axis: bool = True,
         show_progress: bool = True,
-        **kwargs,
     ) -> Union[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, int]]:
         """
         Read transient signal of specified channel to a single, continuous array.
@@ -180,10 +181,11 @@ class TraDatabase(Database):
         Time gaps are filled with 0's.
 
         Args:
-            channel: Channel number to be read
+            channel: Channel number to read
+            time_start: Start reading at relative time (in seconds). Start at beginning if `None`
+            time_stop: Stop reading at relative time (in seconds). Read until end if `None`
             time_axis: Create the correspondig time axis. Default: `True`
             show_progress: Show progress bar. Default: `True`
-            **kwargs: Additional arguments passed to `~.iread`
 
         Returns:
             If `time_axis` is `True`\n
@@ -194,10 +196,10 @@ class TraDatabase(Database):
             - Array with transient signal
             - Samplerate
         """
-        tra_blocks = [np.empty(0)]
+        tra_blocks = [np.empty(0, dtype=np.float32)]
         sr = 0
 
-        iterable = self.iread(channel=channel, **kwargs)
+        iterable = self.iread(channel=channel, time_start=time_start, time_stop=time_stop)
         iterator = iter(iterable)
         if show_progress:
             iterator = tqdm(iterator, total=len(iterable), desc="Tra")
@@ -209,7 +211,9 @@ class TraDatabase(Database):
                 time_gap = tra.time - expected_time
                 if time_gap > 1e-6:
                     samples_gap = round(time_gap * tra.samplerate)
-                    tra_blocks.append(np.zeros(samples_gap))
+                    tra_blocks.append(
+                        np.zeros(samples_gap, dtype=np.float32)
+                    )
 
             expected_time = tra.time + float(tra.samples) / tra.samplerate
 

@@ -157,6 +157,59 @@ def test_read_wave_compare_to_reference_txt(signal_txt, signal_tradb_raw, signal
     assert_allclose(data_txt, data_flac, atol=adc_step, rtol=0)
 
 
+def test_read_continuous_wave(fresh_tradb):
+    def write_time_axis(samplerate, samples, sets, t_start=0):
+        # create time axis
+        y = t_start + np.arange(0, samples * sets, dtype=np.float32) / samplerate
+        # write time axis blockwise
+        for data in np.reshape(y, (-1, sets)):
+            t = data[0]
+            fresh_tradb.write(
+                TraRecord(
+                    time=t, channel=1, param_id=1, pretrigger=0, threshold=0,
+                    samplerate=samplerate, samples=samples,
+                    data_format=0, data=data,
+                )
+            )
+        return y
+
+    samplerate = 100
+    samples = 10
+    sets = 10
+    # write data and get continuous reference
+    ref1 = write_time_axis(samplerate, samples, sets)
+    y1, t1 = fresh_tradb.read_continuous_wave(1)
+
+    assert y1.dtype == np.float32
+    assert t1.dtype == np.float32
+    assert y1.shape == (samples * sets,)
+    assert t1.shape == y1.shape
+    assert_allclose(y1, ref1, atol=1e-6)
+    assert_allclose(t1, ref1, atol=1e-6)
+
+    # write data with time gap
+    ref2 = write_time_axis(samplerate, samples, sets, t_start=2)
+    y2, _ = fresh_tradb.read_continuous_wave(1)
+
+    assert y2.shape == (300,)
+    assert_allclose(
+        y2,
+        np.concatenate(
+            [ref1, np.zeros(samples * sets), ref2]
+        ),
+        atol=1e-6,
+    )
+
+    # get samplerate
+    _, fs = fresh_tradb.read_continuous_wave(1, time_axis=False)
+    assert fs == samplerate
+
+    # get time range
+    y, _ = fresh_tradb.read_continuous_wave(1, time_start=1.9, time_stop=2.2)
+    assert np.min(y) >= 1.9
+    assert np.max(y) <= 2.2
+
+
 def test_write(fresh_tradb):
     new_tra = TraRecord(
         time=11.11, channel=1, param_id=1, pretrigger=500, threshold=111,
