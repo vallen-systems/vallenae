@@ -1,10 +1,15 @@
 import contextlib
+import logging
 import sqlite3
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, Optional, Sequence, Tuple, TypeVar, Union
 
 from .types import SizedIterable
+
+
+logger = logging.getLogger(__name__)
+
 
 T = TypeVar("T")
 class QueryIterable(SizedIterable[T]):
@@ -19,11 +24,17 @@ class QueryIterable(SizedIterable[T]):
         self._connection = connection
         self._query = query
         self._dict_to_type = dict_to_type
+        self._count_result: Optional[int] = None  # cache result of __len__
 
     def __len__(self) -> int:
-        return count_sql_results(self._connection, self._query)
+        if self._count_result is None:
+            self._count_result = count_sql_results(self._connection, self._query)
+        return self._count_result
 
     def __iter__(self) -> Iterator[T]:
+        if self.__len__() == 0:
+            logger.debug("Empty SQLite query")
+
         for row in read_sql_generator(self._connection, self._query):
             yield self._dict_to_type(row)
 
