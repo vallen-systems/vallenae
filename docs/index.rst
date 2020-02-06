@@ -35,6 +35,7 @@ The remaining modules are system-independent and try to comprise the most common
     :caption: Development
     :hidden:
     
+    changelog
     todo
 
 Indices and tables
