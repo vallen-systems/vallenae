@@ -40,7 +40,7 @@ class Database:
             file_ext = Path(self._filename).suffix
             if file_ext.lower() != required_file_ext.lower():
                 raise ValueError(
-                    f"File extension {required_file_ext} required. Please valide file: {filename}"
+                    f"File {filename} does not have the required extension {required_file_ext}"
                 )
 
         # check mode
