@@ -135,6 +135,7 @@ def test_sql_binary_search():
         con.execute("INSERT INTO sin (id, value) VALUES (?, ?)", (i, sin(i)))
 
     # squares table
+    # condition false for all values
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 0) == None
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x > 99**2) == None
 
@@ -147,13 +148,15 @@ def test_sql_binary_search():
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 256) == 15
 
     # consts table
+    # condition false for all values
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x < 11) == None
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x > 11) == None
-
-    # condition true for all values, expect first matching index (0)
+    # condition true for all values
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x >= 11) == 0
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x == 11) == 0
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x <= 11) == 0
+    # return upper bound if condition is true for both bounds
+    assert sql_binary_search(con, "consts", "value", "id", lambda x: x == 11, lower_bound=False) == 99
 
     # sin table, not sorted -> expect exception
     with pytest.raises(ValueError):
