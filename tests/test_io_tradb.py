@@ -178,27 +178,22 @@ def test_read_continuous_wave(fresh_tradb):
     sets = 10
     # write data and get continuous reference
     ref1 = write_time_axis(samplerate, samples, sets)
-    y1, t1 = fresh_tradb.read_continuous_wave(1)
+    y, t = fresh_tradb.read_continuous_wave(1)
 
-    assert y1.dtype == np.float32
-    assert t1.dtype == np.float32
-    assert y1.shape == (samples * sets,)
-    assert t1.shape == y1.shape
-    assert_allclose(y1, ref1, atol=1e-6)
-    assert_allclose(t1, ref1, atol=1e-6)
+    assert y.dtype == np.float32
+    assert t.dtype == np.float32
+    assert y.shape == (samples * sets,)
+    assert t.shape == y.shape
+    assert_allclose(y, ref1, atol=1e-6)
+    assert_allclose(t, ref1, atol=1e-6)
 
     # write data with time gap
     ref2 = write_time_axis(samplerate, samples, sets, t_start=2)
-    y2, _ = fresh_tradb.read_continuous_wave(1)
+    ref2_total = np.concatenate([ref1, np.zeros(samples * sets), ref2])
+    y, _ = fresh_tradb.read_continuous_wave(1)
 
-    assert y2.shape == (300,)
-    assert_allclose(
-        y2,
-        np.concatenate(
-            [ref1, np.zeros(samples * sets), ref2]
-        ),
-        atol=1e-6,
-    )
+    assert y.shape == ref2_total.shape
+    assert_allclose(y, ref2_total, atol=1e-6)
 
     # get samplerate
     _, fs = fresh_tradb.read_continuous_wave(1, time_axis=False)
@@ -208,6 +203,12 @@ def test_read_continuous_wave(fresh_tradb):
     y, _ = fresh_tradb.read_continuous_wave(1, time_start=1.9, time_stop=2.2)
     assert np.min(y) >= 1.9
     assert np.max(y) <= 2.2
+
+    # get time range exceeding lower / upper bounds
+    y, _ = fresh_tradb.read_continuous_wave(1, time_start=-0.1)
+    assert_allclose(y, ref2_total, atol=1e-6)
+    y, _ = fresh_tradb.read_continuous_wave(1, time_stop=100)
+    assert_allclose(y, ref2_total, atol=1e-6)
 
 
 def test_write(fresh_tradb):

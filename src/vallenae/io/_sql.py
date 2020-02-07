@@ -119,6 +119,8 @@ def sql_binary_search(
     column_value: str,
     column_index: str,
     fun_compare: Callable[[float], bool],
+    *,
+    lower_bound: bool = True,
 ) -> Optional[int]:
     """
     Helper function to find the boundary row-index for given condition on a sorted column.
@@ -133,6 +135,8 @@ def sql_binary_search(
         column_value: Name of the sorted column, e.g. Time
         column_index: Name of the indexed column
         fun_compare: Lambda function of the condition, e.g. `lambda t: t > 10` (Time > 10)
+        lower_bound: Specify which index to return if condition is true for both lower/upper bound.
+            Default: Return lower bound (`True`)
     """
 
     def get_value(index):
@@ -141,12 +145,9 @@ def sql_binary_search(
         )
         return cur.fetchone()[0]
 
-    i_min = connection.execute(
-        f"SELECT MIN({column_index}) FROM {table}"
-    ).fetchone()[0]
-    i_max = connection.execute(
-        f"SELECT MAX({column_index}) FROM {table}"
-    ).fetchone()[0]
+    i_min, i_max = connection.execute(
+        f"SELECT MIN({column_index}), MAX({column_index}) FROM {table}"
+    ).fetchone()
 
     while True:
         v_min = get_value(i_min)
@@ -156,10 +157,10 @@ def sql_binary_search(
         c_min = fun_compare(v_min)
         c_max = fun_compare(v_max)
 
-        if c_min and c_max:
-            return i_min  # condition true for both limits, return smaller index
-        if not c_min and not c_max:
-            return None  # condition false for both limits
+        if c_min and c_max:  # condition true for both limits
+            return i_min if lower_bound else i_max
+        if not c_min and not c_max:  # condition false for both limits
+            return None
 
         if i_max - i_min < 2:
             return i_min if c_min is True else i_max

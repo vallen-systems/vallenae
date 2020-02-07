@@ -110,15 +110,31 @@ class TraDatabase(Database):
         con = self.connection()
         setid_time_start = None
         setid_time_stop = None
+        setid_max = con.execute(f"SELECT MAX(SetID) FROM {self._table_main}").fetchone()[0]
 
         if time_start is not None:
             setid_time_start = sql_binary_search(
-                con, "view_tr_data", "Time", "SetID", lambda t: t >= time_start  # type: ignore
+                connection=con,
+                table="view_tr_data",
+                column_value="Time",
+                column_index="SetID",
+                fun_compare=lambda t: t >= time_start,  # type: ignore
+                lower_bound=True,  # return lower index of true conditions
             )
         if time_stop is not None:
             setid_time_stop = sql_binary_search(
-                con, "view_tr_data", "Time", "SetID", lambda t: t < time_stop  # type: ignore
+                connection=con,
+                table="view_tr_data",
+                column_value="Time",
+                column_index="SetID",
+                fun_compare=lambda t: t < time_stop,  # type: ignore
+                lower_bound=False,  # return upper index of true conditions
             )
+
+        # remove upper boundary if equal to max index
+        # otherwise the last row is excluded (less condition)
+        if setid_time_stop == setid_max:
+            setid_time_stop = None
 
         query = """
         SELECT vtr.*, tr.ParamID
