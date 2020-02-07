@@ -31,7 +31,7 @@ trfdb = vae.io.TrfDatabase(TRFDB_TMP, mode="rw")  # allow writing
 #%%
 # Read current trfdb
 # ------------------
-trfdb.read()
+print(trfdb.read())
 
 #%%
 # Compute arrival time offsets with different timepickers
@@ -75,7 +75,7 @@ for tra in tradb.iread():
 #%%
 # Read results from trfdb
 # -----------------------
-trfdb.read().filter(regex="ATO")
+print(trfdb.read().filter(regex="ATO"))
 
 #%%
 # Plot results
@@ -83,6 +83,7 @@ trfdb.read().filter(regex="ATO")
 ax = trfdb.read()[["ATO_Hinkley", "ATO_AIC", "ATO_ER", "ATO_MER"]].plot.barh()
 ax.invert_yaxis()
 ax.set_xlabel("Arrival time offset [µs]")
+plt.show()
 
 #%%
 # Plot waveforms and arrival times
@@ -107,6 +108,7 @@ for row, ax in zip(trfdb.read().itertuples(), axes):
     ax.axvline(row.ATO_MER, color="C3")
 
 axes[0].legend(["Waveform", "Hinkley", "AIC", "ER", "MER"])
+plt.show()
 
 #%%
 # Use results in VisualAE
@@ -115,11 +117,11 @@ axes[0].legend(["Waveform", "Hinkley", "AIC", "ER", "MER"])
 # We only need to specify the unit. VisualAE requires them to be in µs.
 # Units and other column-related meta data is saved in the `trf_fieldinfo` table.
 # Field infos can be retrieved with `vallenae.io.TrfDatabase.fieldinfo`:
-trfdb.fieldinfo()
+print(trfdb.fieldinfo())
 
 #%%
 # Show results as table:
-pd.DataFrame(trfdb.fieldinfo())
+print(pd.DataFrame(trfdb.fieldinfo()))
 
 #%%
 # Write units to trfdb
@@ -131,7 +133,7 @@ trfdb.write_fieldinfo("ATO_AIC", {"Unit": "[µs]", "LongName": "Arrival Time Off
 trfdb.write_fieldinfo("ATO_ER", {"Unit": "[µs]", "LongName": "Arrival Time Offset (ER)"})
 trfdb.write_fieldinfo("ATO_MER", {"Unit": "[µs]", "LongName": "Arrival Time Offset (MER)"})
 
-pd.DataFrame(trfdb.fieldinfo()).filter(regex="ATO")
+print(pd.DataFrame(trfdb.fieldinfo()).filter(regex="ATO"))
 
 
 #%%

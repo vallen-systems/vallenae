@@ -71,7 +71,7 @@ plot(t, y, hc_arr, hc_index, "Hinkley Criterion")
 # Akaike Information Criterion (AIC)
 # ----------------------------------
 aic_arr, aic_index = vae.timepicker.aic(y)
-plot(t, y, aic_arr, aic_index, "Hinkley Criterion")
+plot(t, y, aic_arr, aic_index, "Akaike Information Criterion")
 
 #%%
 # Energy Ratio

@@ -22,8 +22,6 @@ SETUP = os.path.join(HERE, "steel_plate/sample.vaex")
 PRIDB = os.path.join(HERE, "steel_plate/sample.pridb")
 NUMBER_SENSORS = 4
 
-plt.ioff()  # Turn interactive mode off; plt.show() is blocking
-
 
 @njit(f8(f8[:], f8, f8[:, :], f8[:]))
 def lucy_error_fun(

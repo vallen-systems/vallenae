@@ -13,8 +13,6 @@ HERE = os.path.dirname(__file__) if "__file__" in locals() else os.getcwd()
 TRADB = os.path.join(HERE, "steel_plate/sample_plain.tradb")  # uncompressed
 TRAI = 4  # just an example, no magic here
 
-plt.ioff()  # Turn interactive mode off; plt.show() is blocking
-
 
 def main():
     # Read waveform from tradb
