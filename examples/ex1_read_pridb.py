@@ -27,7 +27,7 @@ print("Set of all channels: ", pridb.channel())
 # -----------------------------
 df_hits = pridb.read_hits()
 # Print a few columns
-df_hits[["time", "channel", "amplitude", "counts", "energy"]]
+print(df_hits[["time", "channel", "amplitude", "counts", "energy"]])
 
 # %%
 # Query Pandas DataFrame
@@ -38,15 +38,16 @@ ax = df_hits.groupby("channel").sum()["energy"].plot.bar(figsize=(8, 3))
 ax.set_xlabel("Channel")
 ax.set_ylabel("Summed Energy [eu = 1e-14 V²s]")
 plt.tight_layout()
+plt.show()
 
 #%%
 # Read markers
 # ------------
 df_markers = pridb.read_markers()
-df_markers
+print(df_markers)
 
 #%%
 # Read parametric data
 # --------------------
 df_parametric = pridb.read_parametric()
-df_parametric
+print(df_parametric)
