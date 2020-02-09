@@ -12,6 +12,7 @@
 #
 import os
 import sys
+import pkg_resources
 sys.path.insert(0, os.path.abspath("../"))
 
 
@@ -22,7 +23,7 @@ copyright = "2019, Vallen Systeme GmbH"
 author = "Daniel Altmann, Lukas Berbuer (Vallen Systeme GmbH)"
 
 # The full version, including alpha/beta/rc tags
-release = "0.1"
+release = pkg_resources.get_distribution("vallenae").version
 
 
 # -- General configuration ---------------------------------------------------
