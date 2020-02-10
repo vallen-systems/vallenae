@@ -30,12 +30,12 @@ class HitRecord(NamedTuple):
     amplitude: float  #: Peak amplitude in volts
     duration: float  #: Hit duration in seconds
     energy: float  #: Energy (EN 1330-9) in eu (1e-14 V²s)
-    signal_strength: float  #: Signal strength in nVs (1e-9 Vs)
     rms: float  #: RMS of the noise before the hit in volts
     # optional for creating:
     set_id: Optional[int] = None  #: Unique identifier for data set in pridb
     threshold: Optional[float] = None  #: Threshold amplitude in volts
     rise_time: Optional[float] = None  #: Rise time in seconds
+    signal_strength: Optional[float] = None  #: Signal strength in nVs (1e-9 Vs)
     counts: Optional[int] = None  #: Number of positive threshold crossings
     trai: Optional[int] = None  #: Transient recorder index (foreign key between pridb and tradb)
     cascade_hits: Optional[int] = None  #: Total number of hits in the same hit-cascade
@@ -61,7 +61,7 @@ class HitRecord(NamedTuple):
             rise_time=_to_seconds(row.get("RiseT")),  # optional
             duration=_to_seconds(row["Dur"]),
             energy=row["Eny"],
-            signal_strength=row["SS"],
+            signal_strength=row.get("SS"),  # optional for spotWave
             rms=_to_volts(row["RMS"]),
             counts=row.get("Counts"),  # optional
             trai=row.get("TRAI"),  # optional
@@ -115,11 +115,11 @@ class StatusRecord(NamedTuple):
     channel: int  #: Channel number
     param_id: int  #: Parameter ID of table ae_params for ADC value conversion
     energy: float  #: Energy (EN 1330-9) in eu (1e-14 V²s)
-    signal_strength: float  #: Signal strength in nVs (1e-9 Vs)
     rms: float  #: RMS in volts
     # optional for creating:
     set_id: Optional[int] = None  #: Unique identifier for data set in pridb
     threshold: Optional[float] = None  #: Threshold amplitude in volts
+    signal_strength: Optional[float] = None  #: Signal strength in nVs (1e-9 Vs)
 
     @classmethod
     def from_sql(cls, row: Dict[str, Any]) -> "StatusRecord":
@@ -136,7 +136,7 @@ class StatusRecord(NamedTuple):
             param_id=row["ParamID"],
             threshold=_to_volts(row.get("Thr")),  # optional
             energy=row["Eny"],
-            signal_strength=row["SS"],
+            signal_strength=row.get("SS"),  # optional for spotWave
             rms=_to_volts(row["RMS"]),  # optional
         )
 
