@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.2.1
+-----
+2020-02-10
+
+Bug fixes
+    - examples outputs if not run as notebook
+    - out-of-bound time_start, time_stop with SQL binary search
+    - optional signal strength for spotWave data acquisition
+
+
 0.2.0
 -----
 2020-02-06
