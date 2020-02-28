@@ -1,3 +1,4 @@
+import math
 import random
 from typing import Optional, Tuple
 
@@ -16,6 +17,7 @@ from vallenae.features import (
     peak_amplitude_index,
     rise_time,
     signal_strength,
+    rms,
 )
 
 LEN: int = 100
@@ -136,3 +138,10 @@ def test_counts(random_array):
 
     for threshold in (-1, 0, 0.5, 1):
         assert counts(random_array, threshold) == naive(random_array, threshold)
+
+
+def test_rms(random_array):
+    def naive(data: np.ndarray):
+        return math.sqrt(np.sum(data ** 2) / len(data))
+
+    assert rms(random_array) == pytest.approx(naive(random_array))

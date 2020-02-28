@@ -181,6 +181,7 @@ def counts(data: np.ndarray, threshold: float) -> int:
     return result
 
 
+@njit
 def rms(data: np.ndarray) -> float:
     """
     Compute the root mean square (RMS) of an array.
@@ -188,16 +189,13 @@ def rms(data: np.ndarray) -> float:
     Args:
         data: Input array
 
-    Raises:
-        ValueError: If data is empty. RMS is not defined for empty arrays.
-
     Returns:
         RMS of the input array
-
-    Todo:
-        Add exception
 
     References:
         https://en.wikipedia.org/wiki/Root_mean_square
     """
-    return math.sqrt(np.sum(data ** 2) / len(data))
+    agg: float = 0
+    for sample in data:
+        agg += sample ** 2
+    return math.sqrt(agg / len(data))
