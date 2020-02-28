@@ -1,6 +1,7 @@
 import io
 
 import numpy as np
+from numba import njit
 
 try:
     import soundfile as sf
@@ -9,9 +10,25 @@ except OSError:
     _FLAC_CODEC = False
 
 
+_II16_MIN = np.iinfo(np.int16).min
+_II16_MAX = np.iinfo(np.int16).max
+
+
 def _check_flac_codec():
     if not _FLAC_CODEC:
         raise ValueError("FLAC library not found. Please install libsndfile.")
+
+
+@njit
+def _convert_to_int16(arr: np.ndarray):
+    result = np.empty_like(arr, dtype=np.int16)
+    for i, value in enumerate(arr):
+        # clip to range of int16
+        value = min(value, _II16_MAX)
+        value = max(value, _II16_MIN)
+        # round to next integer
+        result[i] = round(value)
+    return result
 
 
 def decode_data_blob(
@@ -31,7 +48,6 @@ def decode_data_blob(
     Returns:
         Array of voltage values
     """
-
     if data_format == 0:  # uncompressed
         data = np.frombuffer(data_blob, dtype=np.int16)
         factor = 1e-3 * factor_millivolts
@@ -63,11 +79,8 @@ def encode_data_blob(
     Returns:
         Data blob
     """
-    ii16 = np.iinfo(np.int16)
     data = data * 1e3 / factor_millivolts
-    data = np.clip(data, ii16.min, ii16.max)  # clip to range of int16
-    data = np.rint(data)  # round to next integer
-    data_int16 = data.astype(np.int16)
+    data_int16 = _convert_to_int16(data)
     if data_format == 0:  # uncompressed
         return data_int16.tobytes()
     if data_format == 2:  # flac
