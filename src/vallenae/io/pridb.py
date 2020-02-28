@@ -329,26 +329,39 @@ class PriDatabase(Database):
             Status flag
         """
         parameter = self._parameter(hit.param_id)
-        return insert_from_dict(
-            self.connection(),
-            self._table_main,
-            {
-                "SetType": 2,
-                "Time": int(hit.time * self._timebase),
-                "Chan": int(hit.channel),
-                "Status": 0,
-                "ParamID": int(hit.param_id),
-                "Thr": int(hit.threshold * 1e6 / parameter["ADC_µV"]) if hit.threshold else None,
-                "Amp": int(hit.amplitude * 1e6 / parameter["ADC_µV"]),
-                "RiseT": int(hit.rise_time * self._timebase) if hit.rise_time else None,
-                "Dur": int(hit.duration * self._timebase),
-                "Eny": int(hit.energy / parameter["ADC_TE"]),
-                "SS": int(hit.signal_strength / parameter["ADC_SS"]),
-                "RMS": int(hit.rms * 1e6 / parameter["ADC_µV"] / 0.0065536),
-                "Counts": int(hit.counts) if hit.counts else None,
-                "TRAI": int(hit.trai) if hit.trai else None,
-            },
-        )
+        with self.connection() as con:  # commit/rollback transaction
+            return insert_from_dict(
+                con,
+                self._table_main,
+                {
+                    "SetType": 2,
+                    "Time": int(hit.time * self._timebase),
+                    "Chan": int(hit.channel),
+                    "Status": 0,
+                    "ParamID": int(hit.param_id),
+                    "Thr": (
+                        int(hit.threshold * 1e6 / parameter["ADC_µV"])
+                        if hit.threshold else None
+                    ),
+                    "Amp": int(hit.amplitude * 1e6 / parameter["ADC_µV"]),
+                    "RiseT": (
+                        int(hit.rise_time * self._timebase)
+                        if hit.rise_time else None
+                    ),
+                    "Dur": int(hit.duration * self._timebase),
+                    "Eny": int(hit.energy / parameter["ADC_TE"]),
+                    "SS": int(hit.signal_strength / parameter["ADC_SS"]),
+                    "RMS": int(hit.rms * 1e6 / parameter["ADC_µV"] / 0.0065536),
+                    "Counts": (
+                        int(hit.counts)
+                        if hit.counts else None
+                    ),
+                    "TRAI": (
+                        int(hit.trai)
+                        if hit.trai else None
+                    ),
+                },
+            )
 
     @require_write_access
     @check_monotonic_time
@@ -364,24 +377,28 @@ class PriDatabase(Database):
         Returns:
             Index (SetID) of inserted row
         """
-        set_id = insert_from_dict(
-            self.connection(),
-            self._table_main,
-            {
-                "SetType": int(marker.set_type),
-                "Time": int(marker.time * self._timebase),
-            },
-        )
-        insert_from_dict(
-            self.connection(),
-            "ae_markers",
-            {
-                "SetID": int(set_id),
-                "Number": int(marker.number) if marker.number else None,
-                "Data": marker.data,
-            },
-        )
-        return set_id
+        with self.connection() as con:  # commit/rollback transaction
+            set_id = insert_from_dict(
+                con,
+                self._table_main,
+                {
+                    "SetType": int(marker.set_type),
+                    "Time": int(marker.time * self._timebase),
+                },
+            )
+            insert_from_dict(
+                con,
+                "ae_markers",
+                {
+                    "SetID": int(set_id),
+                    "Number": (
+                        int(marker.number)
+                        if marker.number else None
+                    ),
+                    "Data": marker.data,
+                },
+            )
+            return set_id
 
     @require_write_access
     @check_monotonic_time
@@ -401,24 +418,25 @@ class PriDatabase(Database):
             Status flag
         """
         parameter = self._parameter(status.param_id)
-        return insert_from_dict(
-            self.connection(),
-            self._table_main,
-            {
-                "SetType": 3,
-                "Time": int(status.time * self._timebase),
-                "Chan": int(status.channel),
-                "Status": 0,
-                "ParamID": int(status.param_id),
-                "Thr": (
-                    int(status.threshold * 1e6 / parameter["ADC_µV"])
-                    if status.threshold else None
-                ),
-                "Eny": int(status.energy / parameter["ADC_TE"]),
-                "SS": int(status.signal_strength / parameter["ADC_SS"]),
-                "RMS": int(status.rms * 1e6 / parameter["ADC_µV"] / 0.0065536),
-            },
-        )
+        with self.connection() as con:  # commit/rollback transaction
+            return insert_from_dict(
+                con,
+                self._table_main,
+                {
+                    "SetType": 3,
+                    "Time": int(status.time * self._timebase),
+                    "Chan": int(status.channel),
+                    "Status": 0,
+                    "ParamID": int(status.param_id),
+                    "Thr": (
+                        int(status.threshold * 1e6 / parameter["ADC_µV"])
+                        if status.threshold else None
+                    ),
+                    "Eny": int(status.energy / parameter["ADC_TE"]),
+                    "SS": int(status.signal_strength / parameter["ADC_SS"]),
+                    "RMS": int(status.rms * 1e6 / parameter["ADC_µV"] / 0.0065536),
+                },
+            )
 
     @require_write_access
     @check_monotonic_time
@@ -438,24 +456,34 @@ class PriDatabase(Database):
             Status flag
         """
         parameter = self._parameter(parametric.param_id)
-        return insert_from_dict(
-            self.connection(),
-            self._table_main,
-            {
-                "SetType": 1,
-                "Time": int(parametric.time * self._timebase),
-                "Status": 0,
-                "ParamID": int(parametric.param_id),
-                "PCTD": int(parametric.pctd) if parametric.pctd else None,
-                "PCTA": int(parametric.pcta) if parametric.pcta else None,
-                # Try to fetch PAx_mV conversion parameter, otherwise don't scale
-                "PA0": int(parametric.pa0 / parameter.get("PA0_mV", 1)) if parametric.pa0 else None,
-                "PA1": int(parametric.pa1 / parameter.get("PA1_mV", 1)) if parametric.pa1 else None,
-                "PA2": int(parametric.pa2 / parameter.get("PA2_mV", 1)) if parametric.pa2 else None,
-                "PA3": int(parametric.pa3 / parameter.get("PA3_mV", 1)) if parametric.pa3 else None,
-                "PA4": int(parametric.pa4 / parameter.get("PA4_mV", 1)) if parametric.pa4 else None,
-                "PA5": int(parametric.pa5 / parameter.get("PA5_mV", 1)) if parametric.pa5 else None,
-                "PA6": int(parametric.pa6 / parameter.get("PA6_mV", 1)) if parametric.pa6 else None,
-                "PA7": int(parametric.pa7 / parameter.get("PA7_mV", 1)) if parametric.pa7 else None,
-            },
-        )
+        def try_convert(value: Optional[int], conv_id: str):
+            """Try to scale with conversion parameter 'PAx_mV', otherwise scale = 1."""
+            return int(value / parameter.get(conv_id, 1)) if value else None
+
+        with self.connection() as con:  # commit/rollback transaction
+            return insert_from_dict(
+                con,
+                self._table_main,
+                {
+                    "SetType": 1,
+                    "Time": int(parametric.time * self._timebase),
+                    "Status": 0,
+                    "ParamID": int(parametric.param_id),
+                    "PCTD": (
+                        int(parametric.pctd)
+                        if parametric.pctd else None
+                    ),
+                    "PCTA": (
+                        int(parametric.pcta)
+                        if parametric.pcta else None
+                    ),
+                    "PA0": try_convert(parametric.pa0, "PA0_mV"),
+                    "PA1": try_convert(parametric.pa1, "PA1_mV"),
+                    "PA2": try_convert(parametric.pa2, "PA2_mV"),
+                    "PA3": try_convert(parametric.pa3, "PA3_mV"),
+                    "PA4": try_convert(parametric.pa4, "PA4_mV"),
+                    "PA5": try_convert(parametric.pa5, "PA5_mV"),
+                    "PA6": try_convert(parametric.pa6, "PA6_mV"),
+                    "PA7": try_convert(parametric.pa7, "PA7_mV"),
+                },
+            )
