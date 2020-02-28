@@ -96,18 +96,18 @@ class TrfDatabase(Database):
             except (ValueError, TypeError):
                 return None
 
-        con = self.connection()
-        row_dict = {
-            key: convert(value)
-            for key, value in feature_set.features.items()
-        }
-        row_dict["TRAI"] = feature_set.trai
-        try:
+        with self.connection() as con:  # commit/rollback transaction
+            row_dict = {
+                key: convert(value)
+                for key, value in feature_set.features.items()
+            }
+            row_dict["TRAI"] = feature_set.trai
             try:
-                return insert_from_dict(con, self._table_main, row_dict)
-            except sqlite3.IntegrityError:  # UNIQUE constraint, TRAI already exists
-                # update instead
-                return update_from_dict(con, self._table_main, row_dict, "TRAI")
-        except sqlite3.OperationalError:  # missing column(s)
-            self._add_columns(self._table_main, list(row_dict.keys()), "REAL")
-            return self.write(feature_set)  # try again
+                try:
+                    return insert_from_dict(con, self._table_main, row_dict)
+                except sqlite3.IntegrityError:  # UNIQUE constraint, TRAI already exists
+                    # update instead
+                    return update_from_dict(con, self._table_main, row_dict, "TRAI")
+            except sqlite3.OperationalError:  # missing column(s)
+                self._add_columns(self._table_main, list(row_dict.keys()), "REAL")
+                return self.write(feature_set)  # try again

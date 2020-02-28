@@ -258,20 +258,24 @@ class TraDatabase(Database):
         """
         # self._validate_and_update_time(tra.time)
         parameter = self._parameter(tra.param_id)
-        return insert_from_dict(
-            self.connection(),
-            self._table_main,
-            {
-                "Time": int(tra.time * self._timebase),
-                "Chan": int(tra.channel),
-                "Status": 32768,
-                "ParamID": int(tra.param_id),
-                "Pretrigger": int(tra.pretrigger),
-                "Thr": int(tra.threshold * 1e6 / parameter["ADC_µV"]),
-                "SampleRate": int(tra.samplerate),
-                "Samples": int(tra.samples),
-                "DataFormat": int(self._data_format),
-                "Data": encode_data_blob(tra.data, self._data_format, parameter["TR_mV"]),
-                "TRAI": int(tra.trai) if tra.trai else None,
-            },
-        )
+        with self.connection() as con:  # commit/rollback transaction
+            return insert_from_dict(
+                con,
+                self._table_main,
+                {
+                    "Time": int(tra.time * self._timebase),
+                    "Chan": int(tra.channel),
+                    "Status": 32768,
+                    "ParamID": int(tra.param_id),
+                    "Pretrigger": int(tra.pretrigger),
+                    "Thr": int(tra.threshold * 1e6 / parameter["ADC_µV"]),
+                    "SampleRate": int(tra.samplerate),
+                    "Samples": int(tra.samples),
+                    "DataFormat": int(self._data_format),
+                    "Data": encode_data_blob(tra.data, self._data_format, parameter["TR_mV"]),
+                    "TRAI": (
+                        int(tra.trai)
+                        if tra.trai else None
+                    ),
+                },
+            )
