@@ -77,7 +77,11 @@ class TrfDatabase(Database):
             Sized iterable to sequential read features
         """
         query = "SELECT * FROM trf_data " + query_conditions(isin={"TRAI": trai})
-        return QueryIterable(self.connection(), query, FeatureRecord.from_sql)
+        return QueryIterable(
+            self._connection_wrapper.get_readonly_connection(),
+            query,
+            FeatureRecord.from_sql,
+        )
 
     @require_write_access
     def write(self, feature_set: FeatureRecord) -> int:
