@@ -145,7 +145,11 @@ class TraDatabase(Database):
             greater_equal={"vtr.SetID": setid_time_start},
             less={"vtr.SetID": setid_time_stop},
         )
-        return QueryIterable(con, query, TraRecord.from_sql)
+        return QueryIterable(
+            self._connection_wrapper.get_readonly_connection(),
+            query,
+            TraRecord.from_sql,
+        )
 
     def read_wave(
         self, trai: int, time_axis: bool = True,

@@ -218,7 +218,11 @@ class PriDatabase(Database):
             greater_equal={"vae.Time": time_start},
             less={"vae.Time": time_stop},
         )
-        return QueryIterable(self.connection(), query, HitRecord.from_sql)
+        return QueryIterable(
+            self._connection_wrapper.get_readonly_connection(),
+            query,
+            HitRecord.from_sql,
+        )
 
     def iread_markers(
         self,
@@ -246,7 +250,11 @@ class PriDatabase(Database):
             greater_equal={"vae.Time": time_start},
             less={"vae.Time": time_stop},
         )
-        return QueryIterable(self.connection(), query, MarkerRecord.from_sql)
+        return QueryIterable(
+            self._connection_wrapper.get_readonly_connection(),
+            query,
+            MarkerRecord.from_sql,
+        )
 
     def iread_parametric(
         self,
@@ -276,7 +284,11 @@ class PriDatabase(Database):
             greater_equal={"vae.Time": time_start},
             less={"vae.Time": time_stop},
         )
-        return QueryIterable(self.connection(), query, ParametricRecord.from_sql)
+        return QueryIterable(
+            self._connection_wrapper.get_readonly_connection(),
+            query,
+            ParametricRecord.from_sql,
+        )
 
     def iread_status(
         self,
@@ -309,7 +321,11 @@ class PriDatabase(Database):
             greater_equal={"vae.Time": time_start},
             less={"vae.Time": time_stop},
         )
-        return QueryIterable(self.connection(), query, StatusRecord.from_sql)
+        return QueryIterable(
+            self._connection_wrapper.get_readonly_connection(),
+            query,
+            StatusRecord.from_sql,
+        )
 
     @require_write_access
     @check_monotonic_time

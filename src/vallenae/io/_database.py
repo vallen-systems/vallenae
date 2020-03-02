@@ -5,13 +5,13 @@ from functools import wraps
 from pathlib import Path
 from typing import Any, Dict, Optional, Sequence, Set, Tuple, Union
 
-from ._sql import insert_from_dict, read_sql_generator, update_from_dict
+from ._sql import ConnectionWrapper, insert_from_dict, read_sql_generator, update_from_dict
 
 
 def require_write_access(func):
     @wraps(func)
     def wrapper(self: "Database", *args, **kwargs):
-        if self.readonly:
+        if self._readonly:  # pylint: disable=protected-access
             raise ValueError(
                 "Can not write to database in read-only mode. Open database with mode='rw'"
             )
@@ -32,43 +32,20 @@ class Database:
         table_prefix: str,
         required_file_ext: Optional[str] = None,
     ):
-        self._connected: bool = False
-        self._filename: str = str(filename)  # forced str conversion (e.g. for pathlib.Path)
-
         # check file extension
         if required_file_ext is not None:
-            file_ext = Path(self._filename).suffix
+            file_ext = Path(filename).suffix
             if file_ext.lower() != required_file_ext.lower():
                 raise ValueError(
                     f"File {filename} does not have the required extension {required_file_ext}"
                 )
 
-        # check mode
-        valid_modes = ("ro", "rw", "rwc")
-        if mode not in valid_modes:
-            raise ValueError(f"Invalid access mode '{mode}', use: {valid_modes}")
         if mode == "rwc":
             if not Path(filename).exists():
                 self.create(filename)  # call abstract method (implemented by child class)
-        self._readonly: bool = (mode == "ro")
 
-        # open sqlite connection
-        self._connection = sqlite3.connect(
-            f"file:{self._filename}?mode={mode}",
-            uri=True,
-            check_same_thread=(not self._readonly),  # allow multithreading in read-only mode
-        )
-        self._connected = True
-
-        # set pragmas for write-mode
-        if not self._readonly:
-            self._connection.executescript(
-                """
-                PRAGMA journal_mode = WAL;
-                PRAGMA locking_mode = EXCLUSIVE;
-                PRAGMA synchronous = OFF;
-                """
-            )
+        self._readonly = (mode == "ro")
+        self._connection_wrapper = ConnectionWrapper(filename, mode)
 
         self._table_prefix: str = table_prefix
         self._table_main: str = f"{table_prefix}_data"
@@ -97,17 +74,12 @@ class Database:
     @property
     def filename(self) -> str:
         """Filename of database."""
-        return self._filename
-
-    @property
-    def readonly(self) -> bool:
-        """Read-only mode for database connection."""
-        return self._readonly
+        return self._connection_wrapper.filename
 
     @property
     def connected(self) -> bool:
         """Check if connected to SQLite database."""
-        return self._connected
+        return self._connection_wrapper.connected
 
     def connection(self) -> sqlite3.Connection:
         """
@@ -116,9 +88,7 @@ class Database:
         Raises:
             RuntimeError: If connection is closed
         """
-        if not self._connected:
-            raise RuntimeError("Not connected to SQLite database")
-        return self._connection
+        return self._connection_wrapper.connection()
 
     def rows(self) -> int:
         """Number of rows in data table."""
@@ -258,12 +228,10 @@ class Database:
 
     def close(self):
         """Close database connection."""
-        if self._connected:
+        if self.connected:
             if not self._readonly:
                 self._update_globalinfo()
-                self._connection.commit()  # commit remaining changes
-            self._connection.close()
-            self._connected = False
+            self._connection_wrapper.close()
 
     def __del__(self):
         self.close()

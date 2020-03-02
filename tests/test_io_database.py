@@ -1,6 +1,7 @@
 import os
 import sqlite3
 from pathlib import Path
+import pickle
 
 import pytest
 
@@ -211,3 +212,13 @@ def test_write_fieldinfo(empty_pridb):
     # try write field, that doesn't correspond to column in data table
     with pytest.raises(ValueError):
         empty_pridb.write_fieldinfo("NotAColumn", {"Unit": "[Hz]"})
+
+
+def test_pickle(sample_pridb):
+    pkl = pickle.dumps(sample_pridb)
+    pridb_unpickled = pickle.loads(pkl)
+
+    # run random queries
+    assert pridb_unpickled.tables() == sample_pridb.tables()
+    assert pridb_unpickled.rows() == sample_pridb.rows()
+    assert pridb_unpickled.columns() == sample_pridb.columns()
