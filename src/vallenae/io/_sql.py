@@ -7,35 +7,134 @@ from typing import Any, Callable, Dict, Iterator, Optional, Sequence, Tuple, Typ
 
 from .types import SizedIterable
 
-
 logger = logging.getLogger(__name__)
+
+
+class ConnectionWrapper:
+    """SQLite3 connection wrapper (picklable)."""
+
+    def __init__(self, filename: str, mode: str = "ro", multithreading: bool = False):
+        # check mode
+        valid_modes = ("ro", "rw", "rwc")
+        if mode not in valid_modes:
+            raise ValueError(f"Invalid access mode '{mode}', use: {valid_modes}")
+
+        self._filename = str(filename)
+        self._mode = mode
+        self._multithreading = multithreading
+        # enable multithreading for read-only connections
+        if mode == "ro":
+            self._multithreading = True
+
+        self._connected = False
+        self._connect()
+
+    def _connect(self):
+        """Open SQLite connection."""
+        self._connection = sqlite3.connect(
+            f"file:{self._filename}?mode={self._mode}",
+            uri=True,
+            check_same_thread=(not self._multithreading),
+        )
+        self._connected = True
+
+        # set pragmas for write-mode
+        if self._mode != "ro":
+            self._connection.executescript(
+                """
+                PRAGMA journal_mode = WAL;
+                PRAGMA synchronous = OFF;
+                """
+            )
+
+    @property
+    def filename(self) -> str:
+        return self._filename
+
+    @property
+    def mode(self) -> str:
+        return self._mode
+
+    @property
+    def connected(self) -> bool:
+        return self._connected
+
+    def connection(self) -> sqlite3.Connection:
+        """
+        Get SQLite connection object.
+
+        Raises:
+            RuntimeError: If connection is closed
+        """
+        if not self._connected:
+            raise RuntimeError("Not connected to SQLite database")
+        return self._connection
+
+    def get_readonly_connection(self) -> "ConnectionWrapper":
+        """
+        Return read-only ConnectionWrapper.
+
+        Create new connection if mode != ro.
+        """
+        if self._mode == "ro":
+            return self
+        return ConnectionWrapper(self._filename, mode="ro")
+
+    def close(self):
+        if self._connected:
+            self._connection.commit()  # commit remaining changes
+            self._connection.close()
+            self._connected = False
+
+    def __del__(self):
+        self.close()
+
+    def __getstate__(self):
+        # commit changes, database will be reopened with __setstate__
+        if self._connected:
+            self._connection.commit()
+        state = self.__dict__.copy()
+        del state["_connection"]  # remove the unpicklable sqlite3.connection
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        # reopen connection if connected before
+        if self._connected:
+            self._connect()
 
 
 T = TypeVar("T")
 class QueryIterable(SizedIterable[T]):
-    """Sized iterable to query results from SQLite as dictionaries."""
+    """
+    Sized iterable to query results from SQLite as dictionaries.
 
+    SQLite connection is stored in picklable ConnectionWrapper to be used with multiprocessing.
+    """
     def __init__(
         self,
-        connection: sqlite3.Connection,
+        connection_wrapper: ConnectionWrapper,
         query: str,
         dict_to_type: Callable[[Dict[str, Any]], T],
     ):
-        self._connection = connection
+        self._connection_wrapper = connection_wrapper
         self._query = query
         self._dict_to_type = dict_to_type
         self._count_result: Optional[int] = None  # cache result of __len__
 
     def __len__(self) -> int:
         if self._count_result is None:
-            self._count_result = count_sql_results(self._connection, self._query)
+            self._count_result = count_sql_results(
+                self._connection_wrapper.connection(),
+                self._query
+            )
         return self._count_result
 
     def __iter__(self) -> Iterator[T]:
         if self.__len__() == 0:
             logger.debug("Empty SQLite query")
 
-        for row in read_sql_generator(self._connection, self._query):
+        for row in read_sql_generator(self._connection_wrapper.connection(), self._query):
             yield self._dict_to_type(row)
 
 

@@ -1,9 +1,14 @@
 import sqlite3
 from math import sin
+from pathlib import Path
+from tempfile import gettempdir
+import pickle
+import os
 
 import pytest
 
 from vallenae.io._sql import (
+    ConnectionWrapper,
     QueryIterable,
     count_sql_results,
     generate_insert_query,
@@ -37,6 +42,24 @@ def fixture_memory_id_abc():
     con.close()
 
 
+@pytest.fixture(name="temp_database")
+def fixture_temp_database():
+    try:
+        filename = Path(gettempdir()) / "temp.db"
+        con = sqlite3.connect(f"file:{filename}?mode=rwc", uri=True)
+        # add 10 rows of dummy data
+        with con:
+            con.execute("CREATE TABLE abc (a INT, b INT, c INT)")
+            for i in range(10):
+                con.execute(
+                    f"INSERT INTO abc (a, b, c) VALUES ({i}, {10 + i}, {20 + i})"
+                )
+        con.close()
+        yield filename
+    finally:
+        os.remove(filename)
+
+
 def get_row_by_id(connection, table, row_id):
     cur = connection.execute(f"SELECT * FROM {table} WHERE id == {row_id}")
     columns = [column[0] for column in cur.description]
@@ -44,6 +67,40 @@ def get_row_by_id(connection, table, row_id):
     if values is None:
         return None
     return dict(zip(columns, values))
+
+
+@pytest.mark.parametrize("mode", ("ro", "rw", "rwc"))
+def test_connection(temp_database, mode: str):
+    con = ConnectionWrapper(temp_database, mode=mode)
+    assert con.filename == str(temp_database)
+    assert con.mode == mode
+    assert con.connected == True
+
+    con_readonly = con.get_readonly_connection()
+    if mode == "ro":
+        assert con_readonly is con
+    assert con_readonly.mode == "ro"
+
+    assert con.connection().execute("SELECT * FROM abc").fetchone() == (0, 10, 20)
+
+    # pickle/unpickle
+    pkl = pickle.dumps(con)
+    con_unpickled = pickle.loads(pkl)
+    assert con.filename == str(temp_database)
+    assert con.mode == mode
+    assert con_unpickled.connected == True
+    assert con_unpickled.connection().execute("SELECT * FROM abc").fetchone() == (0, 10, 20)
+
+    # close connection
+    con.close()
+    assert con.connected == False
+    with pytest.raises(RuntimeError):
+        con.connection()
+
+    # pickle/unpickle closed connection
+    pkl = pickle.dumps(con)
+    con_unpickled = pickle.loads(pkl)
+    assert con_unpickled.connected == False
 
 
 def test_sql_query_conditions():
@@ -166,12 +223,16 @@ def test_sql_binary_search():
     con.close()
 
 
-def test_query_iterable(memory_abc):
+def test_query_iterable(temp_database):
     # simple conversion function dict to tuple
     def dict_to_type_func(row_dict):
         return (row_dict["a"], row_dict["b"], row_dict["c"])
 
-    iterable = QueryIterable(memory_abc, "SELECT * FROM abc", dict_to_type_func)
+    iterable = QueryIterable(
+        ConnectionWrapper(temp_database),
+        "SELECT * FROM abc",
+        dict_to_type_func
+    )
 
     assert len(iterable) == 10
 
