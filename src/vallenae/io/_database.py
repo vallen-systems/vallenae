@@ -116,11 +116,11 @@ class Database:
         """Add columns to specified table."""
         if dtype is None:
             dtype = ""
-        con = self.connection()
-        columns_exist = self._columns(table)
-        for column in columns:  # keep order of columns
-            if column not in columns_exist:
-                con.execute(f"ALTER TABLE {table} ADD COLUMN {column} {dtype}")
+        with self.connection() as con:  # commit/rollback transaction
+            columns_exist = self._columns(table)
+            for column in columns:  # keep order of columns
+                if column not in columns_exist:
+                    con.execute(f"ALTER TABLE {table} ADD COLUMN {column} {dtype}")
 
     def tables(self) -> Set[str]:
         """Get table names."""
@@ -157,17 +157,17 @@ class Database:
         if field not in self.columns():
             raise ValueError(f"Field {field} must be a column of data table")
 
-        con = self.connection()
         row_dict = info
         row_dict["field"] = field
-        try:
-            if field in self.fieldinfo().keys():
-                update_from_dict(con, self._table_fieldinfo, row_dict, "field")
-            else:
-                insert_from_dict(con, self._table_fieldinfo, row_dict)
-        except sqlite3.OperationalError:  # missing column(s)
-            self._add_columns(self._table_fieldinfo, list(row_dict.keys()))
-            self.write_fieldinfo(field, info)  # try again
+        with self.connection() as con:  # commit/rollback transaction
+            try:
+                if field in self.fieldinfo().keys():
+                    update_from_dict(con, self._table_fieldinfo, row_dict, "field")
+                else:
+                    insert_from_dict(con, self._table_fieldinfo, row_dict)
+            except sqlite3.OperationalError:  # missing column(s)
+                self._add_columns(self._table_fieldinfo, list(row_dict.keys()))
+                self.write_fieldinfo(field, info)  # try again
 
     def globalinfo(self) -> Dict[str, Any]:
         """Read globalinfo table."""
@@ -186,22 +186,23 @@ class Database:
     def _update_globalinfo(self):
         """Update globalinfo after writes."""
         keys = self.globalinfo().keys()
-        if "ValidSets" in keys:
-            self.connection().execute(
-                """
-                UPDATE {prefix}_globalinfo
-                SET Value = (SELECT MAX(rowid) FROM {prefix}_data)
-                WHERE Key == "ValidSets"
-                """.format(prefix=self._table_prefix)
-            )
-        if "TRAI" in keys:
-            self.connection().execute(
-                """
-                UPDATE {prefix}_globalinfo
-                SET Value = (SELECT MAX(TRAI) FROM {prefix}_data)
-                WHERE Key == "TRAI";
-                """.format(prefix=self._table_prefix)
-            )
+        with self.connection() as con:  # commit/rollback transaction
+            if "ValidSets" in keys:
+                con.execute(
+                    """
+                    UPDATE {prefix}_globalinfo
+                    SET Value = (SELECT MAX(rowid) FROM {prefix}_data)
+                    WHERE Key == "ValidSets"
+                    """.format(prefix=self._table_prefix)
+                )
+            if "TRAI" in keys:
+                con.execute(
+                    """
+                    UPDATE {prefix}_globalinfo
+                    SET Value = (SELECT MAX(TRAI) FROM {prefix}_data)
+                    WHERE Key == "TRAI";
+                    """.format(prefix=self._table_prefix)
+                )
 
     def _parameter_table(self) -> Dict[int, Dict[str, Any]]:
         """Read *_params table to dict."""
