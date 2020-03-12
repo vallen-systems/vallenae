@@ -174,7 +174,7 @@ class Database:
         def try_convert_string(value: str) -> Any:
             try:
                 return literal_eval(value)
-            except SyntaxError:
+            except (SyntaxError, ValueError):
                 return str(value)
         con = self.connection()
         cur = con.execute(f"SELECT Key, Value FROM {self._table_globalinfo}")
