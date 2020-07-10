@@ -1,6 +1,20 @@
 Changelog
 =========
 
+0.2.2
+-----
+2020-07-10
+
+Optimizations
+    - database classes are now pickable and can be used in multiprocessing
+    - SQLite transactions for all writes
+    - faster blob encoding (`vallenae.io.encode_data_blob`)
+    - faster RMS computation with Numba (`vallenae.features.rms`)
+
+Bug fixes
+    - catch possible global_info table parsing errors 
+
+
 0.2.1
 -----
 2020-02-10

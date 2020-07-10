@@ -1,3 +1,4 @@
+import collections.abc
 import contextlib
 import logging
 import sqlite3
@@ -157,7 +158,7 @@ def query_conditions(
         for key, values in isin.items():
             if values is None:
                 continue
-            if not isinstance(values, Sequence):
+            if not isinstance(values, collections.abc.Sequence):
                 values = (values,)
             cond.append(
                 "{:s} IN ({:s})".format(key, ", ".join(str(value) for value in values))

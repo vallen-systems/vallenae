@@ -19,9 +19,10 @@ INSTALL_REQUIRES = [
 EXTRAS_REQUIRE = {
     "docs": [
         "sphinx<2.3",
-        "sphinx-autodoc-typehints",
+        "sphinx-autodoc-typehints==1.10.3",  # >1.10 requires sphinx>=3.0 -> to be updated soon
         "sphinx-rtd-theme",
         "sphinx-gallery",
+        "pillow",  # required by sphinx-gallery
         "matplotlib",  # used in examples
     ],
     "tests": [
@@ -39,7 +40,7 @@ EXTRAS_REQUIRE["dev"] = EXTRAS_REQUIRE["docs"] + EXTRAS_REQUIRE["tests"] + EXTRA
 
 setup(
     name="vallenae",
-    version="0.2.1",
+    version="0.2.2",
     description="Extract and analyze Acoustic Emission measurement data",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
