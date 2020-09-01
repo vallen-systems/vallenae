@@ -25,10 +25,10 @@ def check_monotonic_time(func):
     @wraps(func)
     def wrapper(self: "PriDatabase", record: RecordType, *args, **kwargs):
         max_time = get_max_time(self)
-        if record.time < max_time:
+        if record.time + 1e-9 < max_time:  # threshold of 1 ns to ignore rounding errors
             raise ValueError(
                 (
-                    f"Time column has to be monotonic increasing."
+                    f"Time column has to be monotonic increasing. "
                     f"Time of current / last row: {record.time} / {max_time} s"
                 )
             )
