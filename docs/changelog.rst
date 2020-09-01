@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.2.3
+-----
+2020-09-01
+
+Bug fixes
+    - AIC timepicker
+    - add threshold for monotonic time check (1 ns) to ignore rounding issues
+    - suppress exception chaining
+
+
 0.2.2
 -----
 2020-07-10
