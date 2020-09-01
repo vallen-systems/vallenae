@@ -346,7 +346,7 @@ def generate_update_query(table: str, columns: Tuple[str, ...], key_column: str)
     try:
         columns_list.remove(key_column)
     except ValueError:
-        raise ValueError(f"Argument key_column '{key_column}' must be a key of row_dict")
+        raise ValueError(f"Argument key_column '{key_column}' must be a key of row_dict") from None
 
     query = "UPDATE {table} SET {set} WHERE {condition}".format(
         table=table,

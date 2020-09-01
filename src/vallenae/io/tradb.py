@@ -177,7 +177,7 @@ class TraDatabase(Database):
         try:
             tra = next(iter(iterable))
         except StopIteration:
-            raise ValueError("TRAI does not exists")
+            raise ValueError("TRAI does not exists") from None
 
         if time_axis:
             return (

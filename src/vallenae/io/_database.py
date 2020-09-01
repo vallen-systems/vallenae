@@ -225,7 +225,7 @@ class Database:
         except KeyError:
             raise ValueError(
                 f"Parameter ID {param_id} not found in {self._table_params}"
-            )
+            ) from None
 
     def close(self):
         """Close database connection."""
