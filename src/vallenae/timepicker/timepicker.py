@@ -123,8 +123,8 @@ def aic(arr: np.ndarray) -> Tuple[np.ndarray, int]:
         r_variance = max(r_variance, safety_eps)
 
         result[i] = (
-            i * math.log(l_variance) / math.log(10) +
-            (n - i - 1) * math.log(r_variance) / math.log(10)
+            (i + 1) * math.log(l_variance) / math.log(10) +
+            (n - i - 2) * math.log(r_variance) / math.log(10)
         )
 
         if result[i] < min_value:
