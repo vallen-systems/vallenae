@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.2.4
+-----
+2020-11-01
+
+Bug fixes
+    - SQL schemas for pridb/tradb/trfdb creation, add fieldinfos
+
+
 0.2.3
 -----
 2020-09-01
