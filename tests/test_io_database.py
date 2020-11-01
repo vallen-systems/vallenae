@@ -186,28 +186,20 @@ def test_fieldinfo_mixed_types(sample_pridb):
 
 
 def test_write_fieldinfo(empty_pridb):
-    def assert_unique_fields():
+    def count_rows(field: str):
         con = empty_pridb.connection()
-        cur = con.execute("SELECT COUNT(field), COUNT(DISTINCT(field)) FROM ae_fieldinfo")
-        total, distinct = cur.fetchone()
-        assert total == distinct
-
-    assert empty_pridb.fieldinfo() == {}
-
-    # insert
-    empty_pridb.write_fieldinfo("Time", {"Unit": "[µs]"})
-    assert empty_pridb.fieldinfo()["Time"]["Unit"] == "[µs]"
-    assert_unique_fields()
+        cur = con.execute(f"SELECT COUNT(field) FROM ae_fieldinfo WHERE field == '{field}'")
+        return cur.fetchone()[0]
 
     # update
-    empty_pridb.write_fieldinfo("Time", {"Unit": "[s]"})
-    assert empty_pridb.fieldinfo()["Time"]["Unit"] == "[s]"
-    assert_unique_fields()
+    empty_pridb.write_fieldinfo("Time", {"Unit": "[hours]"})
+    assert empty_pridb.fieldinfo()["Time"]["Unit"] == "[hours]"
+    assert count_rows("Time") == 1
 
     # write new column
     empty_pridb.write_fieldinfo("Time", {"XYZ": 11})
     assert empty_pridb.fieldinfo()["Time"]["XYZ"] == 11
-    assert_unique_fields()
+    assert count_rows("Time") == 1
 
     # try write field, that doesn't correspond to column in data table
     with pytest.raises(ValueError):
