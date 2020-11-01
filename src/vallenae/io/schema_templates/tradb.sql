@@ -38,14 +38,6 @@ CREATE TABLE tr_params (
 CREATE INDEX idx_TRAI on tr_data (TRAI);
 CREATE INDEX idx_SetupID_Chan on tr_params (SetupID, Chan);
 
--- Set globalinfo and TimeBase
-INSERT INTO tr_globalinfo (Key, Value) VALUES ("Version", 1);
-INSERT INTO tr_globalinfo (Key, Value) VALUES ("FileStatus", 0);
-INSERT INTO tr_globalinfo (Key, Value) VALUES ("TimeBase", {timebase});
-INSERT INTO tr_globalinfo (Key, Value) VALUES ("WriterID", "-");
-INSERT INTO tr_globalinfo (Key, Value) VALUES ("ValidSets", 0);
-INSERT INTO tr_globalinfo (Key, Value) VALUES ("TRAI", 0);
-
 -- Views
 CREATE VIEW view_tr_data AS
     SELECT
@@ -59,7 +51,24 @@ CREATE VIEW view_tr_data AS
         (d.SampleRate) AS SampleRate,
         (d.Samples) AS Samples,
         (d.DataFormat) AS DataFormat,
-        p.TR_mV AS TR_mV,
+        (p.TR_mV) AS TR_mV,
         (d.Data) AS Data
     FROM tr_data d
     LEFT JOIN tr_params p ON p.ID=d.ParamID;
+
+-- Insert fieldinfo
+INSERT INTO tr_fieldinfo VALUES("Time", "[s]", NULL);
+INSERT INTO tr_fieldinfo VALUES("Thr", "[µV]", "ADC_µV");
+INSERT INTO tr_fieldinfo VALUES("SampleRate", "[Hz]", NULL);
+INSERT INTO tr_fieldinfo VALUES("Data", NULL, "TR_mV");
+
+-- Insert globalinfo
+INSERT INTO tr_globalinfo (Key, Value) VALUES ("Version", 1);
+INSERT INTO tr_globalinfo (Key, Value) VALUES ("FileStatus", 0);
+INSERT INTO tr_globalinfo (Key, Value) VALUES ("TimeBase", {timebase});
+INSERT INTO tr_globalinfo (Key, Value) VALUES ("BytesPerSample", 2);
+INSERT INTO tr_globalinfo (Key, Value) VALUES ("WriterID", "-");
+INSERT INTO tr_globalinfo (Key, Value) VALUES ("FileID", NULL);  -- GUID
+INSERT INTO tr_globalinfo (Key, Value) VALUES ("ReferenceID", NULL);  -- GUID of pridb
+INSERT INTO tr_globalinfo (Key, Value) VALUES ("ValidSets", 0);
+INSERT INTO tr_globalinfo (Key, Value) VALUES ("TRAI", 0);
