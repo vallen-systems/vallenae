@@ -118,6 +118,13 @@ def test_iread_markers(sample_pridb):
     assert labels == LABELS_EXPECTED
 
 
+def test_iread_markers_query_filter(sample_pridb):
+    markers = list(
+        sample_pridb.iread_markers(query_filter="Data LIKE '%TimeZone%'")
+    )
+    assert len(markers) == 1
+
+
 def test_read_markers(sample_pridb):
     markers = sample_pridb.read_markers()
 
@@ -157,6 +164,13 @@ def test_iread_hits(sample_pridb):
         assert hit.cascade_counts == hit_expected.cascade_counts
         assert hit.cascade_energy == pytest.approx(hit_expected.cascade_energy)
         assert hit.cascade_signal_strength == pytest.approx(hit_expected.cascade_signal_strength)
+
+
+def test_iread_hits_query_filter(sample_pridb):
+    hits = list(
+        sample_pridb.iread_hits(query_filter="SetID >= 12")
+    )
+    assert len(hits) == 2
 
 
 def test_read_hits(sample_pridb):
@@ -204,6 +218,13 @@ def test_iread_parametric(sample_pridb):
         assert param.pa5 == param_expected.pa5
         assert param.pa6 == param_expected.pa6
         assert param.pa7 == param_expected.pa7
+
+
+def test_iread_parametric_query_filter(sample_pridb):
+    param = list(
+        sample_pridb.iread_parametric(query_filter="SetID > 10")
+    )
+    assert len(param) == 4
 
 
 def test_read_parametric(sample_pridb):

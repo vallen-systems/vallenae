@@ -194,6 +194,7 @@ class PriDatabase(Database):
         time_start: Optional[float] = None,
         time_stop: Optional[float] = None,
         set_id: Union[None, int, Sequence[int]] = None,
+        query_filter: Optional[str] = None,
     ) -> SizedIterable[HitRecord]:
         """
         Stream hits with returned iterable.
@@ -204,19 +205,25 @@ class PriDatabase(Database):
             time_start: Start reading at relative time (in seconds). Start at beginning if `None`
             time_stop: Stop reading at relative time (in seconds). Read until end if `None`
             set_id: Read by SetID
+            query_filter: Optional query filter provided as SQL clause,
+                e.g. "Amp > 5000 AND RiseT < 1000"
 
         Returns:
             Sized iterable to sequential read hits
         """
+        # nested query to fix ambiguous column name error with query_filter
         query = """
-        SELECT vae.*, ae.ParamID
-        FROM view_ae_data vae
-        LEFT JOIN ae_data ae ON vae.SetID == ae.SetID
+        SELECT * FROM (
+            SELECT vae.*, ae.ParamID
+            FROM view_ae_data vae
+            LEFT JOIN ae_data ae ON vae.SetID == ae.SetID
+        )
         """ + query_conditions(
-            equal={"vae.SetType": 2},
-            isin={"vae.Chan": channel, "vae.SetID": set_id},
-            greater_equal={"vae.Time": time_start},
-            less={"vae.Time": time_stop},
+            equal={"SetType": 2},
+            isin={"Chan": channel, "SetID": set_id},
+            greater_equal={"Time": time_start},
+            less={"Time": time_stop},
+            custom_filter=query_filter,
         )
         return QueryIterable(
             self._connection_wrapper.get_readonly_connection(),
@@ -230,6 +237,7 @@ class PriDatabase(Database):
         time_start: Optional[float] = None,
         time_stop: Optional[float] = None,
         set_id: Union[None, int, Sequence[int]] = None,
+        query_filter: Optional[str] = None,
     ) -> SizedIterable[MarkerRecord]:
         """
         Stream markers with returned iterable.
@@ -238,6 +246,8 @@ class PriDatabase(Database):
             time_start: Start reading at relative time (in seconds). Start at beginning if `None`
             time_stop: Stop reading at relative time (in seconds). Read until end if `None`
             set_id: Read by SetID
+            query_filter: Optional query filter provided as SQL clause,
+                e.g. "Number > 11 AND Data LIKE '%TimeZone%'"
 
         Returns:
             Sized iterable to sequential read markers
@@ -246,9 +256,10 @@ class PriDatabase(Database):
         SELECT SetID, Time, SetType, Number, Data
         FROM view_ae_markers vae
         """ + query_conditions(
-            isin={"vae.SetID": set_id},
-            greater_equal={"vae.Time": time_start},
-            less={"vae.Time": time_stop},
+            isin={"SetID": set_id},
+            greater_equal={"Time": time_start},
+            less={"Time": time_stop},
+            custom_filter=query_filter,
         )
         return QueryIterable(
             self._connection_wrapper.get_readonly_connection(),
@@ -262,6 +273,7 @@ class PriDatabase(Database):
         time_start: Optional[float] = None,
         time_stop: Optional[float] = None,
         set_id: Union[None, int, Sequence[int]] = None,
+        query_filter: Optional[str] = None,
     ) -> SizedIterable[ParametricRecord]:
         """
         Stream parametric data with returned iterable.
@@ -270,19 +282,25 @@ class PriDatabase(Database):
             time_start: Start reading at relative time (in seconds). Start at beginning if `None`
             time_stop: Stop reading at relative time (in seconds). Read until end if `None`
             set_id: Read by SetID
+            query_filter: Optional query filter provided as SQL clause,
+                e.g. "PA0 >= -5000 AND PA0 < 5000"
 
         Returns:
             Sized iterable to sequential read parametric data
         """
+        # nested query to fix ambiguous column name error with query_filter
         query = """
-        SELECT vae.*, ae.ParamID
-        FROM view_ae_data vae
-        LEFT JOIN ae_data ae ON vae.SetID == ae.SetID
+        SELECT * FROM (
+            SELECT vae.*, ae.ParamID
+            FROM view_ae_data vae
+            LEFT JOIN ae_data ae ON vae.SetID == ae.SetID
+        )
         """ + query_conditions(
-            equal={"vae.SetType": 1},
-            isin={"vae.SetID": set_id},
-            greater_equal={"vae.Time": time_start},
-            less={"vae.Time": time_stop},
+            equal={"SetType": 1},
+            isin={"SetID": set_id},
+            greater_equal={"Time": time_start},
+            less={"Time": time_stop},
+            custom_filter=query_filter,
         )
         return QueryIterable(
             self._connection_wrapper.get_readonly_connection(),
@@ -297,6 +315,7 @@ class PriDatabase(Database):
         time_start: Optional[float] = None,
         time_stop: Optional[float] = None,
         set_id: Union[None, int, Sequence[int]] = None,
+        query_filter: Optional[str] = None,
     ) -> SizedIterable[StatusRecord]:
         """
         Stream status data with returned iterable.
@@ -307,19 +326,25 @@ class PriDatabase(Database):
             time_start: Start reading at relative time (in seconds). Start at beginning if `None`
             time_stop: Stop reading at relative time (in seconds). Read until end if `None`
             set_id: Read by SetID
+            query_filter: Optional query filter provided as SQL clause,
+                e.g. "RMS < 300 OR RMS > 500"
 
         Returns:
             Sized iterable to sequential read status data
         """
+        # nested query to fix ambiguous column name error with query_filter
         query = """
-        SELECT vae.*, ae.ParamID
-        FROM view_ae_data vae
-        LEFT JOIN ae_data ae ON vae.SetID == ae.SetID
+        SELECT * FROM (
+            SELECT vae.*, ae.ParamID
+            FROM view_ae_data vae
+            LEFT JOIN ae_data ae ON vae.SetID == ae.SetID
+        )
         """ + query_conditions(
-            equal={"vae.SetType": 3},
-            isin={"vae.Chan": channel, "vae.SetID": set_id},
-            greater_equal={"vae.Time": time_start},
-            less={"vae.Time": time_stop},
+            equal={"SetType": 3},
+            isin={"Chan": channel, "SetID": set_id},
+            greater_equal={"Time": time_start},
+            less={"Time": time_stop},
+            custom_filter=query_filter,
         )
         return QueryIterable(
             self._connection_wrapper.get_readonly_connection(),

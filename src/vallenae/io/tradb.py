@@ -93,6 +93,7 @@ class TraDatabase(Database):
         time_start: Optional[float] = None,
         time_stop: Optional[float] = None,
         trai: Union[None, int, Sequence[int]] = None,
+        query_filter: Optional[str] = None,
     ) -> SizedIterable[TraRecord]:
         """
         Stream transient data with returned Iterable.
@@ -103,6 +104,8 @@ class TraDatabase(Database):
             time_start: Start reading at relative time (in seconds). Start at beginning if `None`
             time_stop: Stop reading at relative time (in seconds). Read until end if `None`
             trai: Read data by TRAI (transient recorder index)
+            query_filter: Optional query filter provided as SQL clause,
+                e.g. "Pretrigger == 500 AND Samples >= 1024"
 
         Returns:
             Sized iterable to sequential read transient data
@@ -136,14 +139,18 @@ class TraDatabase(Database):
         if setid_time_stop == setid_max:
             setid_time_stop = None
 
+        # nested query to fix ambiguous column name error with query_filter
         query = """
-        SELECT vtr.*, tr.ParamID
-        FROM view_tr_data vtr
-        LEFT JOIN tr_data tr ON vtr.SetID == tr.SetID
+        SELECT * FROM (
+            SELECT vtr.*, tr.ParamID
+            FROM view_tr_data vtr
+            LEFT JOIN tr_data tr ON vtr.SetID == tr.SetID
+        )
         """ + query_conditions(
-            isin={"vtr.Chan": channel, "vtr.TRAI": trai},
-            greater_equal={"vtr.SetID": setid_time_start},
-            less={"vtr.SetID": setid_time_stop},
+            isin={"Chan": channel, "TRAI": trai},
+            greater_equal={"SetID": setid_time_start},
+            less={"SetID": setid_time_stop},
+            custom_filter=query_filter,
         )
         return QueryIterable(
             self._connection_wrapper.get_readonly_connection(),

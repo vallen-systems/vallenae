@@ -121,6 +121,13 @@ def test_iread(sample_tradb):
         assert tra.trai == tra_expected.trai
 
 
+def test_iread_query_filter(sample_tradb):
+    tras = list(
+        sample_tradb.iread(query_filter="Samples >= 100000")
+    )
+    assert len(tras) == 1
+
+
 def test_read(sample_tradb):
     df = sample_tradb.read()
 

@@ -112,6 +112,7 @@ def test_sql_query_conditions():
     assert query_conditions(less_equal={"Number": None}) == ""
     assert query_conditions(greater={"Number": None}) == ""
     assert query_conditions(greater_equal={"Number": None}) == ""
+    assert query_conditions(custom_filter=None) == ""
 
     # single conditions
     assert query_conditions(
@@ -150,6 +151,16 @@ def test_sql_query_conditions():
         greater={"d": 3},
         greater_equal={"e": 4}
     ) == "WHERE a == 0 AND b < 1 AND c <= 2 AND d > 3 AND e >= 4"
+
+    # custom filter
+    assert query_conditions(
+        custom_filter="Amp > 50"
+    ) == "WHERE (Amp > 50)"
+
+    assert query_conditions(
+        equal={"a": 0},
+        custom_filter="Amp > 50"
+    ) == "WHERE a == 0 AND (Amp > 50)"
 
 
 def test_count_sql_results(memory_abc):
