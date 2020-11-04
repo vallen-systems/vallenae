@@ -151,6 +151,7 @@ def query_conditions(
     less_equal: Optional[TComparison] = None,
     greater: Optional[TComparison] = None,
     greater_equal: Optional[TComparison] = None,
+    custom_filter: Optional[str] = None,
 ) -> str:
     cond = []
 
@@ -180,6 +181,9 @@ def query_conditions(
                 if isinstance(value, str):
                     value = f"'{value}'"  # add quotation marks
                 cond.append(f"{key} {comp_operator} {value}")
+
+    if custom_filter is not None:
+        cond.append(f"({custom_filter})")  # wrap custom condition(s) in brackets
 
     return "WHERE " + " AND ".join(cond) if cond else ""
 
