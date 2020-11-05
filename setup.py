@@ -40,7 +40,7 @@ EXTRAS_REQUIRE["dev"] = EXTRAS_REQUIRE["docs"] + EXTRAS_REQUIRE["tests"] + EXTRA
 
 setup(
     name="vallenae",
-    version="0.2.4",
+    version="0.3.0",
     description="Extract and analyze Acoustic Emission measurement data",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
@@ -48,7 +48,7 @@ setup(
     author="Daniel Altmann, Lukas Berbuer (Vallen Systeme GmbH)",
     author_email="software@vallen.de",
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering",
         "License :: OSI Approved :: MIT License",

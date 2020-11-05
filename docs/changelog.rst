@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.3.0
+-----
+2020-11-05
+
+New features
+    - Add optional query filter for pridb/tradb (i)read functions 
+      (https://github.com/vallen-systems/pyVallenAE/issues/18)
+
+
 0.2.4
 -----
 2020-11-01
