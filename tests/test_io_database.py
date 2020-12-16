@@ -76,6 +76,7 @@ def test_create():
     with pytest.raises(NotImplementedError):
         Database("test.db", mode="rwc", table_prefix="")
 
+
 def test_tables_pridb(sample_pridb):
     assert sample_pridb._table_main == "ae_data"
     assert sample_pridb.tables() == {
