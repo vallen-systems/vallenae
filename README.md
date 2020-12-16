@@ -1,8 +1,8 @@
 # Vallen AE Python Tools
 
-[![Build Status](https://travis-ci.org/vallen-systems/pyVallenAE.svg?branch=master)](https://travis-ci.org/vallen-systems/pyVallenAE)
+[![CI](https://github.com/vallen-systems/pyVallenAE/workflows/CI/badge.svg)](https://github.com/vallen-systems/pyVallenAE/actions)
 [![Documentation Status](https://readthedocs.org/projects/pyvallenae/badge/?version=latest)](https://pyvallenae.readthedocs.io/en/latest/?badge=latest)
-[![Coverage Status](https://coveralls.io/repos/github/vallen-systems/pyVallenAE/badge.svg?branch=dev)](https://coveralls.io/github/vallen-systems/pyVallenAE)
+[![Coverage Status](https://coveralls.io/repos/github/vallen-systems/pyVallenAE/badge.svg?branch=master)](https://coveralls.io/github/vallen-systems/pyVallenAE)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PyPI](https://img.shields.io/pypi/v/vallenae)](https://pypi.org/project/vallenae)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/vallenae)](https://pypi.org/project/vallenae)
