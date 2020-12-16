@@ -75,9 +75,7 @@ print(f"Time single thread: {time_single_thread:.2f} ms")
 # Compute with multiple processes/cores
 # -------------------------------------
 # First get number of available cores in your machine:
-cores_total = os.cpu_count()
-cores_available = len(os.sched_getaffinity(0))  # https://docs.python.org/3/library/os.html#os.cpu_count
-print(f"Available / total CPU cores: {cores_available} / {cores_total}")
+print(f"Available CPU cores: {os.cpu_count()}")
 
 #%%
 # But how can we utilize those cores? The common answer for most programming languages is multithreading.
