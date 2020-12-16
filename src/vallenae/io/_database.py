@@ -229,6 +229,8 @@ class Database:
 
     def close(self):
         """Close database connection."""
+        if not hasattr(self, "_connection_wrapper"):
+            return
         if self.connected:
             if not self._readonly:
                 self._update_globalinfo()
