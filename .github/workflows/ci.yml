@@ -1,0 +1,48 @@
+name: CI
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: [3.6, 3.7, 3.8]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install libsndfile
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt install -y libsndfile1
+      - name: Install Tox
+        run: pip install tox
+      - name: Run pylint
+        run: tox -e pylint
+      - name: Run mypy
+        run: tox -e mypy
+      - name: Run pytest
+        run: tox -e py
+      - name: Coveralls
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.8'
+        run: tox -e coveralls
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install libsndfile
+        run: sudo apt install -y libsndfile1
+      - name: Install Tox
+        run: pip install tox
+      - name: Check docs
+        run: tox -e docs
