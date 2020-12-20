@@ -1,0 +1,104 @@
+[tool.black]
+line-length = 100
+
+[tool.isort]
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+use_parentheses = true
+
+[tool.pylint.message_control]
+disable = [
+    "import-error",  # run without install in tox
+    "bad-continuation", # code style by black
+    "missing-module-docstring",
+    "missing-function-docstring",
+]
+
+[tool.pylint.format]
+max-line-length = 100
+good-names = [
+    "logger",
+    "i", "j", "k", "n", "m",
+    "t", "f",
+    "x", "y",
+    "sr",  # sample rate
+    "ax",  # matplotlib axes
+    "df",  # pandas dataframe
+    "e",  # exceptions
+    "T",  # typing generics (TypeVar)
+]
+
+[tool.pylint.design]
+max-attributes = 10
+
+[tool.pylint.similarities]
+min-similarity-lines = 5
+
+[tool.mypy]  # not supported yet
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"  # test summary for (a)ll except passed
+testpaths = ["tests"]
+log_cli = true
+log_cli_level = "WARNING"
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = pylint, mypy, py36, py37, py38, py39, coverage-report
+
+[testenv:pylint]
+skip_install = true
+deps = pylint
+commands = pylint src/
+
+[testenv:mypy]
+skip_install = true
+deps = mypy
+commands = mypy --ignore-missing-imports src/
+
+[testenv]
+setenv =
+    NUMBA_DISABLE_JIT = 1
+extras = tests
+commands = 
+    coverage run --parallel -m pytest
+
+[testenv:coverage-report]
+skip_install = true
+deps =
+    coverage>=5
+    toml
+commands =
+    - coverage combine
+    coverage report
+
+[testenv:coveralls]
+skip_install = true
+deps =
+    coverage>=5
+    coveralls
+    toml
+passenv = GITHUB_*
+commands = 
+    - coverage combine
+    coveralls
+
+[testenv:docs]
+extras = docs
+changedir = docs
+whitelist_externals = make
+commands =
+    make linkcheck
+    make dummy
+"""
+
+[tool.coverage.run]
+branch = true
+source = ["vallenae"]
+
+[tool.coverage.paths]
+source = ["src", ".tox/*/site-packages"]
