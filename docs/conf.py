@@ -70,16 +70,6 @@ default_role = "autolink"
 # If true, "()" will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
 
-# Ignored by autosummary, bugfix implemented: https://github.com/sphinx-doc/sphinx/pull/6817
-# Wait until bugfix is released with pypi package...
-def skip(app, what, name, obj, would_skip, options):
-    if name in ("__init__", "__iter__", "__len__", "__enter__", "__exit__"):
-        return False
-    return would_skip
-
-def setup(app):
-    app.connect("autodoc-skip-member", skip)
-
 from sphinx_gallery.sorting import FileNameSortKey
 sphinx_gallery_conf = {
      "examples_dirs": "../examples",  # path to your example scripts
@@ -96,12 +86,10 @@ warnings.filterwarnings(
     message="Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.",
 )
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-# html_theme = "alabaster"
 import sphinx_rtd_theme
 html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]

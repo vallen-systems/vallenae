@@ -18,8 +18,8 @@ INSTALL_REQUIRES = [
 
 EXTRAS_REQUIRE = {
     "docs": [
-        "sphinx<2.3",
-        "sphinx-autodoc-typehints==1.10.3",  # >1.10 requires sphinx>=3.0 -> to be updated soon
+        "sphinx>3",
+        "sphinx-autodoc-typehints",
         "sphinx-rtd-theme",
         "sphinx-gallery",
         "pillow",  # required by sphinx-gallery
