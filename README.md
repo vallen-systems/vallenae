@@ -15,6 +15,15 @@ Python tools to extract and analyze Acoustic Emission measurement data:
 - vallenae.**features**: Extraction of Acoustic Emission features
 - vallenae.**timepicker**: Timepicking algorithms for arrival time estimations
 
+---
+**Note**: A free/lite version of the Vallen AE Suite is available since the release R2020.
+If offers the basic features for real-time data visualization and analysis with VisualAE.
+So you could write you own pridb/tradb files and have real-time visualizations with VisualAE.
+
+The Vallen AE Suite can be downloaded here: https://www.vallen.de/downloads/
+
+---
+
 ## Documentation
 
 For full documentation and examples, please visit http://pyvallenae.rtfd.io.
