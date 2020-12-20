@@ -23,6 +23,7 @@ EXTRAS_REQUIRE = {
         "sphinx-rtd-theme",
         "sphinx-gallery",
         "pillow",  # required by sphinx-gallery
+        "m2r2",  # include markdown files
         "matplotlib",  # used in examples
     ],
     "tests": [

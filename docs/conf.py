@@ -40,7 +40,10 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx_autodoc_typehints",
     "sphinx_gallery.gen_gallery",
+    "m2r2",
 ]
+
+source_suffix = [".rst", ".md"]
 
 autosummary_generate = True
 autodoc_member_order = "bysource"
