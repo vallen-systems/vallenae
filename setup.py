@@ -26,13 +26,14 @@ EXTRAS_REQUIRE = {
         "matplotlib",  # used in examples
     ],
     "tests": [
-        "pytest",
-        "coverage<5.0",
+        "coverage>=5",  # pyproject.toml support
+        "pytest>=6",  # pyproject.toml support
+        "toml",  # toml support for coverage.py
     ],
     "tools": [
-        "tox",
-        "pylint",
         "mypy",
+        "pylint>=2.5",  # pyproject.toml support
+        "tox>=3.4",  # pyproject.toml support
     ]
 }
 
