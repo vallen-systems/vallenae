@@ -245,13 +245,14 @@ def sql_binary_search(
 
     def get_value(index):
         cur = connection.execute(
-            f"SELECT {column_value} FROM {table} WHERE {column_index} == {index}"
+            f"SELECT {column_value} FROM {table} WHERE {column_index} == ?",
+            (index,)
         )
         return cur.fetchone()[0]
 
-    i_min, i_max = connection.execute(
-        f"SELECT MIN({column_index}), MAX({column_index}) FROM {table}"
-    ).fetchone()
+    # two querys are way faster than one combined!
+    i_min = connection.execute(f"SELECT MIN({column_index}) FROM {table}").fetchone()[0]
+    i_max = connection.execute(f"SELECT MAX({column_index}) FROM {table}").fetchone()[0]
 
     while True:
         v_min = get_value(i_min)

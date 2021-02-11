@@ -113,7 +113,6 @@ class TraDatabase(Database):
         con = self.connection()
         setid_time_start = None
         setid_time_stop = None
-        setid_max = con.execute(f"SELECT MAX(SetID) FROM {self._table_main}").fetchone()[0]
 
         if time_start is not None:
             setid_time_start = sql_binary_search(
@@ -136,6 +135,7 @@ class TraDatabase(Database):
 
         # remove upper boundary if equal to max index
         # otherwise the last row is excluded (less condition)
+        setid_max = con.execute(f"SELECT MAX(SetID) FROM {self._table_main}").fetchone()[0]
         if setid_time_stop == setid_max:
             setid_time_stop = None
 
