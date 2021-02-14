@@ -85,7 +85,7 @@ deps =
 passenv = GITHUB_*
 commands = 
     - coverage combine
-    coveralls
+    coveralls --service=github
 
 [testenv:docs]
 extras = docs
