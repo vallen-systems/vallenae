@@ -224,11 +224,9 @@ def test_read_continuous_wave(fresh_tradb):
 
     # get empty time range
     y, t = fresh_tradb.read_continuous_wave(1, time_start=0.1, time_stop=0.1)
-    print(y)
     assert len(y) == 0
     assert len(t) == 0
     y, t = fresh_tradb.read_continuous_wave(1, time_start=-0.1, time_stop=-0.1)
-    print(y)
     assert len(y) == 0
     assert len(t) == 0
 
@@ -242,26 +240,33 @@ def test_read_continuous_wave(fresh_tradb):
     assert_allclose(y, ref2_total, atol=1e-6)
 
     # get exact time range
-    y, _ = fresh_tradb.read_continuous_wave(1, time_start=2.18, time_stop=2.55)
+    y, t = fresh_tradb.read_continuous_wave(1, time_start=2.18, time_stop=2.55)
     assert len(y) == 37  # = (2.55 - 2.18) * samplerate
-    assert np.min(y) == pytest.approx(2.18)
-    assert np.max(y) == pytest.approx(2.54)  # = 2.55 - 1/fs
+    assert y[0] == pytest.approx(2.18)
+    assert y[-1] == pytest.approx(2.54)  # = 2.55 - 1/fs
+    assert t[0] == pytest.approx(2.18)
 
     # get exact time range < 1 block (0.1 s)
-    y, _ = fresh_tradb.read_continuous_wave(1, time_start=2.13, time_stop=2.18)
+    y, t = fresh_tradb.read_continuous_wave(1, time_start=2.13, time_stop=2.18)
     assert len(y) == 5
+    assert y[0] == pytest.approx(2.13)
+    assert y[-1] == pytest.approx(2.17)  # = 2.18 - 1/fs
+    assert t[0] == pytest.approx(2.13)
 
     # get time range exceeding lower bound
-    y, _ = fresh_tradb.read_continuous_wave(1, time_start=1.9, time_stop=2.4)
+    y, t = fresh_tradb.read_continuous_wave(1, time_start=1.9, time_stop=2.4)
     assert len(y) == 50  # = (2.4 - 1.9) * samplerate
-    assert np.min(y) == 0  # zero padded
-    assert np.max(y) == pytest.approx(2.39)  # = 2.4 - 1/fs
+    assert y[0] == 0  # zero padded
+    assert y[-1] == pytest.approx(2.39)  # = 2.4 - 1/fs
+    assert t[0] == pytest.approx(1.9)
 
     # get time range exceeding lower / upper bounds
-    y, _ = fresh_tradb.read_continuous_wave(1, time_start=-0.1)
+    y, t = fresh_tradb.read_continuous_wave(1, time_start=-0.1)
     assert_allclose(y, np.concatenate([np.zeros(10), ref2_total]), atol=1e-6)
-    y, _ = fresh_tradb.read_continuous_wave(1, time_stop=4)
+    assert t[0] == pytest.approx(-0.1)
+    y, t = fresh_tradb.read_continuous_wave(1, time_stop=4)
     assert_allclose(y, np.concatenate([ref2_total, np.zeros(100)]), atol=1e-6)
+    assert t[0] == pytest.approx(0.0)
 
 
 def test_write(fresh_tradb):

@@ -269,6 +269,10 @@ class TraDatabase(Database):
                     iterator,
                 )
 
+        # find beginning if not provided
+        if time_start is None:
+            time_start = self._get_total_time_range()[0]
+
         def slice_range(tra: TraRecord):
             """Get indices to slice given tra record data to time range."""
             def limit_index(i: int):
@@ -282,7 +286,7 @@ class TraDatabase(Database):
 
         samplerate = 0  # will be initialized with samplerate of first record
         tra_blocks = [np.empty(0, dtype=np.float32)]
-        expected_time = time_start if time_start is not None else self._get_total_time_range()[0]
+        expected_time = time_start
 
         for tra in iterator:
             if samplerate == 0:
@@ -310,7 +314,7 @@ class TraDatabase(Database):
 
         y = np.concatenate(tra_blocks)
         if time_axis:
-            return y, _create_time_vector(len(y), samplerate)
+            return y, _create_time_vector(len(y), samplerate) + time_start
         return y, samplerate
 
     @require_write_access
