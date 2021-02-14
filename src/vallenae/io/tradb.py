@@ -133,12 +133,6 @@ class TraDatabase(Database):
                 lower_bound=False,  # return upper index of true conditions
             )
 
-        # remove upper boundary if equal to max index
-        # otherwise the last row is excluded (less condition)
-        setid_max = con.execute(f"SELECT MAX(SetID) FROM {self._table_main}").fetchone()[0]
-        if setid_time_stop == setid_max:
-            setid_time_stop = None
-
         # nested query to fix ambiguous column name error with query_filter
         query = """
         SELECT * FROM (
@@ -149,7 +143,8 @@ class TraDatabase(Database):
         """ + query_conditions(
             isin={"Chan": channel, "TRAI": trai},
             greater_equal={"SetID": setid_time_start},
-            less={"SetID": setid_time_stop},
+            # < condition already met in binary search, use <= here for found indice range
+            less_equal={"SetID": setid_time_stop},
             custom_filter=query_filter,
         )
         return QueryIterable(
