@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2021-02-14
+
 ### Added
 
 - CI with GitHub actions on Linux, MacOS and Windows
@@ -87,6 +89,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial public release
 
 [Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.3.0...HEAD
+[0.4.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.2.3...0.3.0
 [0.2.4]: https://github.com/vallen-systems/pyVallenAE/compare/0.2.3...0.2.4
 [0.2.3]: https://github.com/vallen-systems/pyVallenAE/compare/0.2.2...0.2.3
