@@ -196,10 +196,12 @@ def test_sql_binary_search():
     con = sqlite3.connect(":memory:")
     con.execute("CREATE TABLE squares (id INTEGER PRIMARY KEY, value REAL)")
     con.execute("CREATE TABLE consts (id INTEGER PRIMARY KEY, value INT)")
+    con.execute("CREATE TABLE step (id INTEGER PRIMARY KEY, value INT)")
     con.execute("CREATE TABLE sin (id INTEGER PRIMARY KEY, value REAL)")
     for i in range(100):
         con.execute("INSERT INTO squares (id, value) VALUES (?, ?)", (i, i**2))
         con.execute("INSERT INTO consts (id, value) VALUES (?, ?)", (i, 11))
+        con.execute("INSERT INTO step (id, value) VALUES (?, ?)", (i, int(i >= 33)))
         con.execute("INSERT INTO sin (id, value) VALUES (?, ?)", (i, sin(i)))
 
     # squares table
@@ -226,9 +228,15 @@ def test_sql_binary_search():
     # return upper bound if condition is true for both bounds
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x == 11, lower_bound=False) == 99
 
+    # step table
+    assert sql_binary_search(con, "step", "value", "id", lambda x: x == 0) == 0
+    assert sql_binary_search(con, "step", "value", "id", lambda x: x == 0, lower_bound=False) == 32
+    assert sql_binary_search(con, "step", "value", "id", lambda x: x >= 1) == 33
+    assert sql_binary_search(con, "step", "value", "id", lambda x: x >= 1, lower_bound=False) == 99
+
     # sin table, not sorted -> expect exception
-    with pytest.raises(ValueError):
-        for limit in (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9):
+    for limit in (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9):
+        with pytest.raises(ValueError):
             sql_binary_search(con, "sin", "value", "id", lambda x: x >= limit)
 
     con.close()

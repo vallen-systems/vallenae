@@ -227,11 +227,14 @@ def sql_binary_search(
     lower_bound: bool = True,
 ) -> Optional[int]:
     """
-    Helper function to find the boundary row-index for given condition on a sorted column.
+    Helper function to find the boundary index for given condition on a sorted column.
 
     Especially using conditions on the pridb's and tradb's Time column are expensive (not indexed).
     E.g.: SELECT * FROM view_tr_data WHERE Time > 10 AND Time < 100
+
     Because the Time column is monotonic increasing, a fast binary search can be applied.
+    The Time column is not *stricly* monotonic increasing; different channels might share the same
+    timestamp. To find the lower/upper bound of same values, a subsequent linear search is applied.
 
     Args:
         connection: SQLite connection
@@ -239,44 +242,61 @@ def sql_binary_search(
         column_value: Name of the sorted column, e.g. Time
         column_index: Name of the indexed column
         fun_compare: Lambda function of the condition, e.g. `lambda t: t > 10` (Time > 10)
-        lower_bound: Specify which index to return if condition is true for both lower/upper bound.
+        lower_bound: Specify which index to return for ranges of same values.
             Default: Return lower bound (`True`)
     """
 
+    # two querys are way faster than one combined!
+    i_min_total = connection.execute(f"SELECT MIN({column_index}) FROM {table}").fetchone()[0]
+    i_max_total = connection.execute(f"SELECT MAX({column_index}) FROM {table}").fetchone()[0]
+
     def get_value(index):
         cur = connection.execute(
-            f"SELECT {column_value} FROM {table} WHERE {column_index} == ?",
-            (index,)
+            f"SELECT {column_value} FROM {table} WHERE {column_index} == ?", (index,)
         )
         return cur.fetchone()[0]
 
-    # two querys are way faster than one combined!
-    i_min = connection.execute(f"SELECT MIN({column_index}) FROM {table}").fetchone()[0]
-    i_max = connection.execute(f"SELECT MAX({column_index}) FROM {table}").fetchone()[0]
+    def binary_search():
+        i_min, i_max = i_min_total, i_max_total
+        while True:
+            v_min = get_value(i_min)
+            v_max = get_value(i_max)
+            if v_min > v_max:
+                raise ValueError(f"Value column {column_value} not sorted")
+            c_min = fun_compare(v_min)
+            c_max = fun_compare(v_max)
 
-    while True:
-        v_min = get_value(i_min)
-        v_max = get_value(i_max)
-        if v_min > v_max:
-            raise ValueError(f"Value column {column_value} not sorted")
-        c_min = fun_compare(v_min)
-        c_max = fun_compare(v_max)
+            if c_min and c_max:  # condition true for both limits
+                return i_min if lower_bound else i_max
+            if not c_min and not c_max:  # condition false for both limits
+                return None
 
-        if c_min and c_max:  # condition true for both limits
-            return i_min if lower_bound else i_max
-        if not c_min and not c_max:  # condition false for both limits
-            return None
+            if i_max - i_min < 2:
+                return i_min if c_min is True else i_max
 
-        if i_max - i_min < 2:
-            return i_min if c_min is True else i_max
+            i_mid = (i_max + i_min) // 2
+            c_mid = fun_compare(get_value(i_mid))
 
-        i_mid = (i_max + i_min) // 2
-        c_mid = fun_compare(get_value(i_mid))
+            if c_mid == c_min:
+                i_min = i_mid
+            else:
+                i_max = i_mid
 
-        if c_mid == c_min:
-            i_min = i_mid
-        else:
-            i_max = i_mid
+    def bound_same_value(start: int):
+        """Find lower/upper bound of same values with linear search."""
+        v_start = get_value(start)
+        inc = -1 if lower_bound else 1
+        i = start
+        while i_min_total < i < i_max_total:
+            i += inc
+            if get_value(i) != v_start:
+                return i - inc
+        return i
+
+    i = binary_search()
+    if i is not None:
+        return bound_same_value(i)
+    return i
 
 
 def create_new_database(filename: str, schema: str):
