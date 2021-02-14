@@ -104,6 +104,16 @@ def test_channel(sample_tradb):
     assert sample_tradb.channel() == {1, 2, 3, 4}
 
 
+def test_iread_empty_database(fresh_tradb):
+    assert list(fresh_tradb.iread()) == []
+
+
+def test_iread_empty_query(sample_tradb):
+    assert list(sample_tradb.iread(time_start=0, time_stop=0)) == []
+    assert list(sample_tradb.iread(time_start=-1, time_stop=-1)) == []
+    assert list(sample_tradb.iread(time_start=2, time_stop=1)) == []
+
+
 def test_iread(sample_tradb):
     tras = list(sample_tradb.iread())
     tras_expected_ordered = sorted(TRAS_EXPECTED, key=lambda t: t.trai)

@@ -86,6 +86,15 @@ class TraDatabase(Database):
             self.iread(**kwargs), desc="Tra", index_column="trai",
         )
 
+    def _get_total_time_range(self) -> Tuple[float, float]:
+        """Return total time range [min, max] of tradb."""
+        def get_time(func: str):
+            result = self.connection().execute(
+                f"SELECT Time FROM tr_data WHERE TRAI == (SELECT {func}(TRAI) from tr_data)"
+            ).fetchone()
+            return 0 if result is None else result[0] / self._timebase
+        return get_time("MIN"), get_time("MAX")
+
     def iread(
         self,
         *,
@@ -110,6 +119,18 @@ class TraDatabase(Database):
         Returns:
             Sized iterable to sequential read transient data
         """
+        # check for empty time ranges
+        time_min, time_max = self._get_total_time_range()
+        if time_start is not None:
+            if time_start > time_max:
+                return []
+        if time_stop is not None:
+            if time_stop < time_min:
+                return []
+        if time_start is not None and time_stop is not None:
+            if time_start >= time_stop:
+                return []
+
         con = self.connection()
         trai_start = None
         trai_stop = None
