@@ -13,10 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Workflow with GitHub actions to publish to PyPI on new releases
 - `pyproject.toml` as the main config file for pylint, pytest, tox, coverage, ...
 
+### Changed
+
+- Return exact time range with `TraDatabase.read_continuous_wave`
+- Return "absolute" time axis with `TraDatabase.read_continuous_wave`
+  (instead of starting at t = 0 s)
+
 ### Fixed
 
 - Fix database close if exception raised in `__init__` (e.g. file not found)
 - Example `ex6_multiprocessing` for MacOS
+- Find lower/upper bounds for same values (times) in binary search (used by `TraDatabase.iread`)
+- Stop condition for `time_stop` in `TraDatabase.iread`
+- Use TRAI for `TraDatabase.iread` as a time sorted index for binary search (SetID is not!)
+- Check for empty time ranges in `TraDatabase.iread`
 
 ## [0.3.0] - 2020-11-05
 
