@@ -1,4 +1,5 @@
 from functools import lru_cache
+from itertools import chain
 from pathlib import Path
 from typing import Optional, Sequence, Set, Tuple, Union
 
@@ -95,6 +96,33 @@ class TraDatabase(Database):
             return 0 if result is None else result[0] / self._timebase
         return get_time("MIN"), get_time("MAX")
 
+    def _get_trai_range_from_time_range(
+        self, time_start: Optional[float], time_stop: Optional[float]
+    ) -> Tuple[Optional[int], Optional[int]]:
+        """Use binary search to find indexes (TRAI) of a given time range."""
+        con = self.connection()
+        trai_start = None
+        trai_stop = None
+        if time_start is not None:
+            trai_start = sql_binary_search(
+                connection=con,
+                table="tr_data",
+                column_value="Time",
+                column_index="TRAI",
+                fun_compare=lambda t: t >= time_start * self._timebase,  # type: ignore
+                lower_bound=True,  # return lower index of true conditions
+            )
+        if time_stop is not None:
+            trai_stop = sql_binary_search(
+                connection=con,
+                table="tr_data",
+                column_value="Time",
+                column_index="TRAI",
+                fun_compare=lambda t: t < time_stop * self._timebase,  # type: ignore
+                lower_bound=False,  # return upper index of true conditions
+            )
+        return trai_start, trai_stop
+
     def iread(
         self,
         *,
@@ -131,29 +159,7 @@ class TraDatabase(Database):
             if time_start >= time_stop:
                 return []
 
-        con = self.connection()
-        trai_start = None
-        trai_stop = None
-
-        if time_start is not None:
-            trai_start = sql_binary_search(
-                connection=con,
-                table="view_tr_data",
-                column_value="Time",
-                column_index="TRAI",
-                fun_compare=lambda t: t >= time_start,  # type: ignore
-                lower_bound=True,  # return lower index of true conditions
-            )
-        if time_stop is not None:
-            trai_stop = sql_binary_search(
-                connection=con,
-                table="view_tr_data",
-                column_value="Time",
-                column_index="TRAI",
-                fun_compare=lambda t: t < time_stop,  # type: ignore
-                lower_bound=False,  # return upper index of true conditions
-            )
-
+        trai_start, trai_stop = self._get_trai_range_from_time_range(time_start, time_stop)
         # nested query to fix ambiguous column name error with query_filter
         query = """
         SELECT * FROM (
@@ -210,7 +216,15 @@ class TraDatabase(Database):
             )
         return tra.data, tra.samplerate
 
-    def read_continuous_wave(
+    def _get_previous_trai(self, channel: int, trai: int) -> Optional[int]:
+        """Find previous tra record index for given channel and TRAI."""
+        result = self.connection().execute(
+            "SELECT TRAI FROM tr_data WHERE Chan == ? AND TRAI < ? ORDER BY TRAI DESC LIMIT 1",
+            (channel, trai),
+        ).fetchone()
+        return result[0] if result is not None else None
+
+    def read_continuous_wave(  # pylint: disable=too-many-locals
         self,
         channel: int,
         time_start: Optional[float] = None,
@@ -222,7 +236,7 @@ class TraDatabase(Database):
         """
         Read transient signal of specified channel to a single, continuous array.
 
-        Time gaps are filled with 0's.
+        The signal is exactly cropped to the given time range. Time gaps are filled with 0's.
 
         Args:
             channel: Channel number to read
@@ -240,35 +254,64 @@ class TraDatabase(Database):
             - Array with transient signal
             - Samplerate
         """
-        tra_blocks = [np.empty(0, dtype=np.float32)]
-        sr = 0
-
         iterable = self.iread(channel=channel, time_start=time_start, time_stop=time_stop)
         iterator = iter(iterable)
         if show_progress:
-            iterator = tqdm(iterator, total=len(iterable), desc="Tra")
+            iterator = tqdm(iterator, total=len(iterable), desc="Tra")  # ignores previous tra
 
-        expected_time = None
+        # prepend previous tra to iterator if available
+        trai_start, _ = self._get_trai_range_from_time_range(time_start, None)
+        if trai_start is not None:
+            previous_trai = self._get_previous_trai(channel, trai_start)
+            if previous_trai is not None:
+                iterator = chain(
+                    iter(self.iread(channel=channel, trai=previous_trai)),
+                    iterator,
+                )
+
+        def slice_range(tra: TraRecord):
+            """Get indices to slice given tra record data to time range."""
+            def limit_index(i: int):
+                return min(max(0, i), tra.samples)
+            n_start, n_stop = 0, tra.samples
+            if time_start is not None:
+                n_start = limit_index(round((time_start - tra.time) * tra.samplerate))
+            if time_stop is not None:
+                n_stop = limit_index(round((time_stop - tra.time) * tra.samplerate))
+            return n_start, n_stop
+
+        samplerate = 0  # will be initialized with samplerate of first record
+        tra_blocks = [np.empty(0, dtype=np.float32)]
+        expected_time = time_start if time_start is not None else self._get_total_time_range()[0]
+
         for tra in iterator:
+            if samplerate == 0:
+                samplerate = tra.samplerate
+            if tra.samplerate != samplerate:
+                raise RuntimeError("Different sampling rates inside requested time interval")
+
             # check for gaps in tra stream
-            if expected_time is not None:
-                time_gap = tra.time - expected_time
-                if time_gap > 1e-6:
-                    samples_gap = round(time_gap * tra.samplerate)
-                    tra_blocks.append(
-                        np.zeros(samples_gap, dtype=np.float32)
-                    )
+            time_gap = tra.time - expected_time
+            if time_gap > 1 / tra.samplerate:
+                samples_gap = round(time_gap * tra.samplerate)
+                tra_blocks.append(np.zeros(samples_gap, dtype=np.float32))
 
-            expected_time = tra.time + float(tra.samples) / tra.samplerate
+            sample_start, sample_stop = slice_range(tra)
+            tra_blocks.append(tra.data[sample_start:sample_stop])
+            expected_time = tra.time + sample_stop / tra.samplerate
+            if time_start is not None:
+                # the prepended record might be out of time range -> avoid exceeding zero-padding
+                expected_time = max(expected_time, time_start)
 
-            tra_blocks.append(tra.data)
-            sr = tra.samplerate
+        if time_stop is not None and samplerate and abs(expected_time - time_stop) > 1 / samplerate:
+            # zero padding at ending
+            samples = round((time_stop - expected_time) * samplerate)
+            tra_blocks.append(np.zeros(samples, dtype=np.float32))
 
         y = np.concatenate(tra_blocks)
-
         if time_axis:
-            return y, _create_time_vector(len(y), sr)
-        return y, sr
+            return y, _create_time_vector(len(y), samplerate)
+        return y, samplerate
 
     @require_write_access
     def write(self, tra: TraRecord) -> int:
