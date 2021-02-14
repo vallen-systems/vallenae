@@ -111,24 +111,24 @@ class TraDatabase(Database):
             Sized iterable to sequential read transient data
         """
         con = self.connection()
-        setid_time_start = None
-        setid_time_stop = None
+        trai_start = None
+        trai_stop = None
 
         if time_start is not None:
-            setid_time_start = sql_binary_search(
+            trai_start = sql_binary_search(
                 connection=con,
                 table="view_tr_data",
                 column_value="Time",
-                column_index="SetID",
+                column_index="TRAI",
                 fun_compare=lambda t: t >= time_start,  # type: ignore
                 lower_bound=True,  # return lower index of true conditions
             )
         if time_stop is not None:
-            setid_time_stop = sql_binary_search(
+            trai_stop = sql_binary_search(
                 connection=con,
                 table="view_tr_data",
                 column_value="Time",
-                column_index="SetID",
+                column_index="TRAI",
                 fun_compare=lambda t: t < time_stop,  # type: ignore
                 lower_bound=False,  # return upper index of true conditions
             )
@@ -139,12 +139,13 @@ class TraDatabase(Database):
             SELECT vtr.*, tr.ParamID
             FROM view_tr_data vtr
             LEFT JOIN tr_data tr ON vtr.SetID == tr.SetID
+            ORDER BY TRAI ASC
         )
         """ + query_conditions(
             isin={"Chan": channel, "TRAI": trai},
-            greater_equal={"SetID": setid_time_start},
+            greater_equal={"TRAI": trai_start},
             # < condition already met in binary search, use <= here for found indice range
-            less_equal={"SetID": setid_time_stop},
+            less_equal={"TRAI": trai_stop},
             custom_filter=query_filter,
         )
         return QueryIterable(

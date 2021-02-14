@@ -106,10 +106,11 @@ def test_channel(sample_tradb):
 
 def test_iread(sample_tradb):
     tras = list(sample_tradb.iread())
+    tras_expected_ordered = sorted(TRAS_EXPECTED, key=lambda t: t.trai)
 
-    assert len(tras) == len(TRAS_EXPECTED)
+    assert len(tras) == len(tras_expected_ordered)
 
-    for tra, tra_expected in zip(tras, TRAS_EXPECTED):
+    for tra, tra_expected in zip(tras, tras_expected_ordered):
         assert tra.time == pytest.approx(tra_expected.time)
         assert tra.channel == tra_expected.channel
         assert tra.param_id == tra_expected.param_id
@@ -165,17 +166,20 @@ def test_read_wave_compare_to_reference_txt(signal_txt, signal_tradb_raw, signal
 
 
 def test_read_continuous_wave(fresh_tradb):
+    trai = 0
     def write_time_axis(samplerate, samples, sets, t_start=0):
         # create time axis
         y = t_start + np.arange(0, samples * sets, dtype=np.float32) / samplerate
         # write time axis blockwise
         for data in np.reshape(y, (-1, sets)):
+            nonlocal trai
+            trai += 1
             t = data[0]
             fresh_tradb.write(
                 TraRecord(
                     time=t, channel=1, param_id=1, pretrigger=0, threshold=0,
                     samplerate=samplerate, samples=samples,
-                    data_format=0, data=data,
+                    data_format=0, data=data, trai=trai,
                 )
             )
         return y
