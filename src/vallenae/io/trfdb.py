@@ -1,10 +1,11 @@
 import sqlite3
 from pathlib import Path
-from typing import Sequence, Union
+from typing import Sequence, Optional, Union
 
 import pandas as pd
 
 from ._database import Database, require_write_access
+from ._dataframe import iter_to_dataframe
 from ._sql import (
     QueryIterable,
     create_new_database,
@@ -47,36 +48,42 @@ class TrfDatabase(Database):
             schema_trfdb = file.read()
         create_new_database(filename, schema_trfdb)
 
-    def read(
-        self, *, trai: Union[None, int, Sequence[int]] = None
-    ) -> pd.DataFrame:
+    def read(self, **kwargs) -> pd.DataFrame:
         """
         Read features to Pandas DataFrame.
 
         Args:
-            trai: Read data by TRAI (transient recorder index)
+            **kwargs: Arguments passed to `iread`
 
         Returns:
             Pandas DataFrame with features
         """
-        query = "SELECT * FROM trf_data " + query_conditions(isin={"TRAI": trai})
-        df = pd.read_sql(query, self.connection(), index_col="TRAI")
-        df.index.name = "trai"  # TRAI -> trai, as with pridb and tradb
-        return df
+        def record_to_dict(record: FeatureRecord):
+            return dict(trai=record.trai, **record.features)
+        return iter_to_dataframe(
+            [record_to_dict(r) for r in self.iread(**kwargs)], desc="Trf", index_column="trai",
+        )
 
     def iread(
-        self, *, trai: Union[None, int, Sequence[int]] = None
+        self,
+        *,
+        trai: Union[None, int, Sequence[int]] = None,
+        query_filter: Optional[str] = None,
     ) -> SizedIterable[FeatureRecord]:
         """
         Stream features with returned iterable.
 
         Args:
             trai: Read data by TRAI (transient recorder index)
+            query_filter: Optional query filter provided as SQL clause,
+                e.g. "FFT_CoG >= 150 AND CTP < 20"
 
         Returns:
             Sized iterable to sequential read features
         """
-        query = "SELECT * FROM trf_data " + query_conditions(isin={"TRAI": trai})
+        query = "SELECT * FROM trf_data " + query_conditions(
+            isin={"TRAI": trai}, custom_filter=query_filter
+        )
         return QueryIterable(
             self._connection_wrapper.get_readonly_connection(),
             query,
