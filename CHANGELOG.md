@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Query filter parameter to TrfDatabase.(i)read
+- `listen` method for `PriDatabase`, `TraDatabase` and `TrfDatabase` to retrieve new records live
+
+### Changed
+
+- Order feature records by TRAI for TrfDatabase.(i)read
+
 ## [0.4.0] - 2021-02-14
 
 ### Added
