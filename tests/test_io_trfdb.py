@@ -12,19 +12,6 @@ SAMPLE_TRFDB = STEEL_PLATE_DIR / "sample.trfdb"
 
 TRFS_EXPECTED = [
     FeatureRecord(
-        trai=2,
-        features={
-            "FFT_CoG": 144.04296875,
-            "FFT_FoM": 139.16015625,
-            "PA": 59.450511932373,
-            "RT": 192.0,
-            "Dur": 20575.599609375,
-            "CTP": 35,
-            "FI": 182.29167175293,
-            "FR": 98.0199813842773,
-        }
-    ),
-    FeatureRecord(
         trai=1,
         features={
             "FFT_CoG": 147.705078125,
@@ -35,6 +22,19 @@ TRFS_EXPECTED = [
             "CTP": 11,
             "FI": 222.672058105469,
             "FR": 110.18244934082,
+        }
+    ),
+    FeatureRecord(
+        trai=2,
+        features={
+            "FFT_CoG": 144.04296875,
+            "FFT_FoM": 139.16015625,
+            "PA": 59.450511932373,
+            "RT": 192.0,
+            "Dur": 20575.599609375,
+            "CTP": 35,
+            "FI": 182.29167175293,
+            "FR": 98.0199813842773,
         }
     ),
     FeatureRecord(

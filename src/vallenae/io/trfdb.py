@@ -81,9 +81,12 @@ class TrfDatabase(Database):
         Returns:
             Sized iterable to sequential read features
         """
-        query = "SELECT * FROM trf_data " + query_conditions(
-            isin={"TRAI": trai}, custom_filter=query_filter
+        query = """
+        SELECT * FROM (
+            SELECT * FROM trf_data
+            ORDER BY TRAI ASC
         )
+        """ + query_conditions(isin={"TRAI": trai}, custom_filter=query_filter)
         return QueryIterable(
             self._connection_wrapper.get_readonly_connection(),
             query,
