@@ -7,14 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2020-03-18
+
 ### Added
 
-- Query filter parameter to TrfDatabase.(i)read
+- Query filter parameter to `TrfDatabase.read` and `TrfDatabase.iread`
 - `listen` method for `PriDatabase`, `TraDatabase` and `TrfDatabase` to retrieve new records live
 
 ### Changed
 
-- Order feature records by TRAI for TrfDatabase.(i)read
+- Order feature records by TRAI for `TrfDatabase.read` and `TrfDatabase.iread`
 
 ## [0.4.0] - 2021-02-14
 
@@ -97,7 +99,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial public release
 
-[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.3.0...HEAD
+[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.0...HEAD
+[0.5.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.2.3...0.3.0
 [0.2.4]: https://github.com/vallen-systems/pyVallenAE/compare/0.2.3...0.2.4
