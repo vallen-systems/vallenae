@@ -270,6 +270,19 @@ def test_read(sample_pridb):
     }
 
 
+def test_listen(sample_pridb):
+    assert len(list(sample_pridb.listen())) == 0
+    assert len(list(sample_pridb.listen(existing=True))) == 18
+
+    def records_by_type(type_):
+        return list(filter(lambda r: isinstance(r, type_), sample_pridb.listen(existing=True)))
+
+    assert records_by_type(HitRecord) == list(sample_pridb.iread_hits())
+    assert records_by_type(MarkerRecord) == list(sample_pridb.iread_markers())
+    assert records_by_type(ParametricRecord) == list(sample_pridb.iread_parametric())
+    assert records_by_type(StatusRecord) == list(sample_pridb.iread_status())
+
+
 def test_write_readonly(sample_pridb):
     with pytest.raises(ValueError):
         sample_pridb.write_marker(

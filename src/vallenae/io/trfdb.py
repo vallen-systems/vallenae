@@ -1,6 +1,7 @@
 import sqlite3
 from pathlib import Path
-from typing import Sequence, Optional, Union
+from time import sleep
+from typing import Iterable, Optional, Sequence, Union
 
 import pandas as pd
 
@@ -11,6 +12,7 @@ from ._sql import (
     create_new_database,
     insert_from_dict,
     query_conditions,
+    read_sql_generator,
     update_from_dict,
 )
 from .datatypes import FeatureRecord
@@ -92,6 +94,41 @@ class TrfDatabase(Database):
             query,
             FeatureRecord.from_sql,
         )
+
+    def listen(
+        self,
+        existing: bool = False,
+        wait: bool = False,
+        query_filter: Optional[str] = None,
+    ) -> Iterable[FeatureRecord]:
+        """
+        Listen to database changes and return new records.
+
+        Args:
+            existing: Return already existing records
+            wait: Wait for new records even if no acquisition (writer) is active.
+                Otherwise the function returns after all records are read.
+            query_filter: Optional query filter provided as SQL clause,
+                e.g. "TRAI >= 100"
+
+        Yields:
+            New feature records
+        """
+        query = """
+        SELECT * FROM (
+            SELECT rowid, * FROM trf_data
+            WHERE rowid > ?
+        )
+        """ + query_conditions(custom_filter=query_filter)
+        last_rowid = 0 if existing else self._main_index_range()[1]
+        while True:
+            file_status = self._file_status()
+            for row in read_sql_generator(self.connection(), query, last_rowid):
+                last_rowid = row.pop("rowid")
+                yield FeatureRecord.from_sql(row)
+            if not wait and file_status == 0:  # no writer active
+                break
+            sleep(0.1)  # wait 100 ms until next read
 
     @require_write_access
     def write(self, feature_set: FeatureRecord) -> int:

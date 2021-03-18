@@ -33,7 +33,9 @@ good-names = [
 max-attributes = 10
 
 [tool.pylint.similarities]
-min-similarity-lines = 5
+min-similarity-lines = 6
+ignore-docstrings = true
+ignore-imports = true
 
 [tool.mypy]  # not supported yet
 ignore_missing_imports = true

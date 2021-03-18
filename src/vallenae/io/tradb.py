@@ -1,7 +1,8 @@
 from functools import lru_cache
 from itertools import chain
 from pathlib import Path
-from typing import Optional, Sequence, Set, Tuple, Union
+from time import sleep
+from typing import Iterable, Optional, Sequence, Set, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -14,6 +15,7 @@ from ._sql import (
     create_new_database,
     insert_from_dict,
     query_conditions,
+    read_sql_generator,
     sql_binary_search,
 )
 from .compression import encode_data_blob
@@ -316,6 +318,44 @@ class TraDatabase(Database):
         if time_axis:
             return y, _create_time_vector(len(y), samplerate) + time_start
         return y, samplerate
+
+    def listen(
+        self,
+        existing: bool = False,
+        wait: bool = False,
+        query_filter: Optional[str] = None,
+    ) -> Iterable[TraRecord]:
+        """
+        Listen to database changes and return new records.
+
+        Args:
+            existing: Return already existing records
+            wait: Wait for new records even if no acquisition (writer) is active.
+                Otherwise the function returns after all records are read.
+            query_filter: Optional query filter provided as SQL clause,
+                e.g. "TRAI >= 100 AND Samples >= 1024"
+
+        Yields:
+            New transient data records
+        """
+        query = """
+        SELECT * FROM (
+            SELECT vtr.*, tr.ParamID
+            FROM view_tr_data vtr
+            LEFT JOIN tr_data tr ON vtr.SetID == tr.SetID
+            WHERE vtr.SetID > ?
+        )
+        """ + query_conditions(custom_filter=query_filter)
+        last_set_id = 0 if existing else self._main_index_range()[1]
+        while True:
+            file_status = self._file_status()
+            for row in read_sql_generator(self.connection(), query, last_set_id):
+                yield TraRecord.from_sql(row)
+                last_set_id = row["SetID"]
+            if not wait and file_status == 0:  # no writer active
+                break
+            sleep(0.1)  # wait 100 ms until next read
+
 
     @require_write_access
     def write(self, tra: TraRecord) -> int:

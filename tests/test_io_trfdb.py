@@ -123,6 +123,13 @@ def test_read(sample_trfdb):
     assert df.index.name == "trai"
 
 
+def test_listen(sample_trfdb):
+    assert len(list(sample_trfdb.listen())) == 0
+
+    existing_records_sorted = sorted(sample_trfdb.listen(existing=True), key=lambda r: r.trai)
+    assert existing_records_sorted == list(sample_trfdb.iread())
+
+
 def test_write(fresh_trfdb):
     def get_by_trai(trai):
         gen = read_sql_generator(

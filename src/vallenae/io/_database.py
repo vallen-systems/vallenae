@@ -204,6 +204,19 @@ class Database:
                     """.format(prefix=self._table_prefix)
                 )
 
+    def _file_status(self) -> int:
+        """Get file status (0: offline, 1: suspended, 2: active)."""
+        result = self.connection().execute(
+            f"SELECT Value FROM {self._table_globalinfo} WHERE Key == 'FileStatus'"
+        ).fetchone()
+        return int(result[0]) if result else 0
+
+    def _main_index_range(self) -> Tuple[int, int]:
+        """Get range of main data table index (SetID for pridb/tradb or TRAI for trfdb)."""
+        return self.connection().execute(
+            f"SELECT MIN(rowid), MAX(rowid) FROM {self._table_main}"
+        ).fetchone()
+
     def _parameter_table(self) -> Dict[int, Dict[str, Any]]:
         """Read *_params table to dict."""
         def parameter_by_id():

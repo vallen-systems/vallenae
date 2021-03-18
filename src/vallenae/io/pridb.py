@@ -1,12 +1,19 @@
 from functools import wraps
 from pathlib import Path
-from typing import Optional, Sequence, Set, Union
+from time import sleep
+from typing import Iterable, Optional, Sequence, Set, Union
 
 import pandas as pd
 
 from ._database import Database, require_write_access
 from ._dataframe import iter_to_dataframe
-from ._sql import QueryIterable, create_new_database, insert_from_dict, query_conditions
+from ._sql import (
+    QueryIterable,
+    create_new_database,
+    insert_from_dict,
+    query_conditions,
+    read_sql_generator,
+)
 from .datatypes import HitRecord, MarkerRecord, ParametricRecord, StatusRecord
 from .types import SizedIterable
 
@@ -351,6 +358,50 @@ class PriDatabase(Database):
             query,
             StatusRecord.from_sql,
         )
+
+    def listen(
+        self,
+        existing: bool = False,
+        wait: bool = False,
+        query_filter: Optional[str] = None,
+    ) -> Iterable[Union[HitRecord, MarkerRecord, ParametricRecord, StatusRecord]]:
+        """
+        Listen to database changes and return new records.
+
+        Args:
+            existing: Return already existing records
+            wait: Wait for new records even if no acquisition (writer) is active.
+                Otherwise the function returns after all records are read.
+            query_filter: Optional query filter provided as SQL clause,
+                e.g. "Time >= 100 AND Chan == 2"
+
+        Yields:
+            New hit/marker/parametric/status data records
+        """
+        query = """
+        SELECT * FROM (
+            SELECT vae.*, ae.ParamID
+            FROM view_ae_data vae
+            LEFT JOIN ae_data ae ON vae.SetID == ae.SetID
+            WHERE vae.SetID > ?
+        )
+        """ + query_conditions(custom_filter=query_filter)
+        last_set_id = 0 if existing else self._main_index_range()[1]
+        while True:
+            file_status = self._file_status()
+            for row in read_sql_generator(self.connection(), query, last_set_id):
+                if row["SetType"] == 1:
+                    yield ParametricRecord.from_sql(row)
+                elif row["SetType"] == 2:
+                    yield HitRecord.from_sql(row)
+                elif row["SetType"] == 3:
+                    yield StatusRecord.from_sql(row)
+                elif row["SetType"] in (4, 5, 6):
+                    yield from self.iread_markers(set_id=row["SetID"])
+                last_set_id = row["SetID"]
+            if not wait and file_status == 0:  # no writer active
+                break
+            sleep(0.1)  # wait 100 ms until next read
 
     @require_write_access
     @check_monotonic_time

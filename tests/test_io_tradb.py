@@ -269,6 +269,12 @@ def test_read_continuous_wave(fresh_tradb):
     assert t[0] == pytest.approx(0.0)
 
 
+def test_listen(sample_tradb):
+    assert len(list(sample_tradb.listen())) == 0
+    assert len(list(sample_tradb.listen(existing=True))) == 4
+    assert [tra.trai for tra in sample_tradb.listen(existing=True)] == [2, 1, 3, 4]
+
+
 def test_write(fresh_tradb):
     new_tra = TraRecord(
         time=11.11, channel=1, param_id=1, pretrigger=500, threshold=111,

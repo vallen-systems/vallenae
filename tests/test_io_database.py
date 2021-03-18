@@ -141,6 +141,14 @@ def test_globalinfo(sample_pridb):
     assert isinstance(info["TRAI"], int)
 
 
+def test_file_status(sample_pridb):
+    assert sample_pridb._file_status() == 0
+
+
+def test_main_index_range(sample_pridb):
+    assert sample_pridb._main_index_range() == (1, 18)
+
+
 def test_parameter(sample_pridb):
     assert sample_pridb._parameter(1) == {
         "SetupID": 1,
