@@ -189,7 +189,7 @@ def query_conditions(
 
 
 def read_sql_generator(
-    connection: sqlite3.Connection, query: str
+    connection: sqlite3.Connection, query: str, *parameter,
 ) -> Iterator[Dict[str, Any]]:
     """
     Generator to query data from a SQLite connection as a dictionary.
@@ -201,7 +201,7 @@ def read_sql_generator(
     Yields:
         Row of the query result set as namedtuple
     """
-    cur = connection.execute(query)
+    cur = connection.execute(query, parameter)
     columns = [column[0] for column in cur.description]
 
     while True:

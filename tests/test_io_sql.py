@@ -192,6 +192,11 @@ def test_read_sql_generator(memory_abc):
         assert row_dict["c"] == 20 + index
 
 
+def test_read_sql_generator_parameter(memory_abc):
+    records = list(read_sql_generator(memory_abc, "SELECT * FROM abc WHERE a >= ?", 5))
+    assert len(records) == 5
+
+
 def test_sql_binary_search():
     con = sqlite3.connect(":memory:")
     con.execute("CREATE TABLE squares (id INTEGER PRIMARY KEY, value REAL)")
