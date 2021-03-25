@@ -123,7 +123,7 @@ class TrfDatabase(Database):
         last_rowid = 0 if existing else self._main_index_range()[1]
         while True:
             file_status = self._file_status()
-            for row in read_sql_generator(self.connection(), query, last_rowid):
+            for row in list(read_sql_generator(self.connection(), query, last_rowid)):
                 last_rowid = row.pop("rowid")
                 yield FeatureRecord.from_sql(row)
             if not wait and file_status == 0:  # no writer active

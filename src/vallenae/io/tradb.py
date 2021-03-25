@@ -349,7 +349,7 @@ class TraDatabase(Database):
         last_set_id = 0 if existing else self._main_index_range()[1]
         while True:
             file_status = self._file_status()
-            for row in read_sql_generator(self.connection(), query, last_set_id):
+            for row in list(read_sql_generator(self.connection(), query, last_set_id)):
                 yield TraRecord.from_sql(row)
                 last_set_id = row["SetID"]
             if not wait and file_status == 0:  # no writer active

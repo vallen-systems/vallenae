@@ -389,7 +389,7 @@ class PriDatabase(Database):
         last_set_id = 0 if existing else self._main_index_range()[1]
         while True:
             file_status = self._file_status()
-            for row in read_sql_generator(self.connection(), query, last_set_id):
+            for row in list(read_sql_generator(self.connection(), query, last_set_id)):
                 if row["SetType"] == 1:
                     yield ParametricRecord.from_sql(row)
                 elif row["SetType"] == 2:
