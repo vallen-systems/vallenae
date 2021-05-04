@@ -11,6 +11,17 @@ from .types import SizedIterable
 logger = logging.getLogger(__name__)
 
 
+def create_uri(filename: Union[str, Path], *, mode: str = "ro") -> str:
+    """Create SQLite URI (https://www.sqlite.org/uri.html)."""
+
+    filepath = Path(filename)
+    uri_path = "/" if filepath.is_absolute() else ""
+    uri_path += filepath.as_posix()
+    uri_path = uri_path.replace("?", "%3f")
+    uri_path = uri_path.replace("#", "%23")
+    return f"file:{uri_path}?mode={mode}"
+
+
 class ConnectionWrapper:
     """SQLite3 connection wrapper (picklable)."""
 
@@ -33,7 +44,7 @@ class ConnectionWrapper:
     def _connect(self):
         """Open SQLite connection."""
         self._connection = sqlite3.connect(
-            f"file:{self._filename}?mode={self._mode}",
+            create_uri(self._filename, mode=self._mode),
             uri=True,
             check_same_thread=(not self._multithreading),
         )
@@ -305,7 +316,7 @@ def create_new_database(filename: str, schema: str):
 
     # open database in read-write-create mode
     with contextlib.closing(
-        sqlite3.connect(f"file:{filename}?mode=rwc", uri=True)
+        sqlite3.connect(create_uri(filename, mode="rwc"), uri=True)
     ) as con:
         con.executescript(schema)
 

@@ -8,6 +8,7 @@ import os
 import pytest
 
 from vallenae.io._sql import (
+    create_uri,
     ConnectionWrapper,
     QueryIterable,
     count_sql_results,
@@ -67,6 +68,17 @@ def get_row_by_id(connection, table, row_id):
     if values is None:
         return None
     return dict(zip(columns, values))
+
+
+def test_create_uri():
+    assert create_uri("test.pridb", mode="ro") == "file:test.pridb?mode=ro"
+    assert create_uri("test.pridb", mode="rw") == "file:test.pridb?mode=rw"
+    assert create_uri("test.pridb", mode="rwc") == "file:test.pridb?mode=rwc"
+
+    assert create_uri(r"C:\test.pridb", mode="ro") == "file:/C:/test.pridb?mode=ro"
+
+    assert create_uri("test?test.pridb", mode="ro") == "file:test%3ftest.pridb?mode=ro"
+    assert create_uri("test#test.pridb", mode="ro") == "file:test%23test.pridb?mode=ro"
 
 
 @pytest.mark.parametrize("mode", ("ro", "rw", "rwc"))

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fix SQLite URI for special characters (#, ?)
+
 ## [0.5.1] - 2020-03-25
 
 ### Fixed
