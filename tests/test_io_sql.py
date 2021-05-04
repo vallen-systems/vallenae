@@ -75,8 +75,6 @@ def test_create_uri():
     assert create_uri("test.pridb", mode="rw") == "file:test.pridb?mode=rw"
     assert create_uri("test.pridb", mode="rwc") == "file:test.pridb?mode=rwc"
 
-    assert create_uri(r"C:\test.pridb", mode="ro") == "file:/C:/test.pridb?mode=ro"
-
     assert create_uri("test?test.pridb", mode="ro") == "file:test%3ftest.pridb?mode=ro"
     assert create_uri("test#test.pridb", mode="ro") == "file:test%23test.pridb?mode=ro"
 

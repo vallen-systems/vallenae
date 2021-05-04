@@ -15,8 +15,7 @@ def create_uri(filename: Union[str, Path], *, mode: str = "ro") -> str:
     """Create SQLite URI (https://www.sqlite.org/uri.html)."""
 
     filepath = Path(filename)
-    uri_path = "/" if filepath.is_absolute() else ""
-    uri_path += filepath.as_posix()
+    uri_path = filepath.as_posix()
     uri_path = uri_path.replace("?", "%3f")
     uri_path = uri_path.replace("#", "%23")
     return f"file:{uri_path}?mode={mode}"

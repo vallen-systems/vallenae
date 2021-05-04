@@ -7,9 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- SQLite URI for absolute linux paths
+
 ## [0.5.2] - 2020-05-04
 
-- Fix SQLite URI for special characters (#, ?)
+### Fixed
+
+- SQLite URI for special characters (#, ?)
 
 ## [0.5.1] - 2020-03-25
 
