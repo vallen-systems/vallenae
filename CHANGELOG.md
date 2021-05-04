@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.3] - 2020-05-04
+
 ### Fixed
 
 - SQLite URI for absolute linux paths
@@ -115,7 +117,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial public release
 
-[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.2...HEAD
+[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.3...HEAD
+[0.5.3]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.2...0.5.3
 [0.5.2]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.1...0.5.2
 [0.5.1]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.0...0.5.1
 [0.5.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.4.0...0.5.0
