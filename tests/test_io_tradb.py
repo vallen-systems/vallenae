@@ -7,6 +7,7 @@ from numpy.testing import assert_allclose
 
 import vallenae as vae
 from vallenae.io import TraRecord
+from vallenae.io.tradb import _create_time_vector
 
 STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"
 SAMPLE_TRADB = STEEL_PLATE_DIR / "sample.tradb"
@@ -81,6 +82,22 @@ def fixture_fresh_tradb() -> vae.io.TraDatabase:
             yield tradb
     finally:
         os.remove(filename)
+
+
+def test_create_time_vector():
+    fs = 1_000_000
+    T = 2.5
+    n = T * fs
+    n_pretrigger = 1000
+    t_pretrigger = n_pretrigger / fs
+    t = _create_time_vector(n, fs, n_pretrigger)
+
+    assert len(t) == n
+    assert t[0] == -t_pretrigger
+    assert t[-1] == pytest.approx(T - t_pretrigger - 1 / fs)
+
+    t_diff = np.diff(t)
+    assert np.all(np.isclose(t_diff, 1 / fs))
 
 
 def test_init():

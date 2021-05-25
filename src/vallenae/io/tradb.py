@@ -27,9 +27,7 @@ from .types import SizedIterable
 def _create_time_vector(
     samples: int, samplerate: int, pretrigger: int = 0
 ) -> np.ndarray:
-    t_raw = np.arange(-pretrigger, samples - pretrigger, dtype=np.int32)
-    t_scaled = (t_raw / np.float32(samplerate)).astype(np.float32)
-    return t_scaled
+    return np.arange(-pretrigger, samples - pretrigger, dtype=np.float32) / samplerate
 
 
 class TraDatabase(Database):

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Limit number of buffered records in `listen` methods
+- Time axis rounding errors, e.g. for `TraDatabase.read_wave` with `time_axis=True`
 
 ## [0.5.3] - 2020-05-04
 
