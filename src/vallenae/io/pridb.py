@@ -378,18 +378,20 @@ class PriDatabase(Database):
         Yields:
             New hit/marker/parametric/status data records
         """
-        query = """
+        max_buffer_size = 1000
+        query = f"""
         SELECT * FROM (
             SELECT vae.*, ae.ParamID
             FROM view_ae_data vae
             LEFT JOIN ae_data ae ON vae.SetID == ae.SetID
             WHERE vae.SetID > ?
-        )
-        """ + query_conditions(custom_filter=query_filter)
+        ) {query_conditions(custom_filter=query_filter)} LIMIT {max_buffer_size}
+        """
         last_set_id = 0 if existing else self._main_index_range()[1]
         while True:
-            file_status = self._file_status()
-            for row in list(read_sql_generator(self.connection(), query, last_set_id)):
+            # buffer rows to allow in-between write transactions
+            rows = list(read_sql_generator(self.connection(), query, last_set_id))
+            for row in rows:
                 if row["SetType"] == 1:
                     yield ParametricRecord.from_sql(row)
                 elif row["SetType"] == 2:
@@ -399,9 +401,10 @@ class PriDatabase(Database):
                 elif row["SetType"] in (4, 5, 6):
                     yield from self.iread_markers(set_id=row["SetID"])
                 last_set_id = row["SetID"]
-            if not wait and file_status == 0:  # no writer active
-                break
-            sleep(0.1)  # wait 100 ms until next read
+            if len(rows) == 0:
+                if not wait and self._file_status() == 0:  # no writer active
+                    break
+                sleep(0.1)  # wait 100 ms until next read
 
     @require_write_access
     @check_monotonic_time

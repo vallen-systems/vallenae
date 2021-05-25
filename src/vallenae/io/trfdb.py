@@ -114,21 +114,24 @@ class TrfDatabase(Database):
         Yields:
             New feature records
         """
-        query = """
+        max_buffer_size = 1000
+        query = f"""
         SELECT * FROM (
             SELECT rowid, * FROM trf_data
             WHERE rowid > ?
-        )
-        """ + query_conditions(custom_filter=query_filter)
+        ) {query_conditions(custom_filter=query_filter)} LIMIT {max_buffer_size}
+        """
         last_rowid = 0 if existing else self._main_index_range()[1]
         while True:
-            file_status = self._file_status()
-            for row in list(read_sql_generator(self.connection(), query, last_rowid)):
+            # buffer rows to allow in-between write transactions
+            rows = list(read_sql_generator(self.connection(), query, last_rowid))
+            for row in rows:
                 last_rowid = row.pop("rowid")
                 yield FeatureRecord.from_sql(row)
-            if not wait and file_status == 0:  # no writer active
-                break
-            sleep(0.1)  # wait 100 ms until next read
+            if len(rows) == 0:
+                if not wait and self._file_status() == 0:  # no writer active
+                    break
+                sleep(0.1)  # wait 100 ms until next read
 
     @require_write_access
     def write(self, feature_set: FeatureRecord) -> int:

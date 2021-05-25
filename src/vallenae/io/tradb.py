@@ -338,23 +338,26 @@ class TraDatabase(Database):
         Yields:
             New transient data records
         """
-        query = """
+        max_buffer_size = 100
+        query = f"""
         SELECT * FROM (
             SELECT vtr.*, tr.ParamID
             FROM view_tr_data vtr
             LEFT JOIN tr_data tr ON vtr.SetID == tr.SetID
             WHERE vtr.SetID > ?
-        )
-        """ + query_conditions(custom_filter=query_filter)
+        ) {query_conditions(custom_filter=query_filter)} LIMIT {max_buffer_size}
+        """
         last_set_id = 0 if existing else self._main_index_range()[1]
         while True:
-            file_status = self._file_status()
-            for row in list(read_sql_generator(self.connection(), query, last_set_id)):
+            # buffer rows to allow in-between write transactions
+            rows = list(read_sql_generator(self.connection(), query, last_set_id))
+            for row in rows:
                 yield TraRecord.from_sql(row)
                 last_set_id = row["SetID"]
-            if not wait and file_status == 0:  # no writer active
-                break
-            sleep(0.1)  # wait 100 ms until next read
+            if len(rows) == 0:
+                if not wait and self._file_status() == 0:  # no writer active
+                    break
+                sleep(0.1)  # wait 100 ms until next read
 
 
     @require_write_access

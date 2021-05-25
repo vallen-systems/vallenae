@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Limit number of buffered records in `listen` methods
+
 ## [0.5.3] - 2020-05-04
 
 ### Fixed
