@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.4] - 2020-05-25
+
 ### Fixed
 
 - Limit number of buffered records in `listen` methods
@@ -122,7 +124,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial public release
 
-[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.3...HEAD
+[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.4...HEAD
+[0.5.4]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.3...0.5.4
 [0.5.3]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.2...0.5.3
 [0.5.2]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.1...0.5.2
 [0.5.1]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.0...0.5.1
