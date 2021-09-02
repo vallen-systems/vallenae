@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.6.0] - 2020-09-02
+## [0.6.0] - 2021-09-02
 
 ### Added
 
@@ -17,32 +17,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remove superfluous `data_format` field from `TraRecord` data type
 
-## [0.5.4] - 2020-05-25
+## [0.5.4] - 2021-05-25
 
 ### Fixed
 
 - Limit number of buffered records in `listen` methods
 - Time axis rounding errors, e.g. for `TraDatabase.read_wave` with `time_axis=True`
 
-## [0.5.3] - 2020-05-04
+## [0.5.3] - 2021-05-04
 
 ### Fixed
 
 - SQLite URI for absolute linux paths
 
-## [0.5.2] - 2020-05-04
+## [0.5.2] - 2021-05-04
 
 ### Fixed
 
 - SQLite URI for special characters (#, ?)
 
-## [0.5.1] - 2020-03-25
+## [0.5.1] - 2021-03-25
 
 ### Fixed
 
 - Buffering of SQL results in `listen` methods to allow SQL queries in between
 
-## [0.5.0] - 2020-03-18
+## [0.5.0] - 2021-03-18
 
 ### Added
 
