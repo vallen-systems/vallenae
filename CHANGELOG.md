@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Remove `data_format` field from `TraRecord` data type
+
 ## [0.5.4] - 2020-05-25
 
 ### Fixed

@@ -15,19 +15,19 @@ SAMPLE_TRADB = STEEL_PLATE_DIR / "sample.tradb"
 TRAS_EXPECTED = [
     TraRecord(
         time=3.9927747, channel=2, param_id=3, pretrigger=500, threshold=100.469451121688,
-        samplerate=5000000, samples=103488, data_format=2, data=np.empty(0), trai=2
+        samplerate=5000000, samples=103488, data=np.empty(0), trai=2
     ),
     TraRecord(
         time=3.992771, channel=3, param_id=4, pretrigger=500, threshold=100.469451121688,
-        samplerate=5000000, samples=98960, data_format=2, data=np.empty(0), trai=1
+        samplerate=5000000, samples=98960, data=np.empty(0), trai=1
     ),
     TraRecord(
         time=3.9928129, channel=4, param_id=5, pretrigger=500, threshold=100.469451121688,
-        samplerate=5000000, samples=96256, data_format=2, data=np.empty(0), trai=3
+        samplerate=5000000, samples=96256, data=np.empty(0), trai=3
     ),
     TraRecord(
         time=3.9928143, channel=1, param_id=2, pretrigger=500, threshold=100.469451121688,
-        samplerate=5000000, samples=96944, data_format=2, data=np.empty(0), trai=4
+        samplerate=5000000, samples=96944, data=np.empty(0), trai=4
     ),
 ]
 
@@ -145,7 +145,6 @@ def test_iread(sample_tradb):
         assert tra.threshold == pytest.approx(tra_expected.threshold / 1e6)
         assert tra.samplerate == tra_expected.samplerate
         assert tra.samples == tra_expected.samples
-        assert tra.data_format == tra_expected.data_format
         assert tra.trai == tra_expected.trai
 
 
@@ -215,7 +214,7 @@ def test_read_continuous_wave(fresh_tradb):
                 TraRecord(
                     time=t, channel=1, param_id=1, pretrigger=0, threshold=0,
                     samplerate=samplerate, samples=samples,
-                    data_format=0, data=data, trai=trai,
+                    data=data, trai=trai,
                 )
             )
         return y
@@ -296,7 +295,7 @@ def test_write(fresh_tradb):
     new_tra = TraRecord(
         time=11.11, channel=1, param_id=1, pretrigger=500, threshold=111,
         samplerate=5000000, samples=103488,
-        data_format=2, data=np.empty(0, dtype=np.float32), trai=1,
+        data=np.empty(0, dtype=np.float32), trai=1,
     )
 
     assert fresh_tradb.rows() == 0
@@ -311,7 +310,6 @@ def test_write(fresh_tradb):
     assert tra_read.threshold == new_tra.threshold
     assert tra_read.samplerate == new_tra.samplerate
     assert tra_read.samples == new_tra.samples
-    assert tra_read.data_format == 0  # setting in TraDatabase class
     # assert tra_read.data == new_tra.data
     assert tra_read.trai == new_tra.trai
 

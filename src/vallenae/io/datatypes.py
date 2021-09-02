@@ -201,7 +201,6 @@ class TraRecord(NamedTuple):
     threshold: float  #: Threshold amplitude in volts
     samplerate: int  #: Samplerate in Hz
     samples: int  #: Number of samples
-    data_format: int  #: Data format (0 = uncompressed, 2 = FLAC compression)
     data: np.ndarray  #: Transient signal in volts
     # optional for creating:
     trai: Optional[int] = None  #: Transient recorder index (foreign key between pridb and tradb)
@@ -217,7 +216,6 @@ class TraRecord(NamedTuple):
             threshold=_to_volts(row["Thr"]),
             samplerate=row["SampleRate"],
             samples=row["Samples"],
-            data_format=row["DataFormat"],
             data=decode_data_blob(row["Data"], row["DataFormat"], row["TR_mV"]),
             trai=row["TRAI"],
         )
