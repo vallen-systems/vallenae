@@ -7,9 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2020-09-02
+
+### Added
+
+- CI for Python 3.9
+
 ### Changed
 
-- Remove `data_format` field from `TraRecord` data type
+- Remove superfluous `data_format` field from `TraRecord` data type
 
 ## [0.5.4] - 2020-05-25
 
@@ -128,7 +134,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial public release
 
-[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.4...HEAD
+[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.6.0...HEAD
+[0.6.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.4...0.6.0
 [0.5.4]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.3...0.5.4
 [0.5.3]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.2...0.5.3
 [0.5.2]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.1...0.5.2
