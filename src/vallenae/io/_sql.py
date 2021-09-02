@@ -128,6 +128,7 @@ class QueryIterable(SizedIterable[T]):
         query: str,
         dict_to_type: Callable[[Dict[str, Any]], T],
     ):
+        super().__init__()
         self._connection_wrapper = connection_wrapper
         self._query = query
         self._dict_to_type = dict_to_type

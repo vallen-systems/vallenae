@@ -91,7 +91,7 @@ def aic(arr: np.ndarray) -> Tuple[np.ndarray, int]:
     """
     n = len(arr)
     result = np.full(n, np.nan, dtype=np.float32)
-    safety_eps = np.finfo(np.float32).tiny
+    safety_eps = np.finfo(np.float32).tiny  # pylint: disable=E1101
 
     min_value = math.inf
     min_index = 0
@@ -156,7 +156,7 @@ def energy_ratio(arr: np.ndarray, win_len: int = 100) -> Tuple[np.ndarray, int]:
     """
     n = len(arr)
     result = np.zeros(n, dtype=np.float32)
-    safety_eps = np.finfo(np.float32).tiny
+    safety_eps = np.finfo(np.float32).tiny  # pylint: disable=E1101
 
     max_value = -math.inf
     max_index = 0
