@@ -419,9 +419,6 @@ class PriDatabase(Database):
 
         Returns:
             Index (SetID) of inserted row
-
-        Todo:
-            Status flag
         """
         parameter = self._parameter(hit.param_id)
         with self.connection() as con:  # commit/rollback transaction
@@ -508,9 +505,6 @@ class PriDatabase(Database):
 
         Returns:
             Index (SetID) of inserted row
-
-        Todo:
-            Status flag
         """
         parameter = self._parameter(status.param_id)
         with self.connection() as con:  # commit/rollback transaction
@@ -546,9 +540,6 @@ class PriDatabase(Database):
 
         Returns:
             Index (SetID) of inserted row
-
-        Todo:
-            Status flag
         """
         parameter = self._parameter(parametric.param_id)
         def try_convert(value: Optional[int], conv_id: str):

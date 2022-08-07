@@ -36,7 +36,6 @@ The remaining modules are system-independent and try to comprise the most common
     :hidden:
     
     changelog
-    todo
 
 Indices and tables
 ------------------

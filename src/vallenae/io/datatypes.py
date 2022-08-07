@@ -187,12 +187,7 @@ class ParametricRecord(NamedTuple):
 
 
 class TraRecord(NamedTuple):
-    """
-    Transient data record in tradb.
-
-    Todo:
-        Remove RMS
-    """
+    """Transient data record in tradb."""
 
     time: float  #: Time in seconds
     channel: int  #: Channel number

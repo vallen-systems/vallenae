@@ -368,9 +368,6 @@ class TraDatabase(Database):
 
         Returns:
             Index (SetID) of inserted row
-
-        Todo:
-            Status flag
         """
         # self._validate_and_update_time(tra.time)
         parameter = self._parameter(tra.param_id)

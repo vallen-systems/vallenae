@@ -26,9 +26,6 @@ def hinkley(arr: np.ndarray, alpha: int = 5) -> Tuple[np.ndarray, int]:
         - Array with computed detection function
         - Index of the estimated arrival time (max value)
 
-    Todo:
-        Weak performance, if used with default parameter alpha
-
     References:
         - Molenda, M. (2016). Acoustic Emission monitoring of
           laboratory hydraulic fracturing experiments. Ruhr-Universität Bochum.

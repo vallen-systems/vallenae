@@ -18,7 +18,7 @@ INSTALL_REQUIRES = [
 
 EXTRAS_REQUIRE = {
     "docs": [
-        "sphinx>3",
+        "sphinx>=5",
         "sphinx-autodoc-typehints",
         "sphinx-rtd-theme",
         "sphinx-gallery",
