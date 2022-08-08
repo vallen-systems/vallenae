@@ -27,7 +27,7 @@ EXTRAS_REQUIRE = {
         "matplotlib",  # used in examples
     ],
     "tests": [
-        "coverage>=5",  # pyproject.toml support
+        "coverage[toml]>=5",  # pyproject.toml support
         "pytest>=6",  # pyproject.toml support
         "toml",  # toml support for coverage.py
     ],
@@ -47,7 +47,7 @@ setup(
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     url="https://github.com/vallen-systems/pyVallenAE",
-    author="Daniel Altmann, Lukas Berbuer (Vallen Systeme GmbH)",
+    author="Lukas Berbuer, Daniel Altmann (Vallen Systeme GmbH)",
     author_email="software@vallen.de",
     classifiers=[
         "Development Status :: 4 - Beta",

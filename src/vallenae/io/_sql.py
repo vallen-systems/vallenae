@@ -116,7 +116,7 @@ class ConnectionWrapper:
 
 
 T = TypeVar("T")
-class QueryIterable(SizedIterable[T]):
+class QueryIterable(SizedIterable[T]):  # pylint: disable=inherit-non-class
     """
     Sized iterable to query results from SQLite as dictionaries.
 
@@ -128,7 +128,7 @@ class QueryIterable(SizedIterable[T]):
         query: str,
         dict_to_type: Callable[[Dict[str, Any]], T],
     ):
-        super().__init__()
+        super().__init__()  # pylint: disable=no-value-for-parameter
         self._connection_wrapper = connection_wrapper
         self._query = query
         self._dict_to_type = dict_to_type
@@ -172,9 +172,8 @@ def query_conditions(
                 continue
             if not isinstance(values, collections.abc.Sequence):
                 values = (values,)
-            cond.append(
-                "{:s} IN ({:s})".format(key, ", ".join(str(value) for value in values))
-            )
+            list_values = ", ".join(str(value) for value in values)
+            cond.append(f"{key} IN ({list_values})")
 
     comparison = {
         "==": equal,
@@ -341,12 +340,9 @@ def generate_insert_query(table: str, columns: Tuple[str, ...]) -> str:
     Returns:
         Query string with named placeholders
     """
-    query = "INSERT INTO {table} ({columns}) VALUES ({placeholder})".format(
-        table=table,
-        columns=", ".join(columns),
-        placeholder=", ".join([":" + col for col in columns]),
-    )
-    return query
+    list_columns = ", ".join(columns)
+    list_placeholder = ", ".join(f":{col}" for col in columns)
+    return f"INSERT INTO {table} ({list_columns}) VALUES ({list_placeholder})"
 
 
 def insert_from_dict(
@@ -359,7 +355,7 @@ def insert_from_dict(
     columns = tuple(row_dict.keys())
     query = generate_insert_query(table, columns)
     cur = connection.execute(query, row_dict)
-    return cur.lastrowid
+    return cur.lastrowid or 0
 
 
 @lru_cache(maxsize=128, typed=True)
@@ -384,7 +380,7 @@ def generate_update_query(table: str, columns: Tuple[str, ...], key_column: str)
     except ValueError:
         raise ValueError(f"Argument key_column '{key_column}' must be a key of row_dict") from None
 
-    query = "UPDATE {table} SET {set} WHERE {condition}".format(
+    query = "UPDATE {table} SET {set} WHERE {condition}".format(  # pylint: disable=consider-using-f-string
         table=table,
         set=", ".join([f"{col} = :{col}" for col in columns_list]),
         condition=f"{key_column} == :{key_column}",
@@ -403,4 +399,4 @@ def update_from_dict(
     columns = tuple(row_dict.keys())
     query = generate_update_query(table, columns, key_column)
     cur = connection.execute(query, row_dict)
-    return cur.lastrowid
+    return cur.lastrowid or 0

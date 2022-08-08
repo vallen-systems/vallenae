@@ -10,7 +10,6 @@ use_parentheses = true
 [tool.pylint.message_control]
 disable = [
     "import-error",  # run without install in tox
-    "bad-continuation", # code style by black
     "missing-module-docstring",
     "missing-function-docstring",
 ]
@@ -72,8 +71,7 @@ commands =
 [testenv:coverage-report]
 skip_install = true
 deps =
-    coverage>=5
-    toml
+    coverage[toml]>=5
 commands =
     - coverage combine
     coverage report
@@ -81,9 +79,8 @@ commands =
 [testenv:coveralls]
 skip_install = true
 deps =
-    coverage>=5
+    coverage[toml]>=5
     coveralls
-    toml
 passenv = GITHUB_*
 commands = 
     - coverage combine

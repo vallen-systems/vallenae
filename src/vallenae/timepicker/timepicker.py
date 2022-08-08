@@ -88,7 +88,7 @@ def aic(arr: np.ndarray) -> Tuple[np.ndarray, int]:
     """
     n = len(arr)
     result = np.full(n, np.nan, dtype=np.float32)
-    safety_eps = np.finfo(np.float32).tiny  # pylint: disable=E1101
+    safety_eps = float(np.finfo(np.float32).tiny)  # pylint: disable=E1101
 
     min_value = math.inf
     min_index = 0
