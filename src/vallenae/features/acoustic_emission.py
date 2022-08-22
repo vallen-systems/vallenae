@@ -112,6 +112,8 @@ def rise_time(
         if index_peak is not None
         else peak_amplitude_index(data)
     )
+    if n_first_crossing is None:
+        return 0
     return (n_max - n_first_crossing) / samplerate
 
 
