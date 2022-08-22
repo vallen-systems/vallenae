@@ -442,7 +442,10 @@ class PriDatabase(Database):
                     ),
                     "Dur": int(hit.duration * self._timebase),
                     "Eny": int(hit.energy / parameter["ADC_TE"]),
-                    "SS": int(hit.signal_strength / parameter["ADC_SS"]),
+                    "SS": (
+                        int(hit.signal_strength / parameter["ADC_SS"])
+                        if hit.signal_strength and "ADC_SS" in parameter else None
+                    ),
                     "RMS": int(hit.rms * 1e6 / parameter["ADC_µV"] / 0.0065536),
                     "Counts": (
                         int(hit.counts)
