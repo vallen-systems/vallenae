@@ -340,9 +340,9 @@ def generate_insert_query(table: str, columns: Tuple[str, ...]) -> str:
     Returns:
         Query string with named placeholders
     """
-    list_columns = ", ".join(columns)
-    list_placeholder = ", ".join(f":{col}" for col in columns)
-    return f"INSERT INTO {table} ({list_columns}) VALUES ({list_placeholder})"
+    query_columns = ", ".join(columns)
+    query_placeholder = ", ".join(f":{col}" for col in columns)
+    return f"INSERT INTO {table} ({query_columns}) VALUES ({query_placeholder})"
 
 
 def insert_from_dict(
@@ -380,12 +380,9 @@ def generate_update_query(table: str, columns: Tuple[str, ...], key_column: str)
     except ValueError:
         raise ValueError(f"Argument key_column '{key_column}' must be a key of row_dict") from None
 
-    query = "UPDATE {table} SET {set} WHERE {condition}".format(  # pylint: disable=consider-using-f-string
-        table=table,
-        set=", ".join([f"{col} = :{col}" for col in columns_list]),
-        condition=f"{key_column} == :{key_column}",
-    )
-    return query
+    query_set = ", ".join([f"{col} = :{col}" for col in columns_list])
+    query_where = f"{key_column} == :{key_column}"
+    return f"UPDATE {table} SET {query_set} WHERE {query_where}"
 
 
 def update_from_dict(
