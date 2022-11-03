@@ -80,6 +80,12 @@ setup(
     python_requires=">=3.6",
     install_requires=INSTALL_REQUIRES,
     extras_require=EXTRAS_REQUIRE,
+    entry_points={
+        "pyinstaller40": [
+            "hook-dirs = vallenae._pyinstaller:get_hook_dirs",
+            "tests     = vallenae._pyinstaller:get_tests",
+        ],
+    },
     package_data={
         "vallenae": ["io/schema_templates/*.sql"],
     },
