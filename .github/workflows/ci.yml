@@ -26,6 +26,8 @@ jobs:
         run: tox -e mypy
       - name: Run pytest
         run: tox -e py
+      - name: Run PyInstaller test
+        run: tox -e pyinstaller
       - name: Coveralls
         if: matrix.os == 'ubuntu-latest' && matrix.python == '3.8'
         run: tox -e coveralls
