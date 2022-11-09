@@ -127,17 +127,22 @@ def test_signal_strength(random_array, samplerate: int):
 def test_counts(random_array):
     def naive(data: np.ndarray, threshold: float) -> int:
         above_positive_threshold = (data >= threshold).astype(int)
-        positive_crossings = np.count_nonzero(np.diff(above_positive_threshold) == 1)
-        if above_positive_threshold[0]:
-            positive_crossings += 1
-        return positive_crossings
+        return np.count_nonzero(np.diff(above_positive_threshold) == 1)
 
     arr = np.zeros(LEN)
-    assert counts(arr, 0) == 1
-    assert counts(arr, 1) == 0
+    assert counts(arr, 0) == 0
+    assert counts(arr, 0.5) == 0
 
-    arr[::2] = 1
-    assert counts(arr, 1) == LEN / 2
+    # ignore if first sample is above threshold
+    arr[0] = 1
+    assert counts(arr, 0.5) == 0
+
+    # ignore negative threshold crossings
+    arr[2] = -1
+    assert counts(arr, 0.5) == 0
+
+    arr[-1] = 1
+    assert counts(arr, 0.5) == 1
 
     for threshold in (-1, 0, 0.5, 1):
         assert counts(random_array, threshold) == naive(random_array, threshold)

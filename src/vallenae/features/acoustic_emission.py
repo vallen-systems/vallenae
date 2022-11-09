@@ -144,9 +144,7 @@ def counts(data: np.ndarray, threshold: float) -> int:
         Number of positive threshold crossings
     """
     above_positive_threshold = data >= threshold
-    result = int(above_positive_threshold[0])
-    result += np.count_nonzero(~above_positive_threshold[:-1] & above_positive_threshold[1:])
-    return result
+    return np.count_nonzero(~above_positive_threshold[:-1] & above_positive_threshold[1:])
 
 
 def rms(data: np.ndarray) -> float:

@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Example for custom feature extraction
 - PyInstaller hook
 
+### Fixed
+
+- Counts computations (first sample above threshold is not a count)
+
 ## [0.6.0] - 2021-09-02
 
 ### Added
