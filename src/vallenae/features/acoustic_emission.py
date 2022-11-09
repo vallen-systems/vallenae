@@ -1,11 +1,8 @@
-import math
 from typing import Optional
 
 import numpy as np
-from numba import njit
 
 
-@njit
 def peak_amplitude(data: np.ndarray) -> float:
     """
     Compute maximum absolute amplitude.
@@ -16,15 +13,9 @@ def peak_amplitude(data: np.ndarray) -> float:
     Returns:
         Peak amplitude of the input array
     """
-    max_amplitude = 0
-    for sample in data:
-        abs_value = abs(sample)
-        if abs_value > max_amplitude:
-            max_amplitude = abs_value
-    return max_amplitude
+    return np.max(np.abs(data))
 
 
-@njit
 def peak_amplitude_index(data: np.ndarray) -> int:
     """
     Compute index of peak amplitude.
@@ -35,17 +26,13 @@ def peak_amplitude_index(data: np.ndarray) -> int:
     Returns:
         Index of peak amplitude
     """
-    max_amplitude = 0
-    index_peak = 0
-    for index, sample in enumerate(data):
-        abs_value = abs(sample)
-        if abs_value > max_amplitude:
-            max_amplitude = abs_value
-            index_peak = index
-    return index_peak
+    return np.argmax(np.abs(data))
 
 
-@njit
+def _mask_above_threshold(data: np.ndarray, threshold: float) -> np.ndarray:
+    return (data >= threshold) | (data <= -threshold)
+
+
 def is_above_threshold(data: np.ndarray, threshold: float) -> bool:
     """
     Checks if absolute amplitudes are above threshold.
@@ -57,13 +44,9 @@ def is_above_threshold(data: np.ndarray, threshold: float) -> bool:
     Returns:
         True if input array is above threshold, otherwise False
     """
-    for sample in data:
-        if abs(sample) >= threshold:
-            return True
-    return False
+    return np.any(_mask_above_threshold(data, threshold))
 
 
-@njit
 def first_threshold_crossing(data: np.ndarray, threshold: float) -> Optional[int]:
     """
     Compute index of first threshold crossing.
@@ -75,13 +58,11 @@ def first_threshold_crossing(data: np.ndarray, threshold: float) -> Optional[int
     Returns:
         Index of first threshold crossing. None if threshold was not exceeded
     """
-    for index, sample in enumerate(data):
-        if abs(sample) >= threshold:
-            return index
-    return None
+    above_threshold = _mask_above_threshold(data, threshold)
+    index = np.argmax(above_threshold)
+    return index if above_threshold[index] else None
 
 
-@njit
 def rise_time(
     data: np.ndarray,
     threshold: float,
@@ -117,7 +98,6 @@ def rise_time(
     return (n_max - n_first_crossing) / samplerate
 
 
-@njit
 def energy(data: np.ndarray, samplerate: int) -> float:
     """
     Compute the energy of a hit.
@@ -132,13 +112,9 @@ def energy(data: np.ndarray, samplerate: int) -> float:
     Returns:
         Energy of input array (hit)
     """
-    agg: float = 0
-    for sample in data:
-        agg += sample ** 2
-    return agg * 1e14 / samplerate
+    return np.sum(data ** 2) * 1e14 / samplerate
 
 
-@njit
 def signal_strength(data: np.ndarray, samplerate: int) -> float:
     """
     Compute the signal strength of a hit.
@@ -153,13 +129,9 @@ def signal_strength(data: np.ndarray, samplerate: int) -> float:
     Returns:
         Signal strength of input array (hit)
     """
-    agg: float = 0
-    for sample in data:
-        agg += abs(sample)
-    return agg * 1e9 / samplerate
+    return np.sum(np.abs(data)) * 1e9 / samplerate
 
 
-@njit
 def counts(data: np.ndarray, threshold: float) -> int:
     """
     Compute the number of positive threshold crossings of a hit (counts).
@@ -171,19 +143,12 @@ def counts(data: np.ndarray, threshold: float) -> int:
     Returns:
         Number of positive threshold crossings
     """
-    result: int = 0
-    was_above_threshold: bool = False
-    for sample in data:
-        if sample >= threshold:
-            if not was_above_threshold:
-                result += 1
-                was_above_threshold = True
-        else:
-            was_above_threshold = False
+    above_positive_threshold = data >= threshold
+    result = int(above_positive_threshold[0])
+    result += np.count_nonzero(~above_positive_threshold[:-1] & above_positive_threshold[1:])
     return result
 
 
-@njit
 def rms(data: np.ndarray) -> float:
     """
     Compute the root mean square (RMS) of an array.
@@ -197,7 +162,4 @@ def rms(data: np.ndarray) -> float:
     References:
         https://en.wikipedia.org/wiki/Root_mean_square
     """
-    agg: float = 0
-    for sample in data:
-        agg += sample ** 2
-    return math.sqrt(agg / len(data))
+    return np.sqrt(np.mean(data ** 2))

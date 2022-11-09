@@ -81,6 +81,9 @@ def test_first_threshold_crossing():
             return None
         return index
 
+    arr = np.zeros(LEN)
+    assert first_threshold_crossing(arr, 1.0) is None
+
     arr = np.random.rand(LEN)
     thr = abs(random.random())
     assert first_threshold_crossing(arr, thr) == naive(arr, thr)
