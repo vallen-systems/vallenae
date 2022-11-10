@@ -28,6 +28,7 @@ EXTRAS_REQUIRE = {
     "tests": [
         "coverage[toml]>=5",  # pyproject.toml support
         "pytest>=6",  # pyproject.toml support
+        "pytest-benchmark",
         "toml",  # toml support for coverage.py
     ],
     "tools": [

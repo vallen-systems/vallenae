@@ -75,7 +75,7 @@ deps =
     numba: numba
 extras = tests
 commands = 
-    coverage run --parallel -m pytest
+    coverage run --parallel -m pytest --benchmark-disable
 
 [testenv:coverage-report]
 skip_install = true
