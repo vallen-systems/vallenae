@@ -42,7 +42,7 @@ EXTRAS_REQUIRE["dev"] = EXTRAS_REQUIRE["docs"] + EXTRAS_REQUIRE["tests"] + EXTRA
 
 setup(
     name="vallenae",
-    version="0.6.0",
+    version="0.7.0",
     description="Extract and analyze Acoustic Emission measurement data",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
@@ -60,6 +60,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Operating System :: OS Independent",
     ],
     keywords=[
