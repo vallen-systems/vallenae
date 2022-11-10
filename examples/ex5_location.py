@@ -6,8 +6,8 @@ Localisation
 import math
 import os
 import time
-import xml.etree.ElementTree as ElementTree
 from typing import Dict, Optional, Tuple
+from xml.etree import ElementTree
 
 import matplotlib.pyplot as plt
 import numpy as np

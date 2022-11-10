@@ -66,18 +66,18 @@ def fixture_signal_tradb_flac() -> vae.io.TraDatabase:
 @pytest.fixture(name="fresh_tradb")
 def fixture_fresh_tradb(tmp_path) -> vae.io.TraDatabase:
     filename = tmp_path / "test.tradb"
-        with vae.io.TraDatabase(filename, mode="rwc") as tradb:
-            con = tradb.connection()
-            con.execute(
-                """
-                INSERT INTO tr_params (
-                    ID, SetupID, Chan, ADC_µV, TR_mV
-                ) VALUES (
-                    1, 1, 1, 1, 1
-                )
-                """
+    with vae.io.TraDatabase(filename, mode="rwc") as tradb:
+        con = tradb.connection()
+        con.execute(
+            """
+            INSERT INTO tr_params (
+                ID, SetupID, Chan, ADC_µV, TR_mV
+            ) VALUES (
+                1, 1, 1, 1, 1
             )
-            yield tradb
+            """
+        )
+        yield tradb
 
 
 def test_create_time_vector():
@@ -103,11 +103,11 @@ def test_init():
 
 def test_create(tmp_path):
     filename = tmp_path / "empty.tradb"
-        vae.io.TraDatabase.create(filename)
-        with vae.io.TraDatabase(filename) as tradb:
-            assert tradb.tables() == {
-                "tr_data", "tr_fieldinfo", "tr_params", "tr_globalinfo",
-            }
+    vae.io.TraDatabase.create(filename)
+    with vae.io.TraDatabase(filename) as tradb:
+        assert tradb.tables() == {
+            "tr_data", "tr_fieldinfo", "tr_params", "tr_globalinfo",
+        }
 
 
 def test_channel(sample_tradb):
@@ -174,7 +174,7 @@ def test_read_wave_compare_results_raw_flac(signal_tradb_raw, signal_tradb_flac)
 
 def test_read_wave_compare_to_reference_txt(signal_txt, signal_tradb_raw, signal_tradb_flac):
     max_amplitude = 1
-    dt, samples, data_txt = signal_txt
+    _, _, data_txt = signal_txt
 
     data_raw, _ = signal_tradb_raw.read_wave(1, time_axis=False)
     data_flac, _ = signal_tradb_flac.read_wave(1, time_axis=False)

@@ -10,7 +10,6 @@ import os
 import time
 
 import matplotlib.pyplot as plt
-import numpy as np
 
 import vallenae as vae
 
@@ -94,10 +93,10 @@ plot(t, y, mer_arr, mer_index, "Modified Energy Ratio")
 # the average of multiple executions should be compared.
 
 
-def timeit(callable, loops=100):
+def timeit(func, loops=100):
     time_start = time.perf_counter()
     for _ in range(loops):
-        callable()
+        func()
     return 1e6 * (time.perf_counter() - time_start) / loops  # elapsed time in µs
 
 timer_results = {

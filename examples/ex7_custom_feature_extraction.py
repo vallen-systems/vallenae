@@ -27,7 +27,7 @@ TRFDB_TMP = os.path.join(gettempdir(), "sample_custom.trfdb")  # use a temp file
 # ------------------------------------
 def rms(data: np.ndarray) -> float:
     """Root mean square (RMS)."""
-    return np.sqrt(np.mean(data ** 2))  
+    return np.sqrt(np.mean(data ** 2))
 
 
 def crest_factor(data: np.ndarray) -> float:

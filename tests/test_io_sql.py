@@ -5,10 +5,10 @@ from math import sin
 import pytest
 
 from vallenae.io._sql import (
-    create_uri,
     ConnectionWrapper,
     QueryIterable,
     count_sql_results,
+    create_uri,
     generate_insert_query,
     generate_update_query,
     insert_from_dict,
@@ -43,16 +43,16 @@ def fixture_memory_id_abc():
 @pytest.fixture(name="temp_database")
 def fixture_temp_database(tmp_path):
     filename = tmp_path / "temp.db"
-        con = sqlite3.connect(f"file:{filename}?mode=rwc", uri=True)
-        # add 10 rows of dummy data
-        with con:
-            con.execute("CREATE TABLE abc (a INT, b INT, c INT)")
-            for i in range(10):
-                con.execute(
-                    f"INSERT INTO abc (a, b, c) VALUES ({i}, {10 + i}, {20 + i})"
-                )
-        con.close()
-        yield filename
+    con = sqlite3.connect(f"file:{filename}?mode=rwc", uri=True)
+    # add 10 rows of dummy data
+    with con:
+        con.execute("CREATE TABLE abc (a INT, b INT, c INT)")
+        for i in range(10):
+            con.execute(
+                f"INSERT INTO abc (a, b, c) VALUES ({i}, {10 + i}, {20 + i})"
+            )
+    con.close()
+    yield filename
 
 
 def get_row_by_id(connection, table, row_id):
@@ -78,7 +78,7 @@ def test_connection(temp_database, mode: str):
     con = ConnectionWrapper(temp_database, mode=mode)
     assert con.filename == str(temp_database)
     assert con.mode == mode
-    assert con.connected == True
+    assert con.connected
 
     con_readonly = con.get_readonly_connection()
     if mode == "ro":
@@ -92,19 +92,19 @@ def test_connection(temp_database, mode: str):
     con_unpickled = pickle.loads(pkl)
     assert con.filename == str(temp_database)
     assert con.mode == mode
-    assert con_unpickled.connected == True
+    assert con_unpickled.connected
     assert con_unpickled.connection().execute("SELECT * FROM abc").fetchone() == (0, 10, 20)
 
     # close connection
     con.close()
-    assert con.connected == False
+    assert not con.connected
     with pytest.raises(RuntimeError):
         con.connection()
 
     # pickle/unpickle closed connection
     pkl = pickle.dumps(con)
     con_unpickled = pickle.loads(pkl)
-    assert con_unpickled.connected == False
+    assert not con_unpickled.connected
 
 
 def test_sql_query_conditions():
@@ -215,8 +215,8 @@ def test_sql_binary_search():
 
     # squares table
     # condition false for all values
-    assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 0) == None
-    assert sql_binary_search(con, "squares", "value", "id", lambda x: x > 99**2) == None
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 0) is None
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x > 99**2) is None
 
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x > 9) == 4
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 9) == 3
@@ -228,8 +228,8 @@ def test_sql_binary_search():
 
     # consts table
     # condition false for all values
-    assert sql_binary_search(con, "consts", "value", "id", lambda x: x < 11) == None
-    assert sql_binary_search(con, "consts", "value", "id", lambda x: x > 11) == None
+    assert sql_binary_search(con, "consts", "value", "id", lambda x: x < 11) is None
+    assert sql_binary_search(con, "consts", "value", "id", lambda x: x > 11) is None
     # condition true for all values
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x >= 11) == 0
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x == 11) == 0

@@ -5,7 +5,7 @@ from vallenae.io._dataframe import _convert_to_nullable_types
 
 
 def test_convert_to_nullable_types():
-    x = [i for i in range(10)]
+    x = list(range(10))
 
     df = pd.DataFrame({
         "int32": pd.Series(x, dtype="int32"),

@@ -8,16 +8,16 @@ But still only one core/thread will be utilized. We will change that will multip
 Following example shows a batch feature extraction procedure using multiple CPU cores.
 """
 
+import multiprocessing
 import os
 import time
-import multiprocessing
-from typing import Dict, Iterable
 from itertools import cycle
-import __main__
+from typing import Dict, Iterable
 
+import __main__
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
-import matplotlib.pyplot as plt
 
 import vallenae as vae
 

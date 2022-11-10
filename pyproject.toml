@@ -21,7 +21,7 @@ good-names = [
     "i", "j", "k", "n", "m",
     "t", "f",
     "x", "y",
-    "sr",  # sample rate
+    "fs", "sr",  # sample rate
     "ax",  # matplotlib axes
     "df",  # pandas dataframe
     "e",  # exceptions

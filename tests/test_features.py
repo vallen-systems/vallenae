@@ -4,7 +4,6 @@ from typing import Optional, Tuple
 
 import numpy as np
 import pytest
-from scipy import stats
 
 from vallenae.features import (
     amplitude_to_db,
@@ -16,8 +15,8 @@ from vallenae.features import (
     peak_amplitude,
     peak_amplitude_index,
     rise_time,
-    signal_strength,
     rms,
+    signal_strength,
 )
 
 LEN: int = 100

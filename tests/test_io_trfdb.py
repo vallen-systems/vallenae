@@ -74,8 +74,8 @@ def fixture_sample_trfdb() -> vae.io.TrfDatabase:
 @pytest.fixture(name="fresh_trfdb")
 def fixture_fresh_trfdb(tmp_path) -> vae.io.TrfDatabase:
     filename = tmp_path / "test.trfdb"
-        with vae.io.TrfDatabase(filename, mode="rwc") as trfdb:
-            yield trfdb
+    with vae.io.TrfDatabase(filename, mode="rwc") as trfdb:
+        yield trfdb
 
 
 def test_init():
@@ -85,11 +85,11 @@ def test_init():
 
 def test_create(tmp_path):
     filename = tmp_path / "empty.trfdb"
-        vae.io.TrfDatabase.create(filename)
-        with vae.io.TrfDatabase(filename) as trfdb:
-            assert trfdb.tables() == {
-                "trf_data", "trf_fieldinfo", "trf_globalinfo",
-            }
+    vae.io.TrfDatabase.create(filename)
+    with vae.io.TrfDatabase(filename) as trfdb:
+        assert trfdb.tables() == {
+            "trf_data", "trf_fieldinfo", "trf_globalinfo",
+        }
 
 
 def test_iread(sample_trfdb):
@@ -143,5 +143,5 @@ def test_write(fresh_trfdb):
 
     # add new column
     fresh_trfdb.write(FeatureRecord(trai=1, features={"New": -33.33}))
-    assert get_by_trai(0)["New"] == None
+    assert get_by_trai(0)["New"] is None
     assert get_by_trai(1)["New"] == -33.33
