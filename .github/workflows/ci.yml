@@ -29,6 +29,8 @@ jobs:
         run: tox -e mypy
       - name: Run pytest
         run: tox -e py
+      - name: Run pytest with numba
+        run: tox -e py-numba
       - name: Run PyInstaller test
         run: tox -e pyinstaller
       - name: Upload coverage results to Coveralls

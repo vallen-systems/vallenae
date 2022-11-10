@@ -11,7 +11,6 @@ INSTALL_REQUIRES = [
     "scipy",
     "pandas>=0.24",
     "soundfile",
-    "numba",
     "tqdm",
     "typing_extensions",
 ]

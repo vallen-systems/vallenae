@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Example for custom feature extraction
 - PyInstaller hook
 
+### Changed
+
+- Make Numba dependency optional (fallback timepicker implementations with NumPy)
+
 ### Fixed
 
 - Counts computations (first sample above threshold is not a count)
