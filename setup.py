@@ -24,18 +24,18 @@ EXTRAS_REQUIRE = {
         "pillow",  # required by sphinx-gallery
         "m2r2",  # include markdown files
         "matplotlib",  # used in examples
+        "numba",  # used in location example
     ],
     "tests": [
         "coverage[toml]>=5",  # pyproject.toml support
         "pytest>=6",  # pyproject.toml support
         "pytest-benchmark",
-        "toml",  # toml support for coverage.py
     ],
     "tools": [
         "mypy",
         "pylint>=2.5",  # pyproject.toml support
         "tox>=3.4",  # pyproject.toml support
-    ]
+    ],
 }
 
 EXTRAS_REQUIRE["dev"] = EXTRAS_REQUIRE["docs"] + EXTRAS_REQUIRE["tests"] + EXTRAS_REQUIRE["tools"]
