@@ -1,9 +1,6 @@
+import pickle
 import sqlite3
 from math import sin
-from pathlib import Path
-from tempfile import gettempdir
-import pickle
-import os
 
 import pytest
 
@@ -44,9 +41,8 @@ def fixture_memory_id_abc():
 
 
 @pytest.fixture(name="temp_database")
-def fixture_temp_database():
-    try:
-        filename = Path(gettempdir()) / "temp.db"
+def fixture_temp_database(tmp_path):
+    filename = tmp_path / "temp.db"
         con = sqlite3.connect(f"file:{filename}?mode=rwc", uri=True)
         # add 10 rows of dummy data
         with con:
@@ -57,8 +53,6 @@ def fixture_temp_database():
                 )
         con.close()
         yield filename
-    finally:
-        os.remove(filename)
 
 
 def get_row_by_id(connection, table, row_id):

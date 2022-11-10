@@ -1,12 +1,11 @@
-import os
+import pickle
 import sqlite3
 from pathlib import Path
-import pickle
 
 import pytest
 
-from vallenae.io._database import Database
 from vallenae.io import PriDatabase
+from vallenae.io._database import Database
 
 STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"
 PRIDB_FILE_PATH = STEEL_PLATE_DIR / "sample.pridb"
@@ -28,14 +27,11 @@ def fixture_sample_tradb():
 
 
 @pytest.fixture(name="empty_pridb")
-def fixture_empty_pridb():
-    filename = "test.pridb"
-    try:
-        PriDatabase.create(filename)
-        with Database(filename, mode="rw", table_prefix="ae") as db:
-            yield db
-    finally:
-        os.remove(filename)
+def fixture_empty_pridb(tmp_path):
+    filename = tmp_path / "test.pridb"
+    PriDatabase.create(filename)
+    with Database(filename, mode="rw", table_prefix="ae") as db:
+        yield db
 
 
 def test_init():
@@ -106,7 +102,7 @@ def test_rows(sample_pridb):
 
 def test_columns(sample_pridb):
     assert sample_pridb.columns() == (
-        "SetID", "SetType", "Time", "Chan", "Status", "ParamID", 
+        "SetID", "SetType", "Time", "Chan", "Status", "ParamID",
         "Thr", "Amp", "RiseT", "Dur", "Eny", "SS", "RMS", "Counts",
         "TRAI", "CCnt", "CEny", "CSS", "CHits", "PCTD", "PCTA",
     )

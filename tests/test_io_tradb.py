@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 import numpy as np
@@ -65,9 +64,8 @@ def fixture_signal_tradb_flac() -> vae.io.TraDatabase:
 
 
 @pytest.fixture(name="fresh_tradb")
-def fixture_fresh_tradb() -> vae.io.TraDatabase:
-    filename = "test.tradb"
-    try:
+def fixture_fresh_tradb(tmp_path) -> vae.io.TraDatabase:
+    filename = tmp_path / "test.tradb"
         with vae.io.TraDatabase(filename, mode="rwc") as tradb:
             con = tradb.connection()
             con.execute(
@@ -80,8 +78,6 @@ def fixture_fresh_tradb() -> vae.io.TraDatabase:
                 """
             )
             yield tradb
-    finally:
-        os.remove(filename)
 
 
 def test_create_time_vector():
@@ -105,16 +101,13 @@ def test_init():
     tradb.close()
 
 
-def test_create():
-    filename = "empty.tradb"
-    try:
+def test_create(tmp_path):
+    filename = tmp_path / "empty.tradb"
         vae.io.TraDatabase.create(filename)
         with vae.io.TraDatabase(filename) as tradb:
             assert tradb.tables() == {
                 "tr_data", "tr_fieldinfo", "tr_params", "tr_globalinfo",
             }
-    finally:
-        os.remove(filename)
 
 
 def test_channel(sample_tradb):

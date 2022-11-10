@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 import pytest
@@ -73,13 +72,10 @@ def fixture_sample_trfdb() -> vae.io.TrfDatabase:
 
 
 @pytest.fixture(name="fresh_trfdb")
-def fixture_fresh_trfdb() -> vae.io.TrfDatabase:
-    filename = "test.trfdb"
-    try:
+def fixture_fresh_trfdb(tmp_path) -> vae.io.TrfDatabase:
+    filename = tmp_path / "test.trfdb"
         with vae.io.TrfDatabase(filename, mode="rwc") as trfdb:
             yield trfdb
-    finally:
-        os.remove(filename)
 
 
 def test_init():
@@ -87,16 +83,13 @@ def test_init():
     trfdb.close()
 
 
-def test_create():
-    filename = "empty.trfdb"
-    try:
+def test_create(tmp_path):
+    filename = tmp_path / "empty.trfdb"
         vae.io.TrfDatabase.create(filename)
         with vae.io.TrfDatabase(filename) as trfdb:
             assert trfdb.tables() == {
                 "trf_data", "trf_fieldinfo", "trf_globalinfo",
             }
-    finally:
-        os.remove(filename)
 
 
 def test_iread(sample_trfdb):

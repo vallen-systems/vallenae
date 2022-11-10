@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 import pytest
@@ -68,23 +67,20 @@ def fixture_sample_pridb() -> vae.io.PriDatabase:
 
 
 @pytest.fixture(name="fresh_pridb")
-def fixture_fresh_pridb() -> vae.io.PriDatabase:
-    filename = "test.pridb"
-    try:
-        with vae.io.PriDatabase(filename, mode="rwc") as pridb:
-            con = pridb.connection()
-            con.execute(
-                """
-                INSERT INTO ae_params (
-                    ID, SetupID, Chan, ADC_µV, ADC_TE, ADC_SS
-                ) VALUES (
-                    1, 1, 1, 1, 1, 1
-                )
-                """
+def fixture_fresh_pridb(tmp_path) -> vae.io.PriDatabase:
+    filename = tmp_path / "test.pridb"
+    with vae.io.PriDatabase(filename, mode="rwc") as pridb:
+        con = pridb.connection()
+        con.execute(
+            """
+            INSERT INTO ae_params (
+                ID, SetupID, Chan, ADC_µV, ADC_TE, ADC_SS
+            ) VALUES (
+                1, 1, 1, 1, 1, 1
             )
-            yield pridb
-    finally:
-        os.remove(filename)
+            """
+        )
+        yield pridb
 
 
 def test_init():
@@ -92,17 +88,14 @@ def test_init():
     pridb.close()
 
 
-def test_create():
-    filename = "empty.pridb"
-    try:
-        vae.io.PriDatabase.create(filename)
-        with vae.io.PriDatabase(filename) as pridb:
-            assert pridb.tables() == {
-                "acq_setup", "ae_data", "ae_fieldinfo", "ae_globalinfo",
-                "ae_markers", "ae_params", "data_integrity",
-            }
-    finally:
-        os.remove(filename)
+def test_create(tmp_path):
+    filename = tmp_path / "empty.pridb"
+    vae.io.PriDatabase.create(filename)
+    with vae.io.PriDatabase(filename) as pridb:
+        assert pridb.tables() == {
+            "acq_setup", "ae_data", "ae_fieldinfo", "ae_globalinfo",
+            "ae_markers", "ae_params", "data_integrity",
+        }
 
 
 def test_channel(sample_pridb):
@@ -236,7 +229,6 @@ def test_read_parametric(sample_pridb):
     assert dict(param.dtypes) == {
         "param_id": Int64Dtype(),
         "time": float64,
-        "param_id": Int64Dtype(),
         "pctd": Int64Dtype(),
         "pcta": Int64Dtype(),
     }
