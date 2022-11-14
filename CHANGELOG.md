@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Remove scipy dependency (only needed for examples)
+
 ## [0.7.0] - 2022-11-10
 
 ### Added

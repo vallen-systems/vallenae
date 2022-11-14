@@ -8,7 +8,6 @@ with open(path.join(HERE, "README.md"), encoding="utf-8") as f:
 
 INSTALL_REQUIRES = [
     "numpy",
-    "scipy",
     "pandas>=0.24",
     "soundfile",
     "tqdm",
@@ -25,6 +24,7 @@ EXTRAS_REQUIRE = {
         "m2r2",  # include markdown files
         "matplotlib",  # used in examples
         "numba",  # used in location example
+        "scipy",  # used in location and multiprocessing example
     ],
     "tests": [
         "coverage[toml]>=5",  # pyproject.toml support
