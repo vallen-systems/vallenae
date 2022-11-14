@@ -12,9 +12,8 @@ import multiprocessing
 import os
 import time
 from itertools import cycle
-from typing import Dict, Iterable
+from typing import Iterable
 
-import __main__
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
@@ -27,30 +26,21 @@ TRADB = os.path.join(HERE, "steel_plate/sample_plain.tradb")
 #%%
 # Prepare streaming reads
 # -----------------------
-tradb = vae.io.TraDatabase(TRADB)
-
-#%%
 # Our sample tradb only contains four data sets. That is not enough data for demonstrating batch processing.
 # Therefore, we will simulate more data by looping over the data sets with following generator/iterable:
 def tra_generator(loops: int = 1000) -> Iterable[vae.io.TraRecord]:
-    for loop, tra in enumerate(cycle(tradb.iread())):
-        if loop > loops:
-            break
-        yield tra
+    with vae.io.TraDatabase(TRADB) as tradb:
+        for loop, tra in enumerate(cycle(tradb.iread())):
+            if loop > loops:
+                break
+            yield tra
 
 #%%
 # Define feature extraction function
 # ----------------------------------
-# Following function will be applied to all data sets and returns computed features:
-def feature_extraction(tra: vae.io.TraRecord) -> Dict[str, float]:
-    # compute random statistical features
-    return {
-        "Std": np.std(tra.data),
-        "Skew": stats.skew(tra.data),
-    }
-
-# Fix to use pickle serialization in sphinx gallery
-setattr(__main__, feature_extraction.__name__, feature_extraction)
+# A simple function from the module `_feature_extraction` is applied to all data sets and returns computed features.
+# The function is defined in another module to work with `multiprocessing.Pool`: https://bugs.python.org/issue25053
+from _feature_extraction import feature_extraction
 
 #%%
 # Compute with single thread/core
@@ -63,13 +53,14 @@ setattr(__main__, feature_extraction.__name__, feature_extraction)
 # Run computation in a single thread and get the time:
 time_elapsed_ms = lambda t0: 1e3 * (time.perf_counter() - t0)
 
-time_start = time.perf_counter()
-for tra in tra_generator():
-    results = feature_extraction(tra)
-    # do something with the results
-time_single_thread = time_elapsed_ms(time_start)
+if __name__ == "__main__":  # guard needed for multiprocessing on Windows
+    time_start = time.perf_counter()
+    for tra in tra_generator():
+        results = feature_extraction(tra)
+        # do something with the results
+    time_single_thread = time_elapsed_ms(time_start)
 
-print(f"Time single thread: {time_single_thread:.2f} ms")
+    print(f"Time single thread: {time_single_thread:.2f} ms")
 
 #%%
 # Compute with multiple processes/cores
@@ -89,31 +80,33 @@ print(f"Available CPU cores: {os.cpu_count()}")
 
 #%%
 # Run computation on 4 cores with chunks of 128 data sets and get the time / speedup:
-with multiprocessing.Pool(4) as pool:
-    time_start = time.perf_counter()
-    for results in pool.imap(feature_extraction, tra_generator(), chunksize=128):
-        pass  # do something with the results
-    time_multiprocessing = time_elapsed_ms(time_start)
+if __name__ == "__main__":  # guard needed for multiprocessing on Windows
+    with multiprocessing.Pool(4) as pool:
+        time_start = time.perf_counter()
+        for results in pool.imap(feature_extraction, tra_generator(), chunksize=128):
+            pass  # do something with the results
+        time_multiprocessing = time_elapsed_ms(time_start)
 
-print(f"Time multiprocessing: {time_multiprocessing:.2f} ms")
-print(f"Speedup: {(time_single_thread / time_multiprocessing):.2f}")
+    print(f"Time multiprocessing: {time_multiprocessing:.2f} ms")
+    print(f"Speedup: {(time_single_thread / time_multiprocessing):.2f}")
 
 #%%
 # Variation of the chunksize
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Following results show how the chunksize impacts the overall performance.
 # The speedup is measured for different chunksizes and plotted against the chunksize:
-chunksizes = (10, 40, 60, 80, 100, 120, 140, 160, 200)
-speedup_chunksizes = []
-with multiprocessing.Pool(4) as pool:
-    for chunksize in chunksizes:
-        time_start = time.perf_counter()
-        for results in pool.imap(feature_extraction, tra_generator(), chunksize=chunksize):
-            pass  # do something with the results
-        speedup_chunksizes.append(time_single_thread / time_elapsed_ms(time_start))
+if __name__ == "__main__":  # guard needed for multiprocessing on Windows
+    chunksizes = (10, 40, 60, 80, 100, 120, 140, 160, 200)
+    speedup_chunksizes = []
+    with multiprocessing.Pool(4) as pool:
+        for chunksize in chunksizes:
+            time_start = time.perf_counter()
+            for results in pool.imap(feature_extraction, tra_generator(), chunksize=chunksize):
+                pass  # do something with the results
+            speedup_chunksizes.append(time_single_thread / time_elapsed_ms(time_start))
 
-plt.figure(tight_layout=True, figsize=(6, 3))
-plt.plot(chunksizes, speedup_chunksizes)
-plt.xlabel("Chunksize")
-plt.ylabel("Speedup")
-plt.show()
+    plt.figure(tight_layout=True, figsize=(6, 3))
+    plt.plot(chunksizes, speedup_chunksizes)
+    plt.xlabel("Chunksize")
+    plt.ylabel("Speedup")
+    plt.show()

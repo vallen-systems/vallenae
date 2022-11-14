@@ -56,6 +56,7 @@ sphinx_gallery_conf = {
      "examples_dirs": "../examples",  # path to your example scripts
      "gallery_dirs": "examples",  # path to where to save gallery generated output
      "filename_pattern": "",
+     "ignore_pattern": r"[\\,/]_",  # files starting with an underscore
      "within_subsection_order": FileNameSortKey,
      "download_all_examples": False,
 }
