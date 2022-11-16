@@ -237,6 +237,24 @@ def _energy_ratio_numpy(arr: np.ndarray, win_len: int = 100) -> Tuple[np.ndarray
 
 
 def energy_ratio(arr: np.ndarray, win_len: int = 100) -> Tuple[np.ndarray, int]:
+    """
+    Energy ratio for arrival time estimation.
+
+    Method based on preceding and following energy collection windows.
+
+    Args:
+        arr: Transient signal of hit
+        win_len: Samples of sliding windows. Default: 100
+
+    Returns:
+        - Array with computed detection function
+        - Index of the estimated arrival time (max value)
+
+    References:
+        - Han, L., Wong, J., & Bancroft, J. C. (2009).
+          Time picking and random noise reduction on microseismic data.
+          CREWES Research Report, 21, 1–13.
+    """
     if USE_NUMBA:
         return _energy_ratio_numba(arr, win_len)
     return _energy_ratio_numpy(arr, win_len)
