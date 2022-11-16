@@ -21,7 +21,7 @@ EXTRAS_REQUIRE = {
         "sphinx-rtd-theme",
         "sphinx-gallery",
         "pillow",  # required by sphinx-gallery
-        "m2r2",  # include markdown files
+        "myst-parser",  # include markdown files
         "matplotlib",  # used in examples
         "numba",  # used in location example
         "scipy",  # used in location and multiprocessing example

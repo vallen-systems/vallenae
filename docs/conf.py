@@ -24,7 +24,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx_autodoc_typehints",
     "sphinx_gallery.gen_gallery",
-    "m2r2",
+    "myst_parser",
 ]
 
 source_suffix = [".rst", ".md"]
@@ -33,12 +33,9 @@ autosummary_generate = True
 autodoc_member_order = "bysource"
 
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", None),
-    "numpy": ("https://docs.scipy.org/doc/numpy/", None),
-    # "np": ("https://docs.scipy.org/doc/numpy/", None),
-    # "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
-    # "matplotlib": ("https://matplotlib.org/", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "python": ("https://docs.python.org/3/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "pandas": ("https://pandas.pydata.org/docs/", None),
 }
 
 templates_path = ["_templates"]
