@@ -4,14 +4,14 @@ Read pridb
 """
 
 #%%
-import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 
 import vallenae as vae
 
-HERE = os.path.dirname(__file__) if "__file__" in locals() else os.getcwd()
-PRIDB = os.path.join(HERE, "steel_plate/sample.pridb")
+HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
+PRIDB = HERE / "steel_plate" / "sample.pridb"
 
 #%%
 # Open pridb

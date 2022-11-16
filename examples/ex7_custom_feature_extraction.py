@@ -10,17 +10,17 @@ the trfdb is active and waits for the features to be computed. Therefore, the co
 be visualized in real time.
 """
 
-import os
+from pathlib import Path
 from tempfile import gettempdir
 
 import numpy as np
 
 import vallenae as vae
 
-HERE = os.path.dirname(__file__) if "__file__" in locals() else os.getcwd()
-TRADB = os.path.join(HERE, "steel_plate/sample_plain.tradb")
-# TRFDB = os.path.join(HERE, "steel_plate/sample.trfdb")
-TRFDB_TMP = os.path.join(gettempdir(), "sample_custom.trfdb")  # use a temp file for demo
+HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
+TRADB = HERE / "steel_plate" / "sample_plain.tradb"
+# TRFDB = HERE / "steel_plate" / "sample.trfdb"
+TRFDB_TMP = Path(gettempdir()) / "sample_custom.trfdb"  # use a temp file for demo
 
 #%%
 # Custom feature extraction algorithms

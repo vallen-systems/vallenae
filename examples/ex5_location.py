@@ -4,8 +4,8 @@ Localisation
 """
 
 import math
-import os
 import time
+from pathlib import Path
 from typing import Dict, Optional, Tuple
 from xml.etree import ElementTree
 
@@ -17,9 +17,9 @@ from scipy.optimize import differential_evolution
 
 import vallenae as vae
 
-HERE = os.path.dirname(__file__) if "__file__" in locals() else os.getcwd()
-SETUP = os.path.join(HERE, "steel_plate/sample.vaex")
-PRIDB = os.path.join(HERE, "steel_plate/sample.pridb")
+HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
+PRIDB = HERE / "steel_plate" / "sample.pridb"
+SETUP = HERE / "steel_plate" / "sample.vaex"
 NUMBER_SENSORS = 4
 
 

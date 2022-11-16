@@ -12,16 +12,15 @@ import multiprocessing
 import os
 import time
 from itertools import cycle
+from pathlib import Path
 from typing import Iterable
 
 import matplotlib.pyplot as plt
-import numpy as np
-from scipy import stats
 
 import vallenae as vae
 
-HERE = os.path.dirname(__file__) if "__file__" in locals() else os.getcwd()
-TRADB = os.path.join(HERE, "steel_plate/sample_plain.tradb")
+HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
+TRADB = HERE / "steel_plate" / "sample_plain.tradb"
 
 #%%
 # Prepare streaming reads

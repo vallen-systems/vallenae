@@ -6,16 +6,15 @@ Following example showcases the results of different timepicking methods.
 For more informations, please refer to the functions documentation (`vallenae.timepicker`).
 """
 
-import os
 import time
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 
 import vallenae as vae
 
-HERE = os.path.dirname(__file__) if "__file__" in locals() else os.getcwd()
-TRADB = os.path.join(HERE, "steel_plate/sample_plain.tradb")
-
+HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
+TRADB = HERE / "steel_plate" / "sample_plain.tradb"
 TRAI = 4
 SAMPLES = 2000
 

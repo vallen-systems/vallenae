@@ -6,7 +6,7 @@ Following examples shows how to stream transient data row by row,
 compute timepicker results and save the results to a feature database (trfdb).
 """
 
-import os
+from pathlib import Path
 from shutil import copyfile
 from tempfile import gettempdir
 
@@ -15,10 +15,10 @@ import pandas as pd
 
 import vallenae as vae
 
-HERE = os.path.dirname(__file__) if "__file__" in locals() else os.getcwd()
-TRADB = os.path.join(HERE, "steel_plate/sample_plain.tradb")
-TRFDB = os.path.join(HERE, "steel_plate/sample.trfdb")
-TRFDB_TMP = os.path.join(gettempdir(), "sample.trfdb")
+HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
+TRADB = HERE / "steel_plate" / "sample_plain.tradb"
+TRFDB = HERE / "steel_plate" / "sample.trfdb"
+TRFDB_TMP = Path(gettempdir()) / "sample.trfdb"
 
 #%%
 # Open tradb (readonly) and trfdb (readwrite)
