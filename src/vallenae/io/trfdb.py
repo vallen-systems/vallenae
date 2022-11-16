@@ -45,10 +45,9 @@ class TrfDatabase(Database):
         Args:
             filename: Path to new trfdb database file
         """
-        file_schema = Path(__file__).resolve().parent / "schema_templates/trfdb.sql"
-        with open(file_schema, "r", encoding="utf-8") as file:
-            schema_trfdb = file.read()
-        create_new_database(filename, schema_trfdb)
+        schema_path = Path(__file__).parent / "schema_templates/trfdb.sql"
+        schema = schema_path.read_text("utf-8")
+        create_new_database(filename, schema)
 
     def read(self, **kwargs) -> pd.DataFrame:
         """

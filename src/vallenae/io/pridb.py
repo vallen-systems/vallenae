@@ -70,11 +70,9 @@ class PriDatabase(Database):
         Args:
             filename: Path to new pridb database file
         """
-        file_schema = Path(__file__).resolve().parent / "schema_templates/pridb.sql"
-        with open(file_schema, "r", encoding="utf-8") as file:
-            schema_pridb = file.read()
-        schema_pridb = schema_pridb.format(timebase=int(1e7))  # fill placeholder / constants
-        create_new_database(filename, schema_pridb)
+        schema_path = Path(__file__).parent / "schema_templates/pridb.sql"
+        schema = schema_path.read_text("utf-8").format(timebase=int(1e7))  # fill placeholder
+        create_new_database(filename, schema)
 
     def channel(self) -> Set[int]:
         """Get list of channels."""

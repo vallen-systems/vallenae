@@ -1,10 +1,10 @@
-from setuptools import setup, find_packages
-from os import path
+from pathlib import Path
 
-HERE = path.abspath(path.dirname(__file__))
+from setuptools import find_packages, setup
 
-with open(path.join(HERE, "README.md"), encoding="utf-8") as f:
-    LONG_DESCRIPTION = f.read()
+HERE = Path(__file__).parent
+
+LONG_DESCRIPTION = (HERE / "README.md").read_text("utf-8")
 
 INSTALL_REQUIRES = [
     "numpy",
