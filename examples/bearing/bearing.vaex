@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Vallen_XML>
+  <DocumentProperties>
+    <Title>VisualAE Setup</Title>
+    <Version>01.00</Version>
+    <SaveInfo>
+      <SaveDate>2022-11-17T19:50:04.760Z</SaveDate>
+      <ApplicationInfo>
+        <Title>Vallen VisualAE</Title>
+        <Version>2022.0809.2</Version>
+      </ApplicationInfo>
+    </SaveInfo>
+  </DocumentProperties>
+  <VAESetup>
+    <ProjectSettings UpdOnlInterval="1000" UpdOffInterval="3000" TRFDisabled="False" ShowTimeMarkers="False" UseAbsFromRelTime="False" UseAbsTimeGap="False">
+      <PulseTracking TrackTimeMSec="15" TimeOutSec="10" FlagTimeOutMSec="0"/>
+      <PaxConversion>
+        <Input Channel="0" HWChannel="0" Available="True" Enabled="False" Name="PA0U" LongName="~RPM" Description="~RPM" Unit="[mV]" Offset="0" Factor="1" HighGain="False"/>
+      </PaxConversion>
+    </ProjectSettings>
+    <DataStructure>
+      <DataSource ID="1" ServerID="-1" TreeID="bearing.pridb">
+        <Comment>
+          <Caption Visible="True" Align="2"/>
+          <Comment Visible="False" Align="0"/>
+        </Comment>
+      </DataSource>
+      <Diagram2DControl WantSubhit="False" PageIndex="1" PosIndex="0" ID="2" ServerID="1" TreeID="2D1: Peak Amp [dB] vs. Time [s]">
+        <PlaneMapperL IsoTropic="True">
+          <X Attr="Generic.Time.S" Scale="0" FixLo="False" FixHi="False" HideGrid="False" Invert="False" SlideLo="False" SlideHi="False"/>
+          <Y Attr="Hit.Amp.dB" Scale="0" FixLo="True" FixHi="True" UsLo="20" UsHi="100" HideGrid="False" Invert="False"/>
+          <Correlation>
+            <Planes>
+              <Plane BarStyle="0" DotStyle="8" ColIdx="1">
+                <Filter>
+                  <Comment>
+                    <Caption Visible="True" Align="2" Text="=[Filter]"/>
+                    <Comment Visible="False" Align="0"/>
+                  </Comment>
+                </Filter>
+              </Plane>
+            </Planes>
+          </Correlation>
+          <Distribution Bins="32000" BinWidth="0.01" FixWidth="False" Accumulation="4"/>
+        </PlaneMapperL>
+        <PlaneMapperR>
+          <Y Attr="Pax.User.0" Scale="0" FixLo="True" FixHi="False" UsLo="0" HideGrid="True" Invert="False"/>
+          <Correlation>
+            <Planes>
+              <Plane BarStyle="1" DotStyle="0" ColIdx="2">
+                <Filter>
+                  <Comment>
+                    <Caption Visible="True" Align="2" Text="=[Filter]"/>
+                    <Comment Visible="False" Align="0"/>
+                  </Comment>
+                </Filter>
+              </Plane>
+            </Planes>
+          </Correlation>
+          <Distribution Accumulation="6"/>
+        </PlaneMapperR>
+        <Legend Visible="True">
+          <HeaderLeft Caption="=[Y-AttrLongUnit]" Visible="True" Align="2"/>
+          <HeaderRight Caption="=[YR-AttrLongUnit]" Visible="True" Align="2"/>
+          <HeaderBottom Caption="=[X-AttrLongUnit]" Visible="True" Align="2"/>
+          <AxisTextX Visible="False" Align="0"/>
+          <AxisTextY Visible="False" Align="0"/>
+          <AxisTextZ Visible="False" Align="0"/>
+        </Legend>
+        <Comment>
+          <Caption Visible="False" Align="2" Text="=[Y-AttrLongUnit] vs. =[X-AttrLongUnit]"/>
+          <Comment Visible="False" Align="0"/>
+        </Comment>
+      </Diagram2DControl>
+      <TRDiagramControl PageIndex="1" PosIndex="1" ID="3" ServerID="1" TreeID="TR1: Transient Waveform">
+        <TR HasClient="True" Offset="0" Range="5000" Display="0" Window="0" SetNo="490" FFTMinSamples="32" FFTMaxFreq="125000" FFTMinFreq="0" FixScale="False" FixedChan="0" FixMax="0.0213117">
+          <Client Offset="0" Range="5000" Display="1" FixScale="False" FixMax="0.00068913"/>
+          <Filter Type="0" LoFreq="100000" HiFreq="500000" Slope="80"/>
+        </TR>
+        <Legend Visible="True">
+          <HeaderLeft Visible="False" Align="0"/>
+          <HeaderRight Visible="False" Align="0"/>
+          <HeaderBottom Visible="False" Align="0"/>
+          <AxisTextX Visible="False" Align="0"/>
+          <AxisTextY Visible="False" Align="0"/>
+          <AxisTextZ Visible="False" Align="0"/>
+        </Legend>
+        <Comment>
+          <Caption Visible="False" Align="2" Text="Transient Waveform"/>
+          <Comment Visible="False" Align="0"/>
+        </Comment>
+      </TRDiagramControl>
+    </DataStructure>
+    <PageStructure ActivePageIndex="0">
+      <Page PageType="0" Name="Page 1" Layout="01020002">
+        <Comment>
+          <Caption Visible="False" Align="2"/>
+          <Comment Visible="False" Align="0"/>
+        </Comment>
+      </Page>
+    </PageStructure>
+  </VAESetup>
+</Vallen_XML>
