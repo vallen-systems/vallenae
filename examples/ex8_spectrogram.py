@@ -16,7 +16,7 @@ from scipy import signal
 import vallenae as vae
 
 HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
-TRADB = HERE / "bearing" / "bearing.tradb"
+TRADB = HERE / "bearing" / "bearing_plain.tradb"
 
 #%%
 # Read transient data as continous array
