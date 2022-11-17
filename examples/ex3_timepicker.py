@@ -18,8 +18,6 @@ TRADB = HERE / "steel_plate" / "sample_plain.tradb"
 TRAI = 4
 SAMPLES = 2000
 
-plt.ioff()  # Turn interactive mode off; plt.show() is blocking
-
 
 #%%
 # Read waveform from tradb
