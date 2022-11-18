@@ -14,13 +14,15 @@ from pathlib import Path
 from tempfile import gettempdir
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 import vallenae as vae
 
 HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
-TRADB = HERE / "steel_plate" / "sample_plain.tradb"
-# TRFDB = HERE / "steel_plate" / "sample.trfdb"
-TRFDB_TMP = Path(gettempdir()) / "sample_custom.trfdb"  # use a temp file for demo
+PRIDB = HERE / "bearing" / "bearing.pridb"
+TRADB = HERE / "bearing" / "bearing_plain.tradb"
+# TRFDB = HERE / "bearing" / "bearing.trfdb"
+TRFDB_TMP = Path(gettempdir()) / "bearing_custom.trfdb"  # use a temp file for demo
 
 #%%
 # Custom feature extraction algorithms
@@ -60,7 +62,6 @@ trfdb = vae.io.TrfDatabase(TRFDB_TMP, mode="rwc")
 
 #%%
 # Helper function to notify VisualAE, that the transient feature database is active/closed
-
 def set_file_status(trfdb_: vae.io.TrfDatabase, status: int):
     """Notify VisualAE that trfdb is active/closed."""
     trfdb_.connection().execute(
@@ -93,7 +94,6 @@ set_file_status(trfdb, 0)  # 0 = closed
 # Write field infos to trfdb
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Field infos can be written with `vallenae.io.TrfDatabase.write_fieldinfo`:
-
 trfdb.write_fieldinfo("RMS", {"Unit": "[V]", "LongName": "Root mean square"})
 trfdb.write_fieldinfo("CrestFactor", {"Unit": "[]", "LongName": "Crest factor"})
 trfdb.write_fieldinfo("SpectralPeakFreq", {"Unit": "[Hz]", "LongName": "Spectral peak frequency"})
@@ -101,5 +101,46 @@ trfdb.write_fieldinfo("SpectralPeakFreq", {"Unit": "[Hz]", "LongName": "Spectral
 #%%
 # Read results from trfdb
 # -----------------------
-df = trfdb.read()
-print(df)
+df_trfdb = trfdb.read()
+print(df_trfdb)
+
+#%%
+# Plot AE features and custom features
+# ------------------------------------
+# Read pridb and join it with trfdb:
+with vae.io.PriDatabase(PRIDB) as pridb:
+    df_pridb = pridb.read_hits()
+
+df_combined = df_pridb.join(df_trfdb, on="trai", how="left")
+print(df_combined)
+
+#%%
+# Plot joined features from pridb and trfdb
+features = [
+    # from pridb
+    "amplitude",
+    "energy",
+    "counts",
+    # from trfdb - custom
+    "RMS",
+    "CrestFactor",
+    "SpectralPeakFreq",
+]
+df_combined.plot(
+    x="time",
+    y=features,
+    xlabel="Time [s]",
+    title=features,
+    legend=False,
+    subplots=True,
+    figsize=(8, 10),
+)
+plt.suptitle("AE Features from pridb and custom features from trfdb")
+plt.tight_layout()
+plt.show()
+
+#%%
+# Display custom features in VisualAE
+# -----------------------------------
+#
+# .. image:: /images/vae_custom_features.png
