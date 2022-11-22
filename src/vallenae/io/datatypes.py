@@ -46,7 +46,7 @@ class HitRecord(NamedTuple):
     @classmethod
     def from_sql(cls, row: Dict[str, Any]) -> "HitRecord":
         """
-        Create HitRecord from SQL row.
+        Create `HitRecord` from SQL row.
 
         Args:
             row: Dict of column names and values
@@ -92,7 +92,7 @@ class MarkerRecord(NamedTuple):
     @classmethod
     def from_sql(cls, row: Dict[str, Any]) -> "MarkerRecord":
         """
-        Create MarkerRecord from SQL row.
+        Create `MarkerRecord` from SQL row.
 
         Args:
             row: Dict of column names and values
@@ -124,7 +124,7 @@ class StatusRecord(NamedTuple):
     @classmethod
     def from_sql(cls, row: Dict[str, Any]) -> "StatusRecord":
         """
-        Create StatusRecord from SQL row.
+        Create `StatusRecord` from SQL row.
 
         Args:
             row: Dict of column names and values
@@ -164,7 +164,7 @@ class ParametricRecord(NamedTuple):
     @classmethod
     def from_sql(cls, row: Dict[str, Any]) -> "ParametricRecord":
         """
-        Create ParametricRecord from SQL row.
+        Create `ParametricRecord` from SQL row.
 
         Args:
             row: Dict of column names and values
@@ -196,13 +196,22 @@ class TraRecord(NamedTuple):
     threshold: float  #: Threshold amplitude in volts
     samplerate: int  #: Samplerate in Hz
     samples: int  #: Number of samples
-    data: np.ndarray  #: Transient signal in volts
-    # optional for creating:
+    data: np.ndarray  #: Transient signal in volts or ADC values if `raw` = `True`
+    # optional for writing
     trai: Optional[int] = None  #: Transient recorder index (foreign key between pridb and tradb)
     rms: Optional[float] = None  #: RMS of the noise before the hit
+    # optional
+    raw: bool = False  #: `data` is stored as ADC values (int16)
 
     @classmethod
-    def from_sql(cls, row: Dict[str, Any]) -> "TraRecord":
+    def from_sql(cls, row: Dict[str, Any], *, raw: bool = False) -> "TraRecord":
+        """
+        Create `TraRecord` from SQL row.
+
+        Args:
+            row: Dict of column names and values
+            raw: Provide `data` as ADC values (int16)
+        """
         return TraRecord(
             time=row["Time"],
             channel=row["Chan"],
@@ -211,8 +220,9 @@ class TraRecord(NamedTuple):
             threshold=_to_volts(row["Thr"]),
             samplerate=row["SampleRate"],
             samples=row["Samples"],
-            data=decode_data_blob(row["Data"], row["DataFormat"], row["TR_mV"]),
+            data=decode_data_blob(row["Data"], row["DataFormat"], row["TR_mV"], raw=raw),
             trai=row["TRAI"],
+            raw=raw,
         )
 
 
@@ -226,6 +236,12 @@ class FeatureRecord(NamedTuple):
 
     @classmethod
     def from_sql(cls, row: Dict[str, Any]) -> "FeatureRecord":
+        """
+        Create `FeatureRecord` from SQL row.
+
+        Args:
+            row: Dict of column names and values
+        """
         return FeatureRecord(
             trai=row.pop("TRAI"),
             features=row,

@@ -124,8 +124,9 @@ def test_iread_empty_query(sample_tradb):
     assert list(sample_tradb.iread(time_start=2, time_stop=1)) == []
 
 
-def test_iread(sample_tradb):
-    tras = list(sample_tradb.iread())
+@pytest.mark.parametrize("raw", (False, True))
+def test_iread(sample_tradb, raw):
+    tras = list(sample_tradb.iread(raw=raw))
     tras_expected_ordered = sorted(TRAS_EXPECTED, key=lambda t: t.trai)
 
     assert len(tras) == len(tras_expected_ordered)
@@ -138,7 +139,9 @@ def test_iread(sample_tradb):
         assert tra.threshold == pytest.approx(tra_expected.threshold / 1e6)
         assert tra.samplerate == tra_expected.samplerate
         assert tra.samples == tra_expected.samples
+        assert tra.data.dtype == np.int16 if raw else np.float32
         assert tra.trai == tra_expected.trai
+        assert tra.raw == raw
 
 
 def test_iread_query_filter(sample_tradb):
@@ -182,6 +185,12 @@ def test_read_wave_compare_to_reference_txt(signal_txt, signal_tradb_raw, signal
     adc_step = max_amplitude * (2 ** -15)
     assert_allclose(data_txt, data_raw, atol=adc_step, rtol=0)
     assert_allclose(data_txt, data_flac, atol=adc_step, rtol=0)
+
+
+@pytest.mark.parametrize("raw", (False, True))
+def test_read_continuous_wave_dtype(sample_tradb, raw):
+    y, _ = sample_tradb.read_continuous_wave(1, raw=raw)
+    assert y.dtype == np.int16 if raw else np.float32
 
 
 def test_read_continuous_wave_empty_tradb(fresh_tradb):
@@ -288,7 +297,7 @@ def test_write(fresh_tradb):
     new_tra = TraRecord(
         time=11.11, channel=1, param_id=1, pretrigger=500, threshold=111,
         samplerate=5000000, samples=103488,
-        data=np.empty(0, dtype=np.float32), trai=1,
+        data=np.empty(0, dtype=np.float32), trai=1, raw=False,
     )
 
     assert fresh_tradb.rows() == 0
@@ -305,6 +314,7 @@ def test_write(fresh_tradb):
     assert tra_read.samples == new_tra.samples
     # assert tra_read.data == new_tra.data
     assert tra_read.trai == new_tra.trai
+    assert tra_read.raw is False
 
     fresh_tradb.write(new_tra)
     assert fresh_tradb.rows() == 2  # duplicate TRAI, no exception?

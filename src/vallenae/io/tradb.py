@@ -1,4 +1,4 @@
-from functools import lru_cache
+from functools import lru_cache, partial
 from itertools import chain
 from pathlib import Path
 from time import sleep
@@ -129,6 +129,7 @@ class TraDatabase(Database):
         time_stop: Optional[float] = None,
         trai: Union[None, int, Sequence[int]] = None,
         query_filter: Optional[str] = None,
+        raw: bool = False,
     ) -> SizedIterable[TraRecord]:
         """
         Stream transient data with returned Iterable.
@@ -141,6 +142,7 @@ class TraDatabase(Database):
             trai: Read data by TRAI (transient recorder index)
             query_filter: Optional query filter provided as SQL clause,
                 e.g. "Pretrigger == 500 AND Samples >= 1024"
+            raw: Return data as ADC values (int16). Default: `False`
 
         Returns:
             Sized iterable to sequential read transient data
@@ -176,11 +178,15 @@ class TraDatabase(Database):
         return QueryIterable(
             self._connection_wrapper.get_readonly_connection(),
             query,
-            TraRecord.from_sql,
+            partial(TraRecord.from_sql, raw=raw),
         )
 
     def read_wave(
-        self, trai: int, time_axis: bool = True,
+        self,
+        trai: int,
+        time_axis: bool = True,
+        *,
+        raw: bool = False,
     ) -> Union[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, int]]:
         """
         Read transient signal for a given TRAI (transient recorder index).
@@ -191,6 +197,7 @@ class TraDatabase(Database):
         Args:
             trai: Transient recorder index (unique key between pridb and tradb)
             time_axis: Create the correspondig time axis. Default: `True`
+            raw: Return data as ADC values (int16). Default: `False`
 
         Returns:
             If :attr:`time_axis` is `True`\n
@@ -201,7 +208,7 @@ class TraDatabase(Database):
             - Array with transient signal
             - Samplerate
         """
-        iterable = self.iread(trai=trai)
+        iterable = self.iread(trai=trai, raw=raw)
         try:
             tra = next(iter(iterable))
         except StopIteration:
@@ -230,6 +237,7 @@ class TraDatabase(Database):
         *,
         time_axis: bool = True,
         show_progress: bool = True,
+        raw: bool = False,
     ) -> Union[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, int]]:
         """
         Read transient signal of specified channel to a single, continuous array.
@@ -242,6 +250,7 @@ class TraDatabase(Database):
             time_stop: Stop reading at relative time (in seconds). Read until end if `None`
             time_axis: Create the correspondig time axis. Default: `True`
             show_progress: Show progress bar. Default: `True`
+            raw: Return data as ADC values (int16). Default: `False`
 
         Returns:
             If `time_axis` is `True`\n
@@ -252,7 +261,8 @@ class TraDatabase(Database):
             - Array with transient signal
             - Samplerate
         """
-        iterable = self.iread(channel=channel, time_start=time_start, time_stop=time_stop)
+        dtype = np.int16 if raw else np.float32
+        iterable = self.iread(channel=channel, time_start=time_start, time_stop=time_stop, raw=raw)
         iterator = iter(iterable)
         if show_progress:
             iterator = tqdm(iterator, total=len(iterable), desc="Tra")  # ignores previous tra
@@ -263,7 +273,7 @@ class TraDatabase(Database):
             previous_trai = self._get_previous_trai(channel, trai_start)
             if previous_trai is not None:
                 iterator = chain(
-                    iter(self.iread(channel=channel, trai=previous_trai)),
+                    iter(self.iread(channel=channel, trai=previous_trai, raw=raw)),
                     iterator,
                 )
 
@@ -283,7 +293,7 @@ class TraDatabase(Database):
             return n_start, n_stop
 
         samplerate = 0  # will be initialized with samplerate of first record
-        tra_blocks = [np.empty(0, dtype=np.float32)]
+        tra_blocks = [np.empty(0, dtype=dtype)]
         expected_time = time_start
 
         for tra in iterator:
@@ -296,7 +306,7 @@ class TraDatabase(Database):
             time_gap = tra.time - expected_time
             if time_gap > 1 / tra.samplerate:
                 samples_gap = round(time_gap * tra.samplerate)
-                tra_blocks.append(np.zeros(samples_gap, dtype=np.float32))
+                tra_blocks.append(np.zeros(samples_gap, dtype=dtype))
 
             sample_start, sample_stop = slice_range(tra)
             tra_blocks.append(tra.data[sample_start:sample_stop])
@@ -308,7 +318,7 @@ class TraDatabase(Database):
         if time_stop is not None and samplerate and abs(expected_time - time_stop) > 1 / samplerate:
             # zero padding at ending
             samples = round((time_stop - expected_time) * samplerate)
-            tra_blocks.append(np.zeros(samples, dtype=np.float32))
+            tra_blocks.append(np.zeros(samples, dtype=dtype))
 
         y = np.concatenate(tra_blocks)
         if time_axis:
@@ -320,6 +330,7 @@ class TraDatabase(Database):
         existing: bool = False,
         wait: bool = False,
         query_filter: Optional[str] = None,
+        raw: bool = False,
     ) -> Iterable[TraRecord]:
         """
         Listen to database changes and return new records.
@@ -330,6 +341,7 @@ class TraDatabase(Database):
                 Otherwise the function returns after all records are read.
             query_filter: Optional query filter provided as SQL clause,
                 e.g. "TRAI >= 100 AND Samples >= 1024"
+            raw: Return data as ADC values (int16). Default: `False`
 
         Yields:
             New transient data records
@@ -348,7 +360,7 @@ class TraDatabase(Database):
             # buffer rows to allow in-between write transactions
             rows = list(read_sql_generator(self.connection(), query, last_set_id))
             for row in rows:
-                yield TraRecord.from_sql(row)
+                yield TraRecord.from_sql(row, raw=raw)
                 last_set_id = row["SetID"]
             if len(rows) == 0:
                 if not wait and self._file_status() == 0:  # no writer active
