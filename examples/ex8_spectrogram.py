@@ -3,7 +3,7 @@ Spectrogram
 ===========
 
 Generate spectrogram from tradb. The `vallenae.io.TraDatabase.read_continuous_wave` method is used
-to read the transient data as a continous array.
+to read the transient data as a continuous array.
 """
 
 from pathlib import Path
