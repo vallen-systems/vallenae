@@ -29,7 +29,7 @@ The remaining modules are system-independent and try to comprise the most common
     :caption: Examples
     :hidden:
 
-    examples/index
+    _examples/index
 
 .. toctree::
     :caption: Development

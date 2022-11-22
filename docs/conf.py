@@ -36,9 +36,10 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "pandas": ("https://pandas.pydata.org/docs/", None),
+    # "scipy": ("'https://docs.scipy.org/doc/scipy/", None),
 }
 
-templates_path = ["_templates"]
+templates_path = ["templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -51,19 +52,12 @@ add_function_parentheses = True
 from sphinx_gallery.sorting import FileNameSortKey
 sphinx_gallery_conf = {
      "examples_dirs": "../examples",  # path to your example scripts
-     "gallery_dirs": "examples",  # path to where to save gallery generated output
+     "gallery_dirs": "_examples",  # path to where to save gallery generated output
      "filename_pattern": "",
      "ignore_pattern": r"[\\,/]_",  # files starting with an underscore
      "within_subsection_order": FileNameSortKey,
      "download_all_examples": False,
 }
-
-import warnings
-warnings.filterwarnings(
-    "ignore",
-    category=UserWarning,
-    message="Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.",
-)
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

@@ -75,7 +75,7 @@ deps =
     numba: numba
 extras = tests
 commands = 
-    coverage run --parallel -m pytest --benchmark-disable
+    coverage run -m pytest --benchmark-disable
 
 [testenv:coverage-report]
 skip_install = true
@@ -108,6 +108,7 @@ commands =
 
 [tool.coverage.run]
 branch = true
+parallel = true
 source = ["vallenae"]
 
 [tool.coverage.paths]

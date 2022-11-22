@@ -32,5 +32,5 @@ coverage.xml
 
 # Sphinx
 docs/_build/
+docs/_examples/
 docs/generated/
-docs/examples/
