@@ -32,6 +32,14 @@ Install the latest version from [PyPI](https://pypi.org/project/vallenae):
 $ pip install vallenae
 ```
 
+If you want to run the latest version of the code, you can install from the master branch directly:
+
+```shell
+$ pip install -U git+https://github.com/vallen-systems/pyVallenAE.git
+# Or if you don't have git installed
+$ pip install -U https://github.com/vallen-systems/pyVallenAE/zipball/master
+```
+
 Please note, that `vallenae` requires Python 3.6 or newer. On Linux systems, `pip` is usually mapped to Python 2, so use `pip<version>` (e.g. `pip3` or `pip3.7`) instead. Alternatively, you can run `pip` from your specific Python version with `python<version> -m pip`.
 
 ## Contributing
@@ -39,8 +47,7 @@ Please note, that `vallenae` requires Python 3.6 or newer. On Linux systems, `pi
 Feature requests, bug reports and fixes are always welcome!
 Just [create an issue](https://github.com/vallen-systems/pyVallenAE/issues/new) or make a pull-request.
 
-After cloning the repository, you can easily install the development environment and tools 
-([pylint](https://www.pylint.org), [mypy](http://mypy-lang.org), [pytest](https://pytest.org), [tox](https://tox.readthedocs.io), [sphinx](https://www.sphinx-doc.org)).
+### Development setup
 
 ```shell
 # Clone this repository
