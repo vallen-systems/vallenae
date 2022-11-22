@@ -9,8 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Flag `TraRecord.raw` if data is stored as ADC values (int16)
+- Flag `raw` for `TraDatabase` read methods to read data as ADC values:
+  - `TraDatabase.iread`
+  - `TraDatabase.read`
+  - `TraDatabase.read_wave`
+  - `TraDatabase.read_continuous_wave`
+  - `TraDatabase.listen`
 - Bearing example data
 - Spectrogram example
+- WAV export example using the new `raw` flag
 
 ### Changed
 
