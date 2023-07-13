@@ -1,5 +1,97 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vallenae"
+version = "0.7.0"
+description = "Extract and analyze Acoustic Emission measurement data"
+authors = [{ name = "Lukas Berbuer", email = "software@vallen.de" }]
+readme = "README.md"
+license = { text = "MIT License" }
+requires-python = ">=3.6"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+]
+keywords = [
+    "Vallen",
+    "Acoustic Emission",
+    "AMSY",
+    "WaveLine",
+    "data acquisition",
+    "analysis",
+    "timepicker",
+    "SQLite",
+    "pridb",
+    "tradb",
+    "trfdb",
+]
+dependencies = [
+    "numpy",
+    "pandas>=0.24",
+    "soundfile",
+    "tqdm",
+    "typing_extensions",
+]
+
+[project.optional-dependencies]
+docs = [
+    "sphinx>=5",
+    "sphinx-autodoc-typehints",
+    "sphinx-rtd-theme",
+    "sphinx-gallery",
+    "pillow",  # required by sphinx-gallery
+    "myst-parser",  # include markdown files
+    "matplotlib",  # used in examples
+    "numba",  # used in location example
+    "scipy",  # used in location and multiprocessing example
+]
+tests = [
+    "coverage[toml]>=5",  # pyproject.toml support
+    "pytest>=6",  # pyproject.toml support
+    "pytest-benchmark",
+]
+tools = [
+    "mypy>=0.9",  # pyproject.toml support
+    "pylint>=2.5",  # pyproject.toml support
+    "tox>=3.4",  # pyproject.toml support
+]
+dev = [
+    "vallenae[docs,tests,tools]", # recursive dependency since pip 21.2
+]
+
+[project.entry-points.pyinstaller40]
+hook-dirs = "vallenae._pyinstaller:get_hook_dirs"
+tests     = "vallenae._pyinstaller:get_tests"
+
+[project.urls]
+Changelog = "https://github.com/vallen-systems/pyVallenAE/blob/master/CHANGELOG.md"
+Source = "https://github.com/vallen-systems/pyVallenAE"
+Issues = "https://github.com/vallen-systems/pyVallenAE/issues"
+
 [tool.black]
 line-length = 100
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["vallenae"]
+
+[tool.coverage.paths]
+source = ["src", ".tox/*/site-packages"]
 
 [tool.isort]
 line_length = 100
@@ -54,8 +146,8 @@ envlist =
     mypy
     py{36, 37, 38, 39, 310, 311}
     py{36, 37, 38, 39, 310, 311}-numba
-    coverage-report
     pyinstaller
+    coverage-report
     docs
 
 [testenv:pylint]
@@ -96,11 +188,3 @@ commands =
     sphinx-build -b dummy . _build
     sphinx-build -b linkcheck . _build
 """
-
-[tool.coverage.run]
-branch = true
-parallel = true
-source = ["vallenae"]
-
-[tool.coverage.paths]
-source = ["src", ".tox/*/site-packages"]

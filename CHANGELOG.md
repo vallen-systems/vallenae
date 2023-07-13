@@ -19,10 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bearing example data
 - Spectrogram example
 - WAV export example using the new `raw` flag
+- CI for Python 3.11
 
 ### Changed
 
 - Remove scipy dependency (only needed for examples)
+- Migrate from setuptools to hatch (replace `setup.py` with `pyproject.toml`)
 
 ### Fixed
 
@@ -144,7 +146,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Catch possible global_info table parsing errors 
+- Catch possible global_info table parsing errors
 
 ## [0.2.1] - 2020-02-10
 
