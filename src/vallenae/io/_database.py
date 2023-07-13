@@ -44,7 +44,7 @@ class Database:
             if not Path(filename).exists():
                 self.create(filename)  # call abstract method (implemented by child class)
 
-        self._readonly = (mode == "ro")
+        self._readonly = mode == "ro"
         self._connection_wrapper = ConnectionWrapper(filename, mode)
 
         self._table_prefix: str = table_prefix

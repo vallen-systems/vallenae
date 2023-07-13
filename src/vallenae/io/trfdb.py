@@ -60,7 +60,7 @@ class TrfDatabase(Database):
             Pandas DataFrame with features
         """
         def record_to_dict(record: FeatureRecord):
-            return dict(trai=record.trai, **record.features)
+            return {"trai": record.trai, **record.features}
         return iter_to_dataframe(
             [record_to_dict(r) for r in self.iread(**kwargs)], desc="Trf", index_column="trai",
         )
