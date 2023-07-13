@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2023-07-13
+
 ### Added
 
 - Flag `TraRecord.raw` if data is stored as ADC values (int16)
@@ -173,7 +175,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial public release
 
-[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.7.0...HEAD
+[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.8.0...HEAD
+[0.7.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.7.0...0.8.0
 [0.7.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.6.0...0.7.0
 [0.6.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.4...0.6.0
 [0.5.4]: https://github.com/vallen-systems/pyVallenAE/compare/0.5.3...0.5.4
