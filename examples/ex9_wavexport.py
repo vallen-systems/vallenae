@@ -14,10 +14,9 @@ from tempfile import TemporaryDirectory
 from typing import Optional
 
 import numpy as np
+import vallenae as vae
 from scipy import signal
 from scipy.io import wavfile
-
-import vallenae as vae
 
 HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
 

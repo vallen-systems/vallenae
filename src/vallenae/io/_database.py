@@ -11,11 +11,12 @@ from ._sql import ConnectionWrapper, insert_from_dict, read_sql_generator, updat
 def require_write_access(func):
     @wraps(func)
     def wrapper(self: "Database", *args, **kwargs):
-        if self._readonly:  # pylint: disable=protected-access
+        if self._readonly:
             raise ValueError(
                 "Can not write to database in read-only mode. Open database with mode='rw'"
             )
         return func(self, *args, **kwargs)
+
     return wrapper
 
 
@@ -40,9 +41,8 @@ class Database:
                     f"File {filename} does not have the required extension {required_file_ext}"
                 )
 
-        if mode == "rwc":
-            if not Path(filename).exists():
-                self.create(filename)  # call abstract method (implemented by child class)
+        if mode == "rwc" and not Path(filename).exists():
+            self.create(filename)  # call abstract method (implemented by child class)
 
         self._readonly = mode == "ro"
         self._connection_wrapper = ConnectionWrapper(filename, mode)
@@ -126,8 +126,7 @@ class Database:
         """Get table names."""
         con = self.connection()
         cur = con.execute("SELECT name FROM sqlite_master WHERE type == 'table'")
-        tables = {result[0] for result in cur.fetchall()}
-        return tables
+        return {result[0] for result in cur.fetchall()}
 
     def fieldinfo(self) -> Dict[str, Dict[str, Any]]:
         """
@@ -161,7 +160,7 @@ class Database:
         row_dict["field"] = field
         with self.connection() as con:  # commit/rollback transaction
             try:
-                if field in self.fieldinfo().keys():
+                if field in self.fieldinfo():
                     update_from_dict(con, self._table_fieldinfo, row_dict, "field")
                 else:
                     insert_from_dict(con, self._table_fieldinfo, row_dict)
@@ -171,16 +170,16 @@ class Database:
 
     def globalinfo(self) -> Dict[str, Any]:
         """Read globalinfo table."""
+
         def try_convert_string(value: str) -> Any:
             try:
                 return literal_eval(value)
             except (SyntaxError, ValueError):
                 return str(value)
+
         con = self.connection()
         cur = con.execute(f"SELECT Key, Value FROM {self._table_globalinfo}")
-        return {
-            row[0]: try_convert_string(str(row[1])) for row in cur.fetchall()
-        }
+        return {row[0]: try_convert_string(str(row[1])) for row in cur.fetchall()}
 
     @require_write_access
     def _update_globalinfo(self):
@@ -193,7 +192,9 @@ class Database:
                     UPDATE {prefix}_globalinfo
                     SET Value = (SELECT MAX(rowid) FROM {prefix}_data)
                     WHERE Key == "ValidSets"
-                    """.format(prefix=self._table_prefix)
+                    """.format(
+                        prefix=self._table_prefix
+                    )
                 )
             if "TRAI" in keys:
                 con.execute(
@@ -201,24 +202,31 @@ class Database:
                     UPDATE {prefix}_globalinfo
                     SET Value = (SELECT MAX(TRAI) FROM {prefix}_data)
                     WHERE Key == "TRAI";
-                    """.format(prefix=self._table_prefix)
+                    """.format(
+                        prefix=self._table_prefix
+                    )
                 )
 
     def _file_status(self) -> int:
         """Get file status (0: offline, 1: suspended, 2: active)."""
-        result = self.connection().execute(
-            f"SELECT Value FROM {self._table_globalinfo} WHERE Key == 'FileStatus'"
-        ).fetchone()
+        result = (
+            self.connection()
+            .execute(f"SELECT Value FROM {self._table_globalinfo} WHERE Key == 'FileStatus'")
+            .fetchone()
+        )
         return int(result[0]) if result else 0
 
     def _main_index_range(self) -> Tuple[int, int]:
         """Get range of main data table index (SetID for pridb/tradb or TRAI for trfdb)."""
-        return self.connection().execute(
-            f"SELECT MIN(rowid), MAX(rowid) FROM {self._table_main}"
-        ).fetchone()
+        return (
+            self.connection()
+            .execute(f"SELECT MIN(rowid), MAX(rowid) FROM {self._table_main}")
+            .fetchone()
+        )
 
     def _parameter_table(self) -> Dict[int, Dict[str, Any]]:
         """Read *_params table to dict."""
+
         def parameter_by_id():
             for row in read_sql_generator(
                 self.connection(),
@@ -236,9 +244,7 @@ class Database:
         try:
             return self._parameter_table()[param_id]
         except KeyError:
-            raise ValueError(
-                f"Parameter ID {param_id} not found in {self._table_params}"
-            ) from None
+            raise ValueError(f"Parameter ID {param_id} not found in {self._table_params}") from None
 
     def close(self):
         """Close database connection."""

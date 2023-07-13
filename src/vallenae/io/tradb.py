@@ -149,15 +149,12 @@ class TraDatabase(Database):
         """
         # check for empty time ranges
         time_min, time_max = self._get_total_time_range()
-        if time_start is not None:
-            if time_start > time_max:
-                return []
-        if time_stop is not None:
-            if time_stop < time_min:
-                return []
-        if time_start is not None and time_stop is not None:
-            if time_start >= time_stop:
-                return []
+        if time_start is not None and time_start > time_max:
+            return []
+        if time_stop is not None and time_stop < time_min:
+            return []
+        if time_start is not None and time_stop is not None and time_start >= time_stop:
+            return []
 
         trai_start, trai_stop = self._get_trai_range_from_time_range(time_start, time_stop)
         # nested query to fix ambiguous column name error with query_filter

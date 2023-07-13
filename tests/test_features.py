@@ -4,7 +4,6 @@ from typing import Optional, Tuple
 
 import numpy as np
 import pytest
-
 from vallenae.features import (
     amplitude_to_db,
     counts,
@@ -110,7 +109,7 @@ def test_rise_time(samplerate: int):
 @pytest.mark.parametrize("samplerate", SAMPLERATES)
 def test_energy(random_array, samplerate: int):
     def naive(data: np.ndarray, samplerate: int) -> float:
-        return np.sum(data ** 2) * 1e14 / samplerate
+        return np.sum(data**2) * 1e14 / samplerate
 
     assert energy(random_array, samplerate) == pytest.approx(naive(random_array, samplerate))
 
@@ -120,7 +119,9 @@ def test_signal_strength(random_array, samplerate: int):
     def naive(data: np.ndarray, samplerate: int) -> float:
         return np.sum(abs(data)) * 1e9 / samplerate
 
-    assert signal_strength(random_array, samplerate) == pytest.approx(naive(random_array, samplerate))
+    assert signal_strength(random_array, samplerate) == pytest.approx(
+        naive(random_array, samplerate)
+    )
 
 
 def test_counts(random_array):
@@ -149,6 +150,6 @@ def test_counts(random_array):
 
 def test_rms(random_array):
     def naive(data: np.ndarray):
-        return math.sqrt(np.sum(data ** 2) / len(data))
+        return math.sqrt(np.sum(data**2) / len(data))
 
     assert rms(random_array) == pytest.approx(naive(random_array))

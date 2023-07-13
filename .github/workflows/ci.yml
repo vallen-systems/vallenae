@@ -24,8 +24,8 @@ jobs:
         run: sudo apt install -y libsndfile1
       - name: Install Tox
         run: pip install tox
-      - name: Run pylint
-        run: tox -e pylint
+      - name: Run ruff
+        run: tox -e ruff
       - name: Run mypy
         run: tox -e mypy
       - name: Run pytest

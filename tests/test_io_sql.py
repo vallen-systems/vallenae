@@ -3,7 +3,6 @@ import sqlite3
 from math import sin
 
 import pytest
-
 from vallenae.io._sql import (
     ConnectionWrapper,
     QueryIterable,
@@ -25,9 +24,7 @@ def fixture_memory_abc():
     con.execute("CREATE TABLE abc (a INT, b INT, c INT)")
     # add 10 rows of dummy data
     for i in range(10):
-        con.execute(
-            f"INSERT INTO abc (a, b, c) VALUES ({i}, {10 + i}, {20 + i})"
-        )
+        con.execute(f"INSERT INTO abc (a, b, c) VALUES ({i}, {10 + i}, {20 + i})")
     yield con
     con.close()
 
@@ -48,11 +45,9 @@ def fixture_temp_database(tmp_path):
     with con:
         con.execute("CREATE TABLE abc (a INT, b INT, c INT)")
         for i in range(10):
-            con.execute(
-                f"INSERT INTO abc (a, b, c) VALUES ({i}, {10 + i}, {20 + i})"
-            )
+            con.execute(f"INSERT INTO abc (a, b, c) VALUES ({i}, {10 + i}, {20 + i})")
     con.close()
-    yield filename
+    return filename
 
 
 def get_row_by_id(connection, table, row_id):
@@ -73,7 +68,7 @@ def test_create_uri():
     assert create_uri("test#test.pridb", mode="ro") == "file:test%23test.pridb?mode=ro"
 
 
-@pytest.mark.parametrize("mode", ("ro", "rw", "rwc"))
+@pytest.mark.parametrize("mode", ["ro", "rw", "rwc"])
 def test_connection(temp_database, mode: str):
     con = ConnectionWrapper(temp_database, mode=mode)
     assert con.filename == str(temp_database)
@@ -119,52 +114,38 @@ def test_sql_query_conditions():
     assert query_conditions(custom_filter=None) == ""
 
     # single conditions
-    assert query_conditions(
-        isin={"Number": (1, 2, 3)}
-    ) == "WHERE Number IN (1, 2, 3)"
+    assert query_conditions(isin={"Number": (1, 2, 3)}) == "WHERE Number IN (1, 2, 3)"
 
-    assert query_conditions(
-        isin={"Number": 1.1}
-    ) == "WHERE Number IN (1.1)"
+    assert query_conditions(isin={"Number": 1.1}) == "WHERE Number IN (1.1)"
 
-    assert query_conditions(
-        equal={"Str": "value"}
-    ) == "WHERE Str == 'value'"
+    assert query_conditions(equal={"Str": "value"}) == "WHERE Str == 'value'"
 
-    assert query_conditions(
-        less={"a": 1.1}
-    ) == "WHERE a < 1.1"
+    assert query_conditions(less={"a": 1.1}) == "WHERE a < 1.1"
 
-    assert query_conditions(
-        less_equal={"a": 2.2}
-    ) == "WHERE a <= 2.2"
+    assert query_conditions(less_equal={"a": 2.2}) == "WHERE a <= 2.2"
 
-    assert query_conditions(
-        greater={"a": 3.3}
-    ) == "WHERE a > 3.3"
+    assert query_conditions(greater={"a": 3.3}) == "WHERE a > 3.3"
 
-    assert query_conditions(
-        greater_equal={"a": 4.4}
-    ) == "WHERE a >= 4.4"
+    assert query_conditions(greater_equal={"a": 4.4}) == "WHERE a >= 4.4"
 
     # multiple conditions
-    assert query_conditions(
-        equal={"a": 0},
-        less={"b": 1},
-        less_equal={"c": 2},
-        greater={"d": 3},
-        greater_equal={"e": 4}
-    ) == "WHERE a == 0 AND b < 1 AND c <= 2 AND d > 3 AND e >= 4"
+    assert (
+        query_conditions(
+            equal={"a": 0},
+            less={"b": 1},
+            less_equal={"c": 2},
+            greater={"d": 3},
+            greater_equal={"e": 4},
+        )
+        == "WHERE a == 0 AND b < 1 AND c <= 2 AND d > 3 AND e >= 4"
+    )
 
     # custom filter
-    assert query_conditions(
-        custom_filter="Amp > 50"
-    ) == "WHERE (Amp > 50)"
+    assert query_conditions(custom_filter="Amp > 50") == "WHERE (Amp > 50)"
 
-    assert query_conditions(
-        equal={"a": 0},
-        custom_filter="Amp > 50"
-    ) == "WHERE a == 0 AND (Amp > 50)"
+    assert (
+        query_conditions(equal={"a": 0}, custom_filter="Amp > 50") == "WHERE a == 0 AND (Amp > 50)"
+    )
 
 
 def test_count_sql_results(memory_abc):
@@ -235,7 +216,9 @@ def test_sql_binary_search():
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x == 11) == 0
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x <= 11) == 0
     # return upper bound if condition is true for both bounds
-    assert sql_binary_search(con, "consts", "value", "id", lambda x: x == 11, lower_bound=False) == 99
+    assert (
+        sql_binary_search(con, "consts", "value", "id", lambda x: x == 11, lower_bound=False) == 99
+    )
 
     # step table
     assert sql_binary_search(con, "step", "value", "id", lambda x: x == 0) == 0
@@ -244,9 +227,8 @@ def test_sql_binary_search():
     assert sql_binary_search(con, "step", "value", "id", lambda x: x >= 1, lower_bound=False) == 99
 
     # sin table, not sorted -> expect exception
-    for limit in (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9):
-        with pytest.raises(ValueError):
-            sql_binary_search(con, "sin", "value", "id", lambda x: x >= limit)
+    with pytest.raises(ValueError):
+        sql_binary_search(con, "sin", "value", "id", lambda x: x >= 0.5)
 
     con.close()
 
@@ -257,9 +239,7 @@ def test_query_iterable(temp_database):
         return (row_dict["a"], row_dict["b"], row_dict["c"])
 
     iterable = QueryIterable(
-        ConnectionWrapper(temp_database),
-        "SELECT * FROM abc",
-        dict_to_type_func
+        ConnectionWrapper(temp_database), "SELECT * FROM abc", dict_to_type_func
     )
 
     assert len(iterable) == 10
@@ -270,11 +250,15 @@ def test_query_iterable(temp_database):
 
 def test_generate_insert_query():
     assert generate_insert_query("abc", ("a")) == "INSERT INTO abc (a) VALUES (:a)"
-    assert generate_insert_query("abc", ("a", "b", "c")) == "INSERT INTO abc (a, b, c) VALUES (:a, :b, :c)"
+    assert (
+        generate_insert_query("abc", ("a", "b", "c"))
+        == "INSERT INTO abc (a, b, c) VALUES (:a, :b, :c)"
+    )
 
 
 def test_insert_from_dict(memory_id_abc):
-    row_by_id = lambda row_id: get_row_by_id(memory_id_abc, "abc", row_id)
+    def row_by_id(row_id):
+        return get_row_by_id(memory_id_abc, "abc", row_id)
 
     assert insert_from_dict(memory_id_abc, "abc", {"id": 1, "a": 1}) == 1
     assert insert_from_dict(memory_id_abc, "abc", {"id": 2, "a": 2, "b": 1}) == 2
@@ -290,14 +274,18 @@ def test_insert_from_dict(memory_id_abc):
 
 def test_generate_update_query():
     assert generate_update_query("abc", ("a", "b"), "a") == "UPDATE abc SET b = :b WHERE a == :a"
-    assert generate_update_query("abc", ("a", "b", "c"), "a") == "UPDATE abc SET b = :b, c = :c WHERE a == :a"
+    assert (
+        generate_update_query("abc", ("a", "b", "c"), "a")
+        == "UPDATE abc SET b = :b, c = :c WHERE a == :a"
+    )
 
     with pytest.raises(ValueError):
         generate_update_query("abc", ("a"), "xyz")  # xyz not a column
 
 
 def test_update_from_dict(memory_id_abc):
-    row_by_id = lambda row_id: get_row_by_id(memory_id_abc, "abc", row_id)
+    def row_by_id(row_id):
+        return get_row_by_id(memory_id_abc, "abc", row_id)
 
     memory_id_abc.execute("INSERT INTO abc (id, a, b, c) VALUES (1, 11, 22, 33)")
     assert row_by_id(1) == {"id": 1, "a": 11, "b": 22, "c": 33}

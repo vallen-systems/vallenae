@@ -47,5 +47,4 @@ def iter_to_dataframe(
         df = df.dropna(axis="columns", how="all")  # drop empty columns
         if index_column is not None:
             df = df.set_index(index_column)
-    df = _convert_to_nullable_types(df)
-    return df
+    return _convert_to_nullable_types(df)

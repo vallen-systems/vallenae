@@ -1,13 +1,12 @@
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose, assert_array_equal
-
 from vallenae.io import decode_data_blob, encode_data_blob
 
 
 @pytest.mark.parametrize(
     "dtype",
-    (np.int8, np.uint8, np.int16),
+    [np.int8, np.uint8, np.int16],
 )
 def test_encode_datatype_raw_allow(dtype):
     encode_data_blob(np.zeros(0, dtype=dtype), 0, 1, raw=True)
@@ -15,15 +14,15 @@ def test_encode_datatype_raw_allow(dtype):
 
 @pytest.mark.parametrize(
     "dtype",
-    (np.uint16, np.int32, np.int64, np.float32, np.float64, np.complex64),
+    [np.uint16, np.int32, np.int64, np.float32, np.float64, np.complex64],
 )
 def test_encode_datatype_raw_deny(dtype):
     with pytest.raises(TypeError):
         encode_data_blob(np.zeros(0, dtype=dtype), 0, 1, raw=True)
 
 
-@pytest.mark.parametrize("raw", (False, True))
-@pytest.mark.parametrize("data_format", (0, 2))
+@pytest.mark.parametrize("raw", [False, True])
+@pytest.mark.parametrize("data_format", [0, 2])
 def test_encode_decode_i16_to_i16(data_format: int, raw: bool):
     # generate range of all possible values
     ii16 = np.iinfo(np.int16)
@@ -39,8 +38,8 @@ def test_encode_decode_i16_to_i16(data_format: int, raw: bool):
     assert_array_equal(data_decoded, data)
 
 
-@pytest.mark.parametrize("factor_millivolts", (1, 0.1, 0.01, 0.001))
-@pytest.mark.parametrize("data_format", (0, 2))
+@pytest.mark.parametrize("factor_millivolts", [1, 0.1, 0.01, 0.001])
+@pytest.mark.parametrize("data_format", [0, 2])
 def test_encode_decode_f32_to_f32(data_format: int, factor_millivolts: float):
     # calculate min/max amplitude to prevent clipping float32 -> int16
     ii16 = np.iinfo(np.int16)
@@ -56,13 +55,13 @@ def test_encode_decode_f32_to_f32(data_format: int, factor_millivolts: float):
     # compare input <-> decoded
     assert len(data_decoded) == len(data)
 
-    adc_step = amax * (2 ** -15)
+    adc_step = amax * (2**-15)
     assert_allclose(data_decoded, data, atol=adc_step, rtol=0)  # why so high tolerance necessary?
 
 
-@pytest.mark.parametrize("raw", (False, True))
-@pytest.mark.parametrize("factor_millivolts", (1, 0.001))
-@pytest.mark.parametrize("data_format", (0, 2))
+@pytest.mark.parametrize("raw", [False, True])
+@pytest.mark.parametrize("factor_millivolts", [1, 0.001])
+@pytest.mark.parametrize("data_format", [0, 2])
 def test_decode_encode_blob_to_blob(data_format: int, factor_millivolts: float, raw: bool):
     def generate_random_blob():
         ii16 = np.iinfo(np.int16)

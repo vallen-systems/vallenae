@@ -16,7 +16,6 @@ from pathlib import Path
 from typing import Iterable
 
 import matplotlib.pyplot as plt
-
 import vallenae as vae
 
 HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
@@ -39,18 +38,20 @@ def tra_generator(loops: int = 1000) -> Iterable[vae.io.TraRecord]:
 # ----------------------------------
 # A simple function from the module `_feature_extraction` is applied to all data sets and returns computed features.
 # The function is defined in another module to work with `multiprocessing.Pool`: https://bugs.python.org/issue25053
-from _feature_extraction import feature_extraction
+from _feature_extraction import feature_extraction  # noqa
+
 
 #%%
 # Compute with single thread/core
 # -------------------------------
 # .. note::
-#     
+#
 #    The examples are executed on the CI / readthedocs server with limited resources.
 #    Therefore, the shown computation times and speedups are below the capability of modern machines.
 #
 # Run computation in a single thread and get the time:
-time_elapsed_ms = lambda t0: 1e3 * (time.perf_counter() - t0)
+def time_elapsed_ms(t0):
+    return 1000.0 * (time.perf_counter() - t0)
 
 if __name__ == "__main__":  # guard needed for multiprocessing on Windows
     time_start = time.perf_counter()
@@ -82,7 +83,7 @@ print(f"Available CPU cores: {os.cpu_count()}")
 if __name__ == "__main__":  # guard needed for multiprocessing on Windows
     with multiprocessing.Pool(4) as pool:
         time_start = time.perf_counter()
-        for results in pool.imap(feature_extraction, tra_generator(), chunksize=128):
+        for _results in pool.imap(feature_extraction, tra_generator(), chunksize=128):
             pass  # do something with the results
         time_multiprocessing = time_elapsed_ms(time_start)
 
@@ -100,7 +101,7 @@ if __name__ == "__main__":  # guard needed for multiprocessing on Windows
     with multiprocessing.Pool(4) as pool:
         for chunksize in chunksizes:
             time_start = time.perf_counter()
-            for results in pool.imap(feature_extraction, tra_generator(), chunksize=chunksize):
+            for _results in pool.imap(feature_extraction, tra_generator(), chunksize=chunksize):
                 pass  # do something with the results
             speedup_chunksizes.append(time_single_thread / time_elapsed_ms(time_start))
 

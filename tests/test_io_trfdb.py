@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import pytest
-
 import vallenae as vae
 from vallenae.io import FeatureRecord
 from vallenae.io._sql import read_sql_generator
@@ -129,7 +128,7 @@ def test_write(fresh_trfdb):
             fresh_trfdb.connection(),
             f"SELECT * FROM trf_data WHERE TRAI == {trai}",
         )
-        return list(gen)[0]
+        return next(iter(gen))
 
     # first insert
     assert fresh_trfdb.rows() == 0

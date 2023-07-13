@@ -3,13 +3,15 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-import pkg_resources
 from datetime import date
+
+import pkg_resources
+from sphinx_gallery.sorting import FileNameSortKey
 
 # -- Project information -----------------------------------------------------
 
 project = "vallenae"
-copyright = f"{date.today().year}, Vallen Systeme GmbH"
+copyright = f"{date.today().year}, Vallen Systeme GmbH"  # noqa
 author = "Lukas Berbuer, Daniel Altmann (Vallen Systeme GmbH)"
 release = pkg_resources.get_distribution("vallenae").version
 
@@ -49,7 +51,6 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 default_role = "autolink"
 add_function_parentheses = True
 
-from sphinx_gallery.sorting import FileNameSortKey
 sphinx_gallery_conf = {
      "examples_dirs": "../examples",  # path to your example scripts
      "gallery_dirs": "_examples",  # path to where to save gallery generated output

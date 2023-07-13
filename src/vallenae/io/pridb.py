@@ -182,7 +182,7 @@ class PriDatabase(Database):
         }
 
         # concat all dataframes, restore types and sort by index
-        df = (
+        return (
             pd.concat(
                 [df_markers, df_hits, df_status, df_parametric], sort=False, copy=False
             )
@@ -190,7 +190,6 @@ class PriDatabase(Database):
             .sort_index()
             .rename_axis(df_hits.index.name)
         )
-        return df
 
     def iread_hits(
         self,

@@ -1,4 +1,4 @@
-# pylint: disable=invalid-name
+# noqa: N999, invalid module name
 
 from PyInstaller.utils.hooks import collect_data_files
 

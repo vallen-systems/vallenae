@@ -11,11 +11,10 @@ from xml.etree import ElementTree
 
 import matplotlib.pyplot as plt
 import numpy as np
+import vallenae as vae
 from numba import f8, njit
 from numpy.linalg import norm
 from scipy.optimize import differential_evolution
-
-import vallenae as vae
 
 HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
 PRIDB = HERE / "steel_plate" / "sample.pridb"
@@ -56,8 +55,7 @@ def lucy_error_fun(
         theo_delta_dists[i] = theo_dists[i + 1] - theo_dists[0]
 
     # LUCY definition taken from the vallen online help:
-    lucy_val = norm(theo_delta_dists - measured_delta_dists) / math.sqrt(n - 1)
-    return lucy_val
+    return norm(theo_delta_dists - measured_delta_dists) / math.sqrt(n - 1)
 
 
 def get_channel_positions(setup_file: str) -> Dict[int, Tuple[float, float]]:
@@ -65,11 +63,10 @@ def get_channel_positions(setup_file: str) -> Dict[int, Tuple[float, float]]:
     nodes = tree.getroot().findall(".//ChannelPos")
     if nodes is None:
         raise RuntimeError("Can not retrieve channel positions from %s", setup_file)
-    channel_positions = {
+    return {
         int(elem.get("Chan")): (float(elem.get("X")), float(elem.get("Y")))  # type: ignore
         for elem in nodes if elem is not None
     }
-    return channel_positions
 
 
 def get_velocity(setup_file: str) -> Optional[float]:
@@ -108,9 +105,8 @@ def main():
     pos_ordered = np.array([pos_dict[ch] for ch in channel_order])
 
     # Compute heatmap
-    lucy_instance_2args = lambda x, y: lucy_error_fun(
-        np.array([x, y]), velocity, pos_ordered, delta_ts
-    )
+    def lucy_instance_2args(x, y):
+        return lucy_error_fun(np.array([x, y]), velocity, pos_ordered, delta_ts)
 
     x_range = np.arange(location_search_bounds[0][0], location_search_bounds[0][1], grid_delta)
     y_range = x_range
@@ -126,9 +122,8 @@ def main():
     plt.ylabel("y [m]")
 
     # Compute location
-    lucy_instance_single_arg = lambda pos: lucy_error_fun(
-        pos, velocity, pos_ordered, delta_ts
-    )
+    def lucy_instance_single_arg(pos):
+        return lucy_error_fun(pos, velocity, pos_ordered, delta_ts)
 
     start = time.perf_counter()
     # These are excessive search / overkill parameters:

@@ -116,19 +116,22 @@ class ConnectionWrapper:
 
 
 T = TypeVar("T")
-class QueryIterable(SizedIterable[T]):  # pylint: disable=inherit-non-class
+
+
+class QueryIterable(SizedIterable[T]):
     """
     Sized iterable to query results from SQLite as dictionaries.
 
     SQLite connection is stored in picklable ConnectionWrapper to be used with multiprocessing.
     """
+
     def __init__(
         self,
         connection_wrapper: ConnectionWrapper,
         query: str,
         dict_to_type: Callable[[Dict[str, Any]], T],
     ):
-        super().__init__()  # pylint: disable=no-value-for-parameter
+        super().__init__()
         self._connection_wrapper = connection_wrapper
         self._query = query
         self._dict_to_type = dict_to_type
@@ -137,8 +140,7 @@ class QueryIterable(SizedIterable[T]):  # pylint: disable=inherit-non-class
     def __len__(self) -> int:
         if self._count_result is None:
             self._count_result = count_sql_results(
-                self._connection_wrapper.connection(),
-                self._query
+                self._connection_wrapper.connection(), self._query
             )
         return self._count_result
 
@@ -166,13 +168,14 @@ def query_conditions(
 ) -> str:
     cond = []
 
+    def as_sequence(value):
+        return value if isinstance(value, collections.abc.Sequence) else (value,)
+
     if isin is not None:
         for key, values in isin.items():
             if values is None:
                 continue
-            if not isinstance(values, collections.abc.Sequence):
-                values = (values,)
-            list_values = ", ".join(str(value) for value in values)
+            list_values = ", ".join(str(value) for value in as_sequence(values))
             cond.append(f"{key} IN ({list_values})")
 
     comparison = {
@@ -183,14 +186,15 @@ def query_conditions(
         ">=": greater_equal,
     }
 
+    def escape_string(value):
+        return f"'{value}'" if isinstance(value, str) else value
+
     for comp_operator, comp_dict in comparison.items():
         if comp_dict is not None:
             for key, value in comp_dict.items():
                 if value is None:
                     continue
-                if isinstance(value, str):
-                    value = f"'{value}'"  # add quotation marks
-                cond.append(f"{key} {comp_operator} {value}")
+                cond.append(f"{key} {comp_operator} {escape_string(value)}")
 
     if custom_filter is not None:
         cond.append(f"({custom_filter})")  # wrap custom condition(s) in brackets
@@ -199,7 +203,9 @@ def query_conditions(
 
 
 def read_sql_generator(
-    connection: sqlite3.Connection, query: str, *parameter,
+    connection: sqlite3.Connection,
+    query: str,
+    *parameter,
 ) -> Iterator[Dict[str, Any]]:
     """
     Generator to query data from a SQLite connection as a dictionary.
@@ -314,9 +320,7 @@ def create_new_database(filename: str, schema: str):
         raise ValueError("Can not create new database. File already exists")
 
     # open database in read-write-create mode
-    with contextlib.closing(
-        sqlite3.connect(create_uri(filename, mode="rwc"), uri=True)
-    ) as con:
+    with contextlib.closing(sqlite3.connect(create_uri(filename, mode="rwc"), uri=True)) as con:
         con.executescript(schema)
 
 

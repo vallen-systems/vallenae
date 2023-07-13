@@ -66,7 +66,7 @@ tests = [
 ]
 tools = [
     "mypy>=0.9",  # pyproject.toml support
-    "pylint>=2.5",  # pyproject.toml support
+    "ruff>=0.0.278",
     "tox>=3.4",  # pyproject.toml support
 ]
 dev = [
@@ -85,6 +85,41 @@ Issues = "https://github.com/vallen-systems/pyVallenAE/issues"
 [tool.black]
 line-length = 100
 
+[tool.ruff]
+line-length = 100
+select = [
+    "F", # pyflakes
+    "E", "W", # pycodestyle
+    "I", # isort
+    "N", # pep8 naming
+    "B", # flake8 bugbear
+    "A", # flake8 builtins
+    "C4", # flake8 comprehensions
+    "G", # flake8 logging format
+    "PIE", # flake8 pie
+    "RET", # flake8 return
+    "SIM", # flake8 simplify
+    "PT", # flake8 pytest style
+    "PL", # pylint
+    "PERF", # perflint
+    "RUF", # ruff specific rules
+]
+ignore = [
+    "PLR0911", # too many return statements
+    "PLR0913", # too many arguments in function call
+    "PLR2004", # magic value used in comparison
+]
+
+[tool.ruff.per-file-ignores]
+"tests/*" = [
+    "E501", # line too long
+    "PLR0915", # too many statements
+    "PT011", # use a more specific exception in pytest.raises
+]
+"examples/*" = [
+    "E501", # line too long
+]
+
 [tool.coverage.run]
 branch = true
 parallel = true
@@ -92,41 +127,6 @@ source = ["vallenae"]
 
 [tool.coverage.paths]
 source = ["src", ".tox/*/site-packages"]
-
-[tool.isort]
-line_length = 100
-multi_line_output = 3
-include_trailing_comma = true
-use_parentheses = true
-
-[tool.pylint.message_control]
-disable = [
-    "import-error",  # run without install in tox
-    "missing-module-docstring",
-    "missing-function-docstring",
-]
-
-[tool.pylint.format]
-max-line-length = 100
-good-names = [
-    "logger",
-    "i", "j", "k", "n", "m",
-    "t", "f",
-    "x", "y",
-    "fs", "sr",  # sample rate
-    "ax",  # matplotlib axes
-    "df",  # pandas dataframe
-    "e",  # exceptions
-    "T",  # typing generics (TypeVar)
-]
-
-[tool.pylint.design]
-max-attributes = 10
-
-[tool.pylint.similarities]
-min-similarity-lines = 6
-ignore-docstrings = true
-ignore-imports = true
 
 [tool.mypy]
 ignore_missing_imports = true
@@ -142,7 +142,7 @@ log_cli_level = "WARNING"
 legacy_tox_ini = """
 [tox]
 envlist =
-    pylint
+    ruff
     mypy
     py{36, 37, 38, 39, 310, 311}
     py{36, 37, 38, 39, 310, 311}-numba
@@ -150,10 +150,10 @@ envlist =
     coverage-report
     docs
 
-[testenv:pylint]
+[testenv:ruff]
 skip_install = true
-deps = pylint
-commands = pylint src/
+deps = ruff
+commands = ruff check .
 
 [testenv:mypy]
 skip_install = true

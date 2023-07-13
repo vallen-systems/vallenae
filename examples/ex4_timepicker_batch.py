@@ -12,7 +12,6 @@ from tempfile import gettempdir
 
 import matplotlib.pyplot as plt
 import pandas as pd
-
 import vallenae as vae
 
 HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
@@ -49,8 +48,7 @@ def dt_from_timepicker(timepicker_func, tra: vae.io.TraRecord):
     # Get timepicker result
     _, index_timepicker = timepicker_func(data)
     # Compute offset in µs
-    dt_us = (index_timepicker - index_ref) * 1e6 / tra.samplerate
-    return dt_us
+    return (index_timepicker - index_ref) * 1e6 / tra.samplerate
 
 #%%
 # Transient data is streamed from the database row by row using `vallenae.io.TraDatabase.iread`.

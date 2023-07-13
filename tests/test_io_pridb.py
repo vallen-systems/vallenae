@@ -1,10 +1,9 @@
 from pathlib import Path
 
 import pytest
+import vallenae as vae
 from numpy import dtype, float64, int64
 from pandas import Int64Dtype
-
-import vallenae as vae
 from vallenae.io import HitRecord, MarkerRecord, ParametricRecord, StatusRecord
 
 STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"
@@ -21,28 +20,80 @@ LABELS_EXPECTED = [
 # Caution: units are µV and µs (except time)
 HITS_EXPECTED = [
     HitRecord(
-        set_id=10, time=3.992771, channel=3, param_id=4,
-        threshold=100.469451, amplitude=46538.6675710947, rise_time=49.5, duration=19671.6,
-        energy=27995100.3052212, signal_strength=29064.1915258135, rms=5.05799020605523, counts=2180, trai=1,
-        cascade_hits=4, cascade_counts=2193, cascade_energy=27995448.6329966, cascade_signal_strength=29131.710036357
+        set_id=10,
+        time=3.992771,
+        channel=3,
+        param_id=4,
+        threshold=100.469451,
+        amplitude=46538.6675710947,
+        rise_time=49.5,
+        duration=19671.6,
+        energy=27995100.3052212,
+        signal_strength=29064.1915258135,
+        rms=5.05799020605523,
+        counts=2180,
+        trai=1,
+        cascade_hits=4,
+        cascade_counts=2193,
+        cascade_energy=27995448.6329966,
+        cascade_signal_strength=29131.710036357,
     ),
     HitRecord(
-        set_id=11, time=3.9927747, channel=2, param_id=3,
-        threshold=100.469451, amplitude=59621.0079186672, rise_time=192.1, duration=20575.7,
-        energy=22762787.1460552, signal_strength=24734.02914512, rms=5.02806126992473, counts=2047, trai=2,
-        cascade_hits=4, cascade_counts=2054, cascade_energy=22762918.7161395, cascade_signal_strength=24761.7395309888
+        set_id=11,
+        time=3.9927747,
+        channel=2,
+        param_id=3,
+        threshold=100.469451,
+        amplitude=59621.0079186672,
+        rise_time=192.1,
+        duration=20575.7,
+        energy=22762787.1460552,
+        signal_strength=24734.02914512,
+        rms=5.02806126992473,
+        counts=2047,
+        trai=2,
+        cascade_hits=4,
+        cascade_counts=2054,
+        cascade_energy=22762918.7161395,
+        cascade_signal_strength=24761.7395309888,
     ),
     HitRecord(
-        set_id=12, time=3.9928129, channel=4, param_id=5,
-        threshold=100.469451, amplitude=34118.5122422787, rise_time=354.6, duration=19130.7,
-        energy=12867002.8866017, signal_strength=19956.3935214563, rms=4.8085824049677, counts=1854, trai=3,
-        cascade_hits=4, cascade_counts=1858, cascade_energy=12867202.6824819, cascade_signal_strength=19997.9738662233
+        set_id=12,
+        time=3.9928129,
+        channel=4,
+        param_id=5,
+        threshold=100.469451,
+        amplitude=34118.5122422787,
+        rise_time=354.6,
+        duration=19130.7,
+        energy=12867002.8866017,
+        signal_strength=19956.3935214563,
+        rms=4.8085824049677,
+        counts=1854,
+        trai=3,
+        cascade_hits=4,
+        cascade_counts=1858,
+        cascade_energy=12867202.6824819,
+        cascade_signal_strength=19997.9738662233,
     ),
     HitRecord(
-        set_id=13, time=3.9928143, channel=1, param_id=2,
-        threshold=100.469451, amplitude=29114.8291235365, rise_time=160.3, duration=19266.1,
-        energy=12652748.5220513, signal_strength=20545.4817939854, rms=4.90834552540271, counts=1985, trai=4,
-        cascade_hits=5, cascade_counts=1988, cascade_energy=12652874.448889, cascade_signal_strength=20573.5164221492
+        set_id=13,
+        time=3.9928143,
+        channel=1,
+        param_id=2,
+        threshold=100.469451,
+        amplitude=29114.8291235365,
+        rise_time=160.3,
+        duration=19266.1,
+        energy=12652748.5220513,
+        signal_strength=20545.4817939854,
+        rms=4.90834552540271,
+        counts=1985,
+        trai=4,
+        cascade_hits=5,
+        cascade_counts=1988,
+        cascade_energy=12652874.448889,
+        cascade_signal_strength=20573.5164221492,
     ),
 ]
 
@@ -93,8 +144,13 @@ def test_create(tmp_path):
     vae.io.PriDatabase.create(filename)
     with vae.io.PriDatabase(filename) as pridb:
         assert pridb.tables() == {
-            "acq_setup", "ae_data", "ae_fieldinfo", "ae_globalinfo",
-            "ae_markers", "ae_params", "data_integrity",
+            "acq_setup",
+            "ae_data",
+            "ae_fieldinfo",
+            "ae_globalinfo",
+            "ae_markers",
+            "ae_params",
+            "data_integrity",
         }
 
 
@@ -112,9 +168,7 @@ def test_iread_markers(sample_pridb):
 
 
 def test_iread_markers_query_filter(sample_pridb):
-    markers = list(
-        sample_pridb.iread_markers(query_filter="Data LIKE '%TimeZone%'")
-    )
+    markers = list(sample_pridb.iread_markers(query_filter="Data LIKE '%TimeZone%'"))
     assert len(markers) == 1
 
 
@@ -160,9 +214,7 @@ def test_iread_hits(sample_pridb):
 
 
 def test_iread_hits_query_filter(sample_pridb):
-    hits = list(
-        sample_pridb.iread_hits(query_filter="SetID >= 12")
-    )
+    hits = list(sample_pridb.iread_hits(query_filter="SetID >= 12"))
     assert len(hits) == 2
 
 
@@ -193,40 +245,37 @@ def test_read_hits(sample_pridb):
 
 
 def test_iread_parametric(sample_pridb):
-    param = list(sample_pridb.iread_parametric())
+    records = list(sample_pridb.iread_parametric())
+    assert len(records) == len(PARAMETRIC_EXPECTED)
 
-    assert len(param) == len(PARAMETRIC_EXPECTED)
-
-    for param, param_expected in zip(param, PARAMETRIC_EXPECTED):
-        assert param.set_id == param_expected.set_id
-        assert param.time == pytest.approx(param_expected.time)
-        assert param.param_id == param_expected.param_id
-        assert param.pctd == param_expected.pctd
-        assert param.pcta == param_expected.pcta
-        assert param.pa0 == param_expected.pa0
-        assert param.pa1 == param_expected.pa1
-        assert param.pa2 == param_expected.pa2
-        assert param.pa3 == param_expected.pa3
-        assert param.pa4 == param_expected.pa4
-        assert param.pa5 == param_expected.pa5
-        assert param.pa6 == param_expected.pa6
-        assert param.pa7 == param_expected.pa7
+    for record, record_expected in zip(records, PARAMETRIC_EXPECTED):
+        assert record.set_id == record_expected.set_id
+        assert record.time == pytest.approx(record_expected.time)
+        assert record.param_id == record_expected.param_id
+        assert record.pctd == record_expected.pctd
+        assert record.pcta == record_expected.pcta
+        assert record.pa0 == record_expected.pa0
+        assert record.pa1 == record_expected.pa1
+        assert record.pa2 == record_expected.pa2
+        assert record.pa3 == record_expected.pa3
+        assert record.pa4 == record_expected.pa4
+        assert record.pa5 == record_expected.pa5
+        assert record.pa6 == record_expected.pa6
+        assert record.pa7 == record_expected.pa7
 
 
 def test_iread_parametric_query_filter(sample_pridb):
-    param = list(
-        sample_pridb.iread_parametric(query_filter="SetID > 10")
-    )
-    assert len(param) == 4
+    records = list(sample_pridb.iread_parametric(query_filter="SetID > 10"))
+    assert len(records) == 4
 
 
 def test_read_parametric(sample_pridb):
-    param = sample_pridb.read_parametric()
+    df = sample_pridb.read_parametric()
 
-    assert len(param) == len(PARAMETRIC_EXPECTED)
-    assert param.index.name == "set_id"
-    assert param.index.dtype == int64
-    assert dict(param.dtypes) == {
+    assert len(df) == len(PARAMETRIC_EXPECTED)
+    assert df.index.name == "set_id"
+    assert df.index.dtype == int64
+    assert dict(df.dtypes) == {
         "param_id": Int64Dtype(),
         "time": float64,
         "pctd": Int64Dtype(),
@@ -277,22 +326,22 @@ def test_listen(sample_pridb):
 
 def test_write_readonly(sample_pridb):
     with pytest.raises(ValueError):
-        sample_pridb.write_marker(
-            MarkerRecord(
-                set_id=1,
-                time=0,
-                set_type=4,
-                number=1,
-                data="Test"
-            )
-        )
+        sample_pridb.write_marker(MarkerRecord(set_id=1, time=0, set_type=4, number=1, data="Test"))
 
 
 def test_write_hit(fresh_pridb):
     new_hit = HitRecord(
-        time=5, channel=1, param_id=1,
-        threshold=111, amplitude=22222, rise_time=111, duration=11111,
-        energy=12345678, signal_strength=20000, rms=5, counts=1987,
+        time=5,
+        channel=1,
+        param_id=1,
+        threshold=111,
+        amplitude=22222,
+        rise_time=111,
+        duration=11111,
+        energy=12345678,
+        signal_strength=20000,
+        rms=5,
+        counts=1987,
     )
 
     assert fresh_pridb.write_hit(new_hit) == 1

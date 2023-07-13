@@ -1,9 +1,8 @@
 from typing import Dict
 
 import numpy as np
-from scipy import stats
-
 import vallenae as vae
+from scipy import stats
 
 
 def feature_extraction(tra: vae.io.TraRecord) -> Dict[str, float]:

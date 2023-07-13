@@ -2,9 +2,8 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from numpy.testing import assert_allclose
-
 import vallenae as vae
+from numpy.testing import assert_allclose
 from vallenae.io import TraRecord
 from vallenae.io.tradb import _create_time_vector
 
@@ -13,20 +12,48 @@ SAMPLE_TRADB = STEEL_PLATE_DIR / "sample.tradb"
 
 TRAS_EXPECTED = [
     TraRecord(
-        time=3.9927747, channel=2, param_id=3, pretrigger=500, threshold=100.469451121688,
-        samplerate=5000000, samples=103488, data=np.empty(0), trai=2
+        time=3.9927747,
+        channel=2,
+        param_id=3,
+        pretrigger=500,
+        threshold=100.469451121688,
+        samplerate=5000000,
+        samples=103488,
+        data=np.empty(0),
+        trai=2,
     ),
     TraRecord(
-        time=3.992771, channel=3, param_id=4, pretrigger=500, threshold=100.469451121688,
-        samplerate=5000000, samples=98960, data=np.empty(0), trai=1
+        time=3.992771,
+        channel=3,
+        param_id=4,
+        pretrigger=500,
+        threshold=100.469451121688,
+        samplerate=5000000,
+        samples=98960,
+        data=np.empty(0),
+        trai=1,
     ),
     TraRecord(
-        time=3.9928129, channel=4, param_id=5, pretrigger=500, threshold=100.469451121688,
-        samplerate=5000000, samples=96256, data=np.empty(0), trai=3
+        time=3.9928129,
+        channel=4,
+        param_id=5,
+        pretrigger=500,
+        threshold=100.469451121688,
+        samplerate=5000000,
+        samples=96256,
+        data=np.empty(0),
+        trai=3,
     ),
     TraRecord(
-        time=3.9928143, channel=1, param_id=2, pretrigger=500, threshold=100.469451121688,
-        samplerate=5000000, samples=96944, data=np.empty(0), trai=4
+        time=3.9928143,
+        channel=1,
+        param_id=2,
+        pretrigger=500,
+        threshold=100.469451121688,
+        samplerate=5000000,
+        samples=96944,
+        data=np.empty(0),
+        trai=4,
     ),
 ]
 
@@ -82,15 +109,15 @@ def fixture_fresh_tradb(tmp_path) -> vae.io.TraDatabase:
 
 def test_create_time_vector():
     fs = 1_000_000
-    T = 2.5
-    n = T * fs
+    duration = 2.5
+    n = duration * fs
     n_pretrigger = 1000
     t_pretrigger = n_pretrigger / fs
     t = _create_time_vector(n, fs, n_pretrigger)
 
     assert len(t) == n
     assert t[0] == -t_pretrigger
-    assert t[-1] == pytest.approx(T - t_pretrigger - 1 / fs)
+    assert t[-1] == pytest.approx(duration - t_pretrigger - 1 / fs)
 
     t_diff = np.diff(t)
     assert np.all(np.isclose(t_diff, 1 / fs))
@@ -106,7 +133,10 @@ def test_create(tmp_path):
     vae.io.TraDatabase.create(filename)
     with vae.io.TraDatabase(filename) as tradb:
         assert tradb.tables() == {
-            "tr_data", "tr_fieldinfo", "tr_params", "tr_globalinfo",
+            "tr_data",
+            "tr_fieldinfo",
+            "tr_params",
+            "tr_globalinfo",
         }
 
 
@@ -124,7 +154,7 @@ def test_iread_empty_query(sample_tradb):
     assert list(sample_tradb.iread(time_start=2, time_stop=1)) == []
 
 
-@pytest.mark.parametrize("raw", (False, True))
+@pytest.mark.parametrize("raw", [False, True])
 def test_iread(sample_tradb, raw):
     tras = list(sample_tradb.iread(raw=raw))
     tras_expected_ordered = sorted(TRAS_EXPECTED, key=lambda t: t.trai)
@@ -145,9 +175,7 @@ def test_iread(sample_tradb, raw):
 
 
 def test_iread_query_filter(sample_tradb):
-    tras = list(
-        sample_tradb.iread(query_filter="Samples >= 100000")
-    )
+    tras = list(sample_tradb.iread(query_filter="Samples >= 100000"))
     assert len(tras) == 1
 
 
@@ -182,12 +210,12 @@ def test_read_wave_compare_to_reference_txt(signal_txt, signal_tradb_raw, signal
     data_raw, _ = signal_tradb_raw.read_wave(1, time_axis=False)
     data_flac, _ = signal_tradb_flac.read_wave(1, time_axis=False)
 
-    adc_step = max_amplitude * (2 ** -15)
+    adc_step = max_amplitude * (2**-15)
     assert_allclose(data_txt, data_raw, atol=adc_step, rtol=0)
     assert_allclose(data_txt, data_flac, atol=adc_step, rtol=0)
 
 
-@pytest.mark.parametrize("raw", (False, True))
+@pytest.mark.parametrize("raw", [False, True])
 def test_read_continuous_wave_dtype(sample_tradb, raw):
     y, _ = sample_tradb.read_continuous_wave(1, raw=raw)
     assert y.dtype == np.int16 if raw else np.float32
@@ -204,6 +232,7 @@ def test_read_continuous_wave_empty_tradb(fresh_tradb):
 
 def test_read_continuous_wave(fresh_tradb):
     trai = 0
+
     def write_time_axis(samplerate, samples, sets, t_start=0):
         # create time axis
         y = t_start + np.arange(0, samples * sets, dtype=np.float32) / samplerate
@@ -214,9 +243,15 @@ def test_read_continuous_wave(fresh_tradb):
             t = data[0]
             fresh_tradb.write(
                 TraRecord(
-                    time=t, channel=1, param_id=1, pretrigger=0, threshold=0,
-                    samplerate=samplerate, samples=samples,
-                    data=data, trai=trai,
+                    time=t,
+                    channel=1,
+                    param_id=1,
+                    pretrigger=0,
+                    threshold=0,
+                    samplerate=samplerate,
+                    samples=samples,
+                    data=data,
+                    trai=trai,
                 )
             )
         return y
@@ -295,9 +330,16 @@ def test_listen(sample_tradb):
 
 def test_write(fresh_tradb):
     new_tra = TraRecord(
-        time=11.11, channel=1, param_id=1, pretrigger=500, threshold=111,
-        samplerate=5000000, samples=103488,
-        data=np.empty(0, dtype=np.float32), trai=1, raw=False,
+        time=11.11,
+        channel=1,
+        param_id=1,
+        pretrigger=500,
+        threshold=111,
+        samplerate=5000000,
+        samples=103488,
+        data=np.empty(0, dtype=np.float32),
+        trai=1,
+        raw=False,
     )
 
     assert fresh_tradb.rows() == 0

@@ -92,7 +92,7 @@ def hinkley(arr: np.ndarray, alpha: int = 5) -> Tuple[np.ndarray, int]:
 def _aic_numba(arr: np.ndarray) -> Tuple[np.ndarray, int]:
     n = len(arr)
     result = np.full(n, np.nan, dtype=np.float32)
-    safety_eps = np.finfo(np.float32).tiny  # pylint: disable=E1101
+    safety_eps = np.finfo(np.float32).tiny
 
     min_value = math.inf
     min_index = 0
@@ -137,7 +137,7 @@ def _aic_numba(arr: np.ndarray) -> Tuple[np.ndarray, int]:
 
 def _aic_numpy(arr: np.ndarray) -> Tuple[np.ndarray, int]:
     n = len(arr)
-    safety_eps = np.finfo(np.float32).tiny  # pylint: disable=E1101
+    safety_eps = np.finfo(np.float32).tiny
 
     l_sum = np.cumsum(arr, dtype=np.float64)
     l_squaresum = np.cumsum(arr ** 2, dtype=np.float64)
@@ -185,7 +185,7 @@ def aic(arr: np.ndarray) -> Tuple[np.ndarray, int]:
         - Bai, F., Gagar, D., Foote, P., & Zhao, Y. (2017).
           Comparison of alternatives to amplitude thresholding for onset detection
           of acoustic emission signals.
-          Mechanical Systems and Signal Processing, 84, 717–730.
+          Mechanical Systems and Signal Processing, 84, 717-730.
         - van Rijn, N. (2017).
           Investigating the Behaviour of Acoustic Emission Waves Near Cracks:
           Using the Finite Element Method. Delft University of Technology.
@@ -253,7 +253,7 @@ def energy_ratio(arr: np.ndarray, win_len: int = 100) -> Tuple[np.ndarray, int]:
     References:
         - Han, L., Wong, J., & Bancroft, J. C. (2009).
           Time picking and random noise reduction on microseismic data.
-          CREWES Research Report, 21, 1–13.
+          CREWES Research Report, 21, 1-13.
     """
     if USE_NUMBA:
         return _energy_ratio_numba(arr, win_len)
@@ -278,7 +278,7 @@ def modified_energy_ratio(arr: np.ndarray, win_len: int = 100) -> Tuple[np.ndarr
     References:
         - Han, L., Wong, J., & Bancroft, J. C. (2009).
           Time picking and random noise reduction on microseismic data.
-          CREWES Research Report, 21, 1–13.
+          CREWES Research Report, 21, 1-13.
     """
     result, _ = energy_ratio(arr, win_len)
     np.multiply(result, np.abs(arr), out=result)

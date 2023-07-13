@@ -13,9 +13,8 @@ be visualized in real time.
 from pathlib import Path
 from tempfile import gettempdir
 
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
 import vallenae as vae
 
 HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()

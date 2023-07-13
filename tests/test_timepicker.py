@@ -3,7 +3,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose
-
 from vallenae import timepicker
 from vallenae.io import TraDatabase
 
@@ -52,12 +51,12 @@ def test_modified_energy_ratio(waveform):
 
 
 @pytest.mark.parametrize(
-    ("func_numba, func_numpy"),
-    (
+    ("func_numba", "func_numpy"),
+    [
         (timepicker._hinkley_numba, timepicker._hinkley_numpy),
         (timepicker._aic_numba, timepicker._aic_numpy),
         (timepicker._energy_ratio_numba, timepicker._energy_ratio_numpy),
-    ),
+    ],
 )
 def test_implementations(waveform, func_numba, func_numpy):
     result_numba, index_numba = func_numba(waveform)

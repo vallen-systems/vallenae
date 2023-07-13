@@ -5,11 +5,12 @@ import warnings
 USE_NUMBA = True
 
 try:
-    from numba import njit  # pylint: disable=unused-import
+    from numba import njit
 except ImportError:
     USE_NUMBA = False
+
     # https://stackoverflow.com/a/73275170/9967707
-    def njit(f = None, *args, **kwargs):  # pylint: disable=keyword-arg-before-vararg,unused-argument
+    def njit(f=None, *args, **kwargs):
         if callable(f):
             return f
         return lambda func: func
@@ -23,4 +24,5 @@ if not USE_NUMBA:
     warnings.warn(
         "Numba not found. Use Numba (pip install numba) for better performance.",
         PerformanceWarning,
+        stacklevel=1,
     )

@@ -41,7 +41,7 @@ class HitRecord(NamedTuple):
     cascade_hits: Optional[int] = None  #: Total number of hits in the same hit-cascade
     cascade_counts: Optional[int] = None  #: Summed counts of hits in the same hit-cascade
     cascade_energy: Optional[int] = None  #: Summed energy of hits in the same hit-cascade
-    cascade_signal_strength: Optional[int] = None  #: Summed signal strength of hits in the same hit-cascade  # noqa  # pylint: disable=line-too-long
+    cascade_signal_strength: Optional[int] = None  #: Summed signal strength of hits in the same hit-cascade  # noqa
 
     @classmethod
     def from_sql(cls, row: Dict[str, Any]) -> "HitRecord":

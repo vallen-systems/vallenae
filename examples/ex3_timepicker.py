@@ -10,7 +10,6 @@ import time
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-
 import vallenae as vae
 
 HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
@@ -103,8 +102,8 @@ timer_results = {
     "Modified Energy Ratio": timeit(lambda: vae.timepicker.modified_energy_ratio(y)),
 }
 
-for name, time in timer_results.items():
-    print(f"{name}: {time:0.3f} µs")
+for name, execution_time in timer_results.items():
+    print(f"{name}: {execution_time:0.3f} µs")
 
 plt.figure(figsize=(8, 3), tight_layout=True)
 plt.bar(timer_results.keys(), timer_results.values())
