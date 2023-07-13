@@ -83,16 +83,7 @@ deps = coverage[toml]>=5
 commands =
     - coverage combine
     coverage report
-
-[testenv:coveralls]
-skip_install = true
-deps =
-    coverage[toml]>=5
-    coveralls
-passenv = GITHUB_*
-commands = 
-    - coverage combine
-    coveralls --service=github
+    coverage xml
 
 [testenv:pyinstaller]
 deps = pyinstaller>=4
