@@ -67,7 +67,7 @@ tests = [
 ]
 tools = [
     "mypy>=0.9",  # pyproject.toml support
-    "ruff>=0.0.278",
+    "ruff>=0.1.0",
     "tox>=3.4",  # pyproject.toml support
 ]
 dev = [

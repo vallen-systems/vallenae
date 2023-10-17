@@ -206,7 +206,7 @@ def _energy_ratio_numba(arr: np.ndarray, win_len: int = 100) -> Tuple[np.ndarray
     l_squaresum = 0.0
     r_squaresum = 0.0
 
-    for i in range(0, win_len):
+    for i in range(win_len):
         l_squaresum += arr[i] ** 2
 
     for i in range(win_len, win_len + win_len):
