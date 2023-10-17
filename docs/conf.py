@@ -4,8 +4,8 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 from datetime import date
+from importlib import metadata
 
-import pkg_resources
 from sphinx_gallery.sorting import FileNameSortKey
 
 # -- Project information -----------------------------------------------------
@@ -13,7 +13,7 @@ from sphinx_gallery.sorting import FileNameSortKey
 project = "vallenae"
 copyright = f"{date.today().year}, Vallen Systeme GmbH"  # noqa
 author = "Lukas Berbuer, Daniel Altmann (Vallen Systeme GmbH)"
-release = pkg_resources.get_distribution("vallenae").version
+release = metadata.version("vallenae")
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
