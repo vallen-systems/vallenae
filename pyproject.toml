@@ -67,7 +67,7 @@ tests = [
 ]
 tools = [
     "mypy>=0.9",  # pyproject.toml support
-    "ruff>=0.1.0",
+    "ruff>=0.2.0",
     "tox>=3.4",  # pyproject.toml support
 ]
 dev = [
@@ -88,6 +88,8 @@ line-length = 100
 
 [tool.ruff]
 line-length = 100
+
+[tool.ruff.lint]
 select = [
     "F", # pyflakes
     "E", "W", # pycodestyle
@@ -111,7 +113,7 @@ ignore = [
     "PLR2004", # magic value used in comparison
 ]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/*" = [
     "E501", # line too long
     "PLR0915", # too many statements
