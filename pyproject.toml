@@ -129,7 +129,7 @@ parallel = true
 source = ["vallenae"]
 
 [tool.coverage.paths]
-source = ["src", ".tox/*/site-packages"]
+source = ["src", "*/site-packages"]
 
 [tool.mypy]
 ignore_missing_imports = true
