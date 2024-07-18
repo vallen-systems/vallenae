@@ -50,6 +50,7 @@ def test_modified_energy_ratio(waveform):
     assert np.argmax(result) == index
 
 
+@pytest.mark.skipif(not timepicker.USE_NUMBA, reason="requires numba")
 @pytest.mark.parametrize(
     ("func_numba", "func_numpy"),
     [
