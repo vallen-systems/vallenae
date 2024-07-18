@@ -65,7 +65,7 @@ class HitRecord(NamedTuple):
     rms: float  #: RMS of the noise before the hit in volts
     # optional for creating:
     set_id: Optional[int] = None  #: Unique identifier for data set in pridb
-    status: HitFlags = 0  #: Status flags
+    status: HitFlags = HitFlags(0)  #: Status flags
     threshold: Optional[float] = None  #: Threshold amplitude in volts
     rise_time: Optional[float] = None  #: Rise time in seconds
     signal_strength: Optional[float] = None  #: Signal strength in nVs (1e-9 Vs)
@@ -153,7 +153,7 @@ class StatusRecord(NamedTuple):
     rms: float  #: RMS in volts
     # optional for creating:
     set_id: Optional[int] = None  #: Unique identifier for data set in pridb
-    status: StatusFlags = 0  #: Status flags
+    status: StatusFlags = StatusFlags(0)  #: Status flags
     threshold: Optional[float] = None  #: Threshold amplitude in volts
     signal_strength: Optional[float] = None  #: Signal strength in nVs (1e-9 Vs)
 
@@ -187,7 +187,7 @@ class ParametricRecord(NamedTuple):
     param_id: int  #: Parameter ID of table ae_params for ADC value conversion
     # optional for creating:
     set_id: Optional[int] = None  #: Unique identifier for data set in pridb
-    status: StatusFlags = 0  #: Status flags
+    status: StatusFlags = StatusFlags(0)  #: Status flags
     pctd: Optional[int] = None  #: Digital counter value
     pcta: Optional[int] = None  #: Analog hysteresis counter
     pa0: Optional[int] = None  #: Amplitude of parametric input 0 in volts
@@ -237,7 +237,7 @@ class TraRecord(NamedTuple):
     samples: int  #: Number of samples
     data: np.ndarray  #: Transient signal in volts or ADC values if `raw` = `True`
     # optional for writing
-    status: HitFlags = 0  #: Status flags
+    status: HitFlags = HitFlags(0)  #: Status flags
     trai: Optional[int] = None  #: Transient recorder index (foreign key between pridb and tradb)
     rms: Optional[float] = None  #: RMS of the noise before the hit
     # optional
