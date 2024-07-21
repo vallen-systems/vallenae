@@ -73,6 +73,9 @@ row dictionary (column name: value).
     TraRecord
     FeatureRecord
 
+    HitFlags
+    StatusFlags
+
 Compression
 -----------
 

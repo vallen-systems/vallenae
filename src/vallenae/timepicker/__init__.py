@@ -25,7 +25,7 @@ from .._numba import USE_NUMBA, njit
 
 def _hinkley_numpy(arr: np.ndarray, alpha: int = 5) -> Tuple[np.ndarray, int]:
     n = len(arr)
-    energy_cum = np.cumsum(arr ** 2, dtype=np.float64)
+    energy_cum = np.cumsum(arr**2, dtype=np.float64)
     negative_trend = energy_cum[-1] / (alpha * n)
     result = energy_cum - (np.arange(n, dtype=np.float32) * negative_trend)
     return result, np.argmin(result)
@@ -123,10 +123,9 @@ def _aic_numba(arr: np.ndarray) -> Tuple[np.ndarray, int]:
         l_variance = max(l_variance, safety_eps)
         r_variance = max(r_variance, safety_eps)
 
-        result[i] = (
-            (i + 1) * math.log(l_variance) / math.log(10) +
-            (n - i - 2) * math.log(r_variance) / math.log(10)
-        )
+        result[i] = (i + 1) * math.log(l_variance) / math.log(10) + (n - i - 2) * math.log(
+            r_variance
+        ) / math.log(10)
 
         if result[i] < min_value:
             min_value = result[i]
@@ -140,7 +139,7 @@ def _aic_numpy(arr: np.ndarray) -> Tuple[np.ndarray, int]:
     safety_eps = np.finfo(np.float32).tiny
 
     l_sum = np.cumsum(arr, dtype=np.float64)
-    l_squaresum = np.cumsum(arr ** 2, dtype=np.float64)
+    l_squaresum = np.cumsum(arr**2, dtype=np.float64)
     r_sum = l_sum[-1] - l_sum
     r_squaresum = l_squaresum[-1] - l_squaresum
 
@@ -226,10 +225,10 @@ def _energy_ratio_numba(arr: np.ndarray, win_len: int = 100) -> Tuple[np.ndarray
 
 
 def _energy_ratio_numpy(arr: np.ndarray, win_len: int = 100) -> Tuple[np.ndarray, int]:
-    squaresum_cum = np.cumsum(arr ** 2, dtype=np.float64)
+    squaresum_cum = np.cumsum(arr**2, dtype=np.float64)
 
-    l_squaresum = squaresum_cum[win_len:-win_len] - squaresum_cum[0:-2 * win_len]
-    r_squaresum = squaresum_cum[2 * win_len:] - squaresum_cum[win_len:-win_len]
+    l_squaresum = squaresum_cum[win_len:-win_len] - squaresum_cum[0 : -2 * win_len]
+    r_squaresum = squaresum_cum[2 * win_len :] - squaresum_cum[win_len:-win_len]
 
     result = np.zeros_like(arr, dtype=np.float32)
     result[win_len:-win_len] = r_squaresum / l_squaresum

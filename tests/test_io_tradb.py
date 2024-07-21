@@ -119,8 +119,8 @@ def test_create_time_vector():
     assert t[0] == -t_pretrigger
     assert t[-1] == pytest.approx(duration - t_pretrigger - 1 / fs)
 
-    t_diff = np.diff(t)
-    assert np.all(np.isclose(t_diff, 1 / fs))
+    t_expected = (np.arange(n) - n_pretrigger) / fs
+    assert_allclose(t, t_expected)
 
 
 def test_init():

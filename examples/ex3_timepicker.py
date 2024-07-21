@@ -106,6 +106,6 @@ for name, execution_time in timer_results.items():
     print(f"{name}: {execution_time:0.3f} µs")
 
 plt.figure(figsize=(8, 3), tight_layout=True)
-plt.bar(timer_results.keys(), timer_results.values())  # noqa: SIM911
+plt.bar(timer_results.keys(), timer_results.values())
 plt.ylabel("Time [µs]")
 plt.show()

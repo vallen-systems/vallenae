@@ -23,6 +23,7 @@ HITS_EXPECTED = [
         set_id=10,
         time=3.992771,
         channel=3,
+        status=4,
         param_id=4,
         threshold=100.469451,
         amplitude=46538.6675710947,
@@ -42,6 +43,7 @@ HITS_EXPECTED = [
         set_id=11,
         time=3.9927747,
         channel=2,
+        status=4,
         param_id=3,
         threshold=100.469451,
         amplitude=59621.0079186672,
@@ -61,6 +63,7 @@ HITS_EXPECTED = [
         set_id=12,
         time=3.9928129,
         channel=4,
+        status=4,
         param_id=5,
         threshold=100.469451,
         amplitude=34118.5122422787,
@@ -80,6 +83,7 @@ HITS_EXPECTED = [
         set_id=13,
         time=3.9928143,
         channel=1,
+        status=4,
         param_id=2,
         threshold=100.469451,
         amplitude=29114.8291235365,
@@ -98,15 +102,15 @@ HITS_EXPECTED = [
 ]
 
 PARAMETRIC_EXPECTED = [
-    ParametricRecord(set_id=5, time=0.0, param_id=1, pctd=0, pcta=0),
-    ParametricRecord(set_id=6, time=1.0, param_id=1, pctd=0, pcta=0),
-    ParametricRecord(set_id=7, time=2.0, param_id=1, pctd=0, pcta=0),
-    ParametricRecord(set_id=8, time=3.0, param_id=1, pctd=0, pcta=0),
-    ParametricRecord(set_id=9, time=3.99, param_id=1, pctd=0, pcta=0),
-    ParametricRecord(set_id=14, time=4.0, param_id=1, pctd=0, pcta=0),
-    ParametricRecord(set_id=15, time=5.0, param_id=1, pctd=0, pcta=0),
-    ParametricRecord(set_id=16, time=6.0, param_id=1, pctd=0, pcta=0),
-    ParametricRecord(set_id=17, time=6.45, param_id=1, pctd=0, pcta=0),
+    ParametricRecord(set_id=5, time=0.0, status=12, param_id=1, pctd=0, pcta=0),
+    ParametricRecord(set_id=6, time=1.0, status=12, param_id=1, pctd=0, pcta=0),
+    ParametricRecord(set_id=7, time=2.0, status=12, param_id=1, pctd=0, pcta=0),
+    ParametricRecord(set_id=8, time=3.0, status=12, param_id=1, pctd=0, pcta=0),
+    ParametricRecord(set_id=9, time=3.99, status=12, param_id=1, pctd=0, pcta=0),
+    ParametricRecord(set_id=14, time=4.0, status=12, param_id=1, pctd=0, pcta=0),
+    ParametricRecord(set_id=15, time=5.0, status=12, param_id=1, pctd=0, pcta=0),
+    ParametricRecord(set_id=16, time=6.0, status=12, param_id=1, pctd=0, pcta=0),
+    ParametricRecord(set_id=17, time=6.45, status=0, param_id=1, pctd=0, pcta=0),
 ]
 
 
@@ -198,6 +202,8 @@ def test_iread_hits(sample_pridb):
         assert hit.set_id == hit_expected.set_id
         assert hit.time == pytest.approx(hit_expected.time)
         assert hit.channel == hit_expected.channel
+        assert hit.status == hit_expected.status
+        assert hit.param_id == hit_expected.param_id
         assert hit.threshold == pytest.approx(hit_expected.threshold / 1e6)
         assert hit.amplitude == pytest.approx(hit_expected.amplitude / 1e6)
         assert hit.rise_time == pytest.approx(hit_expected.rise_time / 1e6)
@@ -227,6 +233,7 @@ def test_read_hits(sample_pridb):
     assert dict(hits.dtypes) == {
         "time": float64,
         "channel": Int64Dtype(),
+        "status": Int64Dtype(),
         "param_id": Int64Dtype(),
         "threshold": float64,
         "amplitude": float64,
@@ -251,6 +258,7 @@ def test_iread_parametric(sample_pridb):
     for record, record_expected in zip(records, PARAMETRIC_EXPECTED):
         assert record.set_id == record_expected.set_id
         assert record.time == pytest.approx(record_expected.time)
+        assert record.status == record_expected.status
         assert record.param_id == record_expected.param_id
         assert record.pctd == record_expected.pctd
         assert record.pcta == record_expected.pcta
@@ -276,8 +284,9 @@ def test_read_parametric(sample_pridb):
     assert df.index.name == "set_id"
     assert df.index.dtype == int64
     assert dict(df.dtypes) == {
-        "param_id": Int64Dtype(),
         "time": float64,
+        "status": Int64Dtype(),
+        "param_id": Int64Dtype(),
         "pctd": Int64Dtype(),
         "pcta": Int64Dtype(),
     }
@@ -292,6 +301,7 @@ def test_read(sample_pridb):
         "set_type": int64,
         "time": float64,
         "channel": Int64Dtype(),
+        "status": Int64Dtype(),
         "param_id": Int64Dtype(),
         "threshold": float64,
         "amplitude": float64,

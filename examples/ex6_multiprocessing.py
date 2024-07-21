@@ -38,7 +38,7 @@ def tra_generator(loops: int = 1000) -> Iterable[vae.io.TraRecord]:
 # ----------------------------------
 # A simple function from the module `_feature_extraction` is applied to all data sets and returns computed features.
 # The function is defined in another module to work with `multiprocessing.Pool`: https://bugs.python.org/issue25053
-from _feature_extraction import feature_extraction  # noqa
+from __feature_extraction import feature_extraction  # noqa
 
 
 #%%
