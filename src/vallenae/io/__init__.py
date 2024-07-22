@@ -73,6 +73,7 @@ row dictionary (column name: value).
     TraRecord
     FeatureRecord
 
+    SetType
     HitFlags
     StatusFlags
 
