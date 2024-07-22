@@ -14,7 +14,7 @@ from ._sql import (
     query_conditions,
     read_sql_generator,
 )
-from .datatypes import HitRecord, MarkerRecord, ParametricRecord, StatusRecord
+from .datatypes import HitRecord, MarkerRecord, ParametricRecord, SetType, StatusRecord
 from .types import SizedIterable
 
 RecordType = Union[HitRecord, MarkerRecord, ParametricRecord, StatusRecord]
@@ -164,11 +164,11 @@ class PriDatabase(Database):
         # add missing set_types
         column_set_type = 0
         if not df_hits.empty:
-            df_hits.insert(column_set_type, "set_type", 2)
+            df_hits.insert(column_set_type, "set_type", SetType.HIT)
         if not df_parametric.empty:
-            df_parametric.insert(column_set_type, "set_type", 1)
+            df_parametric.insert(column_set_type, "set_type", SetType.PARAMETRIC)
         if not df_status.empty:
-            df_status.insert(column_set_type, "set_type", 3)
+            df_status.insert(column_set_type, "set_type", SetType.STATUS)
 
         # drop additional marker columns
         df_markers.drop(columns=["number", "data"], inplace=True, errors="ignore")

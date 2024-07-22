@@ -4,7 +4,7 @@ import pytest
 import vallenae as vae
 from numpy import dtype, float64, int64
 from pandas import Int64Dtype
-from vallenae.io import HitRecord, MarkerRecord, ParametricRecord, StatusRecord
+from vallenae.io import HitRecord, MarkerRecord, ParametricRecord, SetType, StatusRecord
 
 STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"
 PRIDB_FILE_PATH = STEEL_PLATE_DIR / "sample.pridb"
@@ -336,7 +336,9 @@ def test_listen(sample_pridb):
 
 def test_write_readonly(sample_pridb):
     with pytest.raises(ValueError):
-        sample_pridb.write_marker(MarkerRecord(set_id=1, time=0, set_type=4, number=1, data="Test"))
+        sample_pridb.write_marker(
+            MarkerRecord(set_id=1, time=0, set_type=SetType.LABEL, number=1, data="Test")
+        )
 
 
 def test_write_hit(fresh_pridb):
@@ -380,7 +382,7 @@ def test_write_hit(fresh_pridb):
 def test_write_marker(fresh_pridb):
     new_marker = MarkerRecord(
         time=11.11,
-        set_type=4,
+        set_type=SetType.LABEL,
         number=1,
         data="Test label",
     )
@@ -445,7 +447,7 @@ def test_check_monotonic_time(fresh_pridb):
     def generate_marker(time: float):
         return MarkerRecord(
             time=time,
-            set_type=4,
+            set_type=SetType.LABEL,
             number=1,
             data="Test label",
         )

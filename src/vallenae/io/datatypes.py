@@ -1,6 +1,6 @@
 # ruff: noqa: E501
 
-from enum import IntFlag
+from enum import IntEnum, IntFlag
 from typing import Any, Dict, NamedTuple, Optional
 
 import numpy as np
@@ -20,6 +20,20 @@ def _to_seconds(value: Optional[float]):
     if value is None:
         return None
     return float(value) / 1e6
+
+
+class SetType(IntEnum):
+    """Record types of the pridb."""
+
+    # fmt: off
+    NONE        = 0  #: None
+    PARAMETRIC  = 1  #: Parametric record
+    HIT         = 2  #: Hit record
+    STATUS      = 3  #: Status record
+    LABEL       = 4  #: Label marker
+    DATETIME    = 5  #: Datetime marker, inserted by the acquisition software whenever recording is started
+    SECTION     = 6  #: Section marker, e.g. if acquisition settings changed
+    # fmt: on
 
 
 class HitFlags(IntFlag):
@@ -52,7 +66,7 @@ class StatusFlags(IntFlag):
 
 class HitRecord(NamedTuple):
     """
-    Hit record in pridb (SetType = 2).
+    Hit record in pridb (`SetType.HIT`).
     """
 
     # fmt: off
@@ -109,16 +123,11 @@ class HitRecord(NamedTuple):
 
 class MarkerRecord(NamedTuple):
     """
-    Marker record in pridb (SetType = 4, 5, 6).
-
-    A marker can have different meanings depending on its SetType:\n
-    - 4: label\n
-    - 5: datetime data set, as it is inserted whenever recording is started by software\n
-    - 6: a section start marker. E.g. new sections are started, if acquisition settings changed
+    Marker record in pridb (`SetType.LABEL`, `SetType.DATETIME`, `SetType.SECTION`).
     """
 
     time: float  #: Time in seconds
-    set_type: int  #: Marker type (see above)
+    set_type: SetType  #: Marker type (see above)
     data: str  #: Content of marker (label text or datetime)
     # optional for creating:
     number: Optional[int] = None  #: Marker number
@@ -143,7 +152,7 @@ class MarkerRecord(NamedTuple):
 
 class StatusRecord(NamedTuple):
     """
-    Status data record in pridb (SetType = 3).
+    Status data record in pridb (`SetType.STATUS`).
     """
 
     time: float  #: Time in seconds
@@ -180,7 +189,7 @@ class StatusRecord(NamedTuple):
 
 class ParametricRecord(NamedTuple):
     """
-    Parametric data record in pridb (SetType = 1).
+    Parametric data record in pridb (`SetType.PARAMETRIC`).
     """
 
     time: float  #: Time in seconds
