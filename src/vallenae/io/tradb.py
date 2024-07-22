@@ -24,9 +24,7 @@ from .types import SizedIterable
 
 
 @lru_cache(maxsize=32, typed=True)
-def _create_time_vector(
-    samples: int, samplerate: int, pretrigger: int = 0
-) -> np.ndarray:
+def _create_time_vector(samples: int, samplerate: int, pretrigger: int = 0) -> np.ndarray:
     return np.arange(-pretrigger, samples - pretrigger, dtype=np.float32) / samplerate
 
 
@@ -34,7 +32,11 @@ class TraDatabase(Database):
     """IO wrapper for tradb database file."""
 
     def __init__(
-        self, filename: str, mode: str = "ro", *, compression: bool = False,
+        self,
+        filename: str,
+        mode: str = "ro",
+        *,
+        compression: bool = False,
     ):
         """
         Open tradb database file.
@@ -48,7 +50,10 @@ class TraDatabase(Database):
             compression: Enable/disable FLAC compression data BLOBs for writing
         """
         super().__init__(
-            filename, mode=mode, table_prefix="tr", required_file_ext=".tradb",
+            filename,
+            mode=mode,
+            table_prefix="tr",
+            required_file_ext=".tradb",
         )
         self._data_format = 2 if compression else 0
         self._timebase = self.globalinfo()["TimeBase"]
@@ -82,16 +87,24 @@ class TraDatabase(Database):
             Pandas DataFrame with transient data
         """
         return iter_to_dataframe(
-            self.iread(**kwargs), desc="Tra", index_column="trai",
+            self.iread(**kwargs),
+            desc="Tra",
+            index_column="trai",
         )
 
     def _get_total_time_range(self) -> Tuple[float, float]:
         """Return total time range [min, max] of tradb."""
+
         def get_time(func: str):
-            result = self.connection().execute(
-                f"SELECT Time FROM tr_data WHERE TRAI == (SELECT {func}(TRAI) from tr_data)"
-            ).fetchone()
+            result = (
+                self.connection()
+                .execute(
+                    f"SELECT Time FROM tr_data WHERE TRAI == (SELECT {func}(TRAI) from tr_data)"
+                )
+                .fetchone()
+            )
             return 0 if result is None else result[0] / self._timebase
+
         return get_time("MIN"), get_time("MAX")
 
     def _get_trai_range_from_time_range(
@@ -220,10 +233,14 @@ class TraDatabase(Database):
 
     def _get_previous_trai(self, channel: int, trai: int) -> Optional[int]:
         """Find previous tra record index for given channel and TRAI."""
-        result = self.connection().execute(
-            "SELECT TRAI FROM tr_data WHERE Chan == ? AND TRAI < ? ORDER BY TRAI DESC LIMIT 1",
-            (channel, trai),
-        ).fetchone()
+        result = (
+            self.connection()
+            .execute(
+                "SELECT TRAI FROM tr_data WHERE Chan == ? AND TRAI < ? ORDER BY TRAI DESC LIMIT 1",
+                (channel, trai),
+            )
+            .fetchone()
+        )
         return result[0] if result is not None else None
 
     def read_continuous_wave(  # pylint: disable=too-many-locals
@@ -280,8 +297,10 @@ class TraDatabase(Database):
 
         def slice_range(tra: TraRecord):
             """Get indices to slice given tra record data to time range."""
+
             def limit_index(i: int):
                 return min(max(0, i), tra.samples)
+
             n_start, n_stop = 0, tra.samples
             if time_start is not None:
                 n_start = limit_index(round((time_start - tra.time) * tra.samplerate))
@@ -364,7 +383,6 @@ class TraDatabase(Database):
                     break
                 sleep(0.1)  # wait 100 ms until next read
 
-
     @require_write_access
     def write(self, tra: TraRecord) -> int:
         """
@@ -393,9 +411,6 @@ class TraDatabase(Database):
                     "Samples": int(tra.samples),
                     "DataFormat": int(self._data_format),
                     "Data": encode_data_blob(tra.data, self._data_format, parameter["TR_mV"]),
-                    "TRAI": (
-                        int(tra.trai)
-                        if tra.trai else None
-                    ),
+                    "TRAI": int(tra.trai) if tra.trai else None,
                 },
             )

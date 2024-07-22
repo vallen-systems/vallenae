@@ -192,9 +192,7 @@ class Database:
                     UPDATE {prefix}_globalinfo
                     SET Value = (SELECT MAX(rowid) FROM {prefix}_data)
                     WHERE Key == "ValidSets"
-                    """.format(
-                        prefix=self._table_prefix
-                    )
+                    """.format(prefix=self._table_prefix)
                 )
             if "TRAI" in keys:
                 con.execute(
@@ -202,9 +200,7 @@ class Database:
                     UPDATE {prefix}_globalinfo
                     SET Value = (SELECT MAX(TRAI) FROM {prefix}_data)
                     WHERE Key == "TRAI";
-                    """.format(
-                        prefix=self._table_prefix
-                    )
+                    """.format(prefix=self._table_prefix)
                 )
 
     def _file_status(self) -> int:

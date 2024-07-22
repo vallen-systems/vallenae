@@ -21,7 +21,8 @@ import vallenae as vae
 HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
 TRADB = HERE / "steel_plate" / "sample_plain.tradb"
 
-#%%
+
+# %%
 # Prepare streaming reads
 # -----------------------
 # Our sample tradb only contains four data sets. That is not enough data for demonstrating batch processing.
@@ -33,7 +34,8 @@ def tra_generator(loops: int = 1000) -> Iterable[vae.io.TraRecord]:
                 break
             yield tra
 
-#%%
+
+# %%
 # Define feature extraction function
 # ----------------------------------
 # A simple function from the module `_feature_extraction` is applied to all data sets and returns computed features.
@@ -41,7 +43,7 @@ def tra_generator(loops: int = 1000) -> Iterable[vae.io.TraRecord]:
 from __feature_extraction import feature_extraction  # noqa
 
 
-#%%
+# %%
 # Compute with single thread/core
 # -------------------------------
 # .. note::
@@ -53,6 +55,7 @@ from __feature_extraction import feature_extraction  # noqa
 def time_elapsed_ms(t0):
     return 1000.0 * (time.perf_counter() - t0)
 
+
 if __name__ == "__main__":  # guard needed for multiprocessing on Windows
     time_start = time.perf_counter()
     for tra in tra_generator():
@@ -62,13 +65,13 @@ if __name__ == "__main__":  # guard needed for multiprocessing on Windows
 
     print(f"Time single thread: {time_single_thread:.2f} ms")
 
-#%%
+# %%
 # Compute with multiple processes/cores
 # -------------------------------------
 # First get number of available cores in your machine:
 print(f"Available CPU cores: {os.cpu_count()}")
 
-#%%
+# %%
 # But how can we utilize those cores? The common answer for most programming languages is multithreading.
 # Threads run in the same process and heap, so data can be shared between them (with care).
 # Sadly, Python uses a global interpreter lock (GIL) that locks heap memory, because Python objects are not thread-safe.
@@ -78,7 +81,7 @@ print(f"Available CPU cores: {os.cpu_count()}")
 # Multiprocessing will introduce overhead for interprocess communication and data serialization/deserialization.
 # To reduce the overhead, data is sent in bigger chunks.
 
-#%%
+# %%
 # Run computation on 4 cores with chunks of 128 data sets and get the time / speedup:
 if __name__ == "__main__":  # guard needed for multiprocessing on Windows
     with multiprocessing.Pool(4) as pool:
@@ -90,7 +93,7 @@ if __name__ == "__main__":  # guard needed for multiprocessing on Windows
     print(f"Time multiprocessing: {time_multiprocessing:.2f} ms")
     print(f"Speedup: {(time_single_thread / time_multiprocessing):.2f}")
 
-#%%
+# %%
 # Variation of the chunksize
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Following results show how the chunksize impacts the overall performance.

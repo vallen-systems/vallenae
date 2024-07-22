@@ -34,7 +34,10 @@ class TrfDatabase(Database):
                 **"rwc"** (read-write and create empty database if it does not exist)
         """
         super().__init__(
-            filename, mode=mode, table_prefix="trf", required_file_ext=".trfdb",
+            filename,
+            mode=mode,
+            table_prefix="trf",
+            required_file_ext=".trfdb",
         )
 
     @staticmethod
@@ -59,10 +62,14 @@ class TrfDatabase(Database):
         Returns:
             Pandas DataFrame with features
         """
+
         def record_to_dict(record: FeatureRecord):
             return {"trai": record.trai, **record.features}
+
         return iter_to_dataframe(
-            [record_to_dict(r) for r in self.iread(**kwargs)], desc="Trf", index_column="trai",
+            [record_to_dict(r) for r in self.iread(**kwargs)],
+            desc="Trf",
+            index_column="trai",
         )
 
     def iread(
@@ -143,6 +150,7 @@ class TrfDatabase(Database):
         Returns:
             Index (trai) of inserted row
         """
+
         def convert(value):
             try:
                 return float(value)
@@ -150,10 +158,7 @@ class TrfDatabase(Database):
                 return None
 
         with self.connection() as con:  # commit/rollback transaction
-            row_dict = {
-                key: convert(value)
-                for key, value in feature_set.features.items()
-            }
+            row_dict = {key: convert(value) for key, value in feature_set.features.items()}
             row_dict["TRAI"] = feature_set.trai
             try:
                 try:

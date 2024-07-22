@@ -6,12 +6,14 @@ from vallenae.io._dataframe import _convert_to_nullable_types
 def test_convert_to_nullable_types():
     x = list(range(10))
 
-    df = pd.DataFrame({
-        "int32": pd.Series(x, dtype="int32"),
-        "int64": pd.Series(x, dtype="int64"),
-        "float": pd.Series(x, dtype="float64"),
-        "bool": pd.Series(x, dtype=bool),
-    })
+    df = pd.DataFrame(
+        {
+            "int32": pd.Series(x, dtype="int32"),
+            "int64": pd.Series(x, dtype="int64"),
+            "float": pd.Series(x, dtype="float64"),
+            "bool": pd.Series(x, dtype=bool),
+        }
+    )
 
     assert list(df.dtypes) == [
         dtype("int32"),

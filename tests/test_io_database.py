@@ -81,7 +81,7 @@ def test_tables_pridb(sample_pridb):
         "ae_globalinfo",
         "ae_fieldinfo",
         "ae_params",
-        "data_integrity"
+        "data_integrity",
     }
 
 
@@ -101,9 +101,27 @@ def test_rows(sample_pridb):
 
 def test_columns(sample_pridb):
     assert sample_pridb.columns() == (
-        "SetID", "SetType", "Time", "Chan", "Status", "ParamID",
-        "Thr", "Amp", "RiseT", "Dur", "Eny", "SS", "RMS", "Counts",
-        "TRAI", "CCnt", "CEny", "CSS", "CHits", "PCTD", "PCTA",
+        "SetID",
+        "SetType",
+        "Time",
+        "Chan",
+        "Status",
+        "ParamID",
+        "Thr",
+        "Amp",
+        "RiseT",
+        "Dur",
+        "Eny",
+        "SS",
+        "RMS",
+        "Counts",
+        "TRAI",
+        "CCnt",
+        "CEny",
+        "CSS",
+        "CHits",
+        "PCTD",
+        "PCTA",
     )
 
 
@@ -150,16 +168,18 @@ def test_parameter(sample_pridb):
         "Chan": 0,
         "ADC_µV": 0.0,
         "ADC_TE": 0.0,
-        "ADC_SS": 0.0
+        "ADC_SS": 0.0,
     }
 
-    assert sample_pridb._parameter(2) == pytest.approx({
-        "SetupID": 1,
-        "Chan": 1,
-        "ADC_µV": 1.52226441093467,
-        "ADC_TE": 9.26915433618267e-5,
-        "ADC_SS": 0.000304452859014046
-    })
+    assert sample_pridb._parameter(2) == pytest.approx(
+        {
+            "SetupID": 1,
+            "Chan": 1,
+            "ADC_µV": 1.52226441093467,
+            "ADC_TE": 9.26915433618267e-5,
+            "ADC_SS": 0.000304452859014046,
+        }
+    )
 
     with pytest.raises(ValueError):
         sample_pridb._parameter(0)

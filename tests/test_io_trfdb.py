@@ -20,7 +20,7 @@ TRFS_EXPECTED = [
             "CTP": 11,
             "FI": 222.672058105469,
             "FR": 110.18244934082,
-        }
+        },
     ),
     FeatureRecord(
         trai=2,
@@ -33,7 +33,7 @@ TRFS_EXPECTED = [
             "CTP": 35,
             "FI": 182.29167175293,
             "FR": 98.0199813842773,
-        }
+        },
     ),
     FeatureRecord(
         trai=3,
@@ -46,7 +46,7 @@ TRFS_EXPECTED = [
             "CTP": 55,
             "FI": 155.191879272461,
             "FR": 95.4932327270508,
-        }
+        },
     ),
     FeatureRecord(
         trai=4,
@@ -59,7 +59,7 @@ TRFS_EXPECTED = [
             "CTP": 29,
             "FI": 181.023727416992,
             "FR": 101.906227111816,
-        }
+        },
     ),
 ]
 
@@ -87,7 +87,9 @@ def test_create(tmp_path):
     vae.io.TrfDatabase.create(filename)
     with vae.io.TrfDatabase(filename) as trfdb:
         assert trfdb.tables() == {
-            "trf_data", "trf_fieldinfo", "trf_globalinfo",
+            "trf_data",
+            "trf_fieldinfo",
+            "trf_globalinfo",
         }
 
 
@@ -100,8 +102,7 @@ def test_iread(sample_trfdb):
         assert trf.trai == trf_expected.trai
 
         for (key, value), (key_expected, value_expected) in zip(
-            trf.features.items(),
-            trf_expected.features.items()
+            trf.features.items(), trf_expected.features.items()
         ):
             assert key == key_expected
             assert value == pytest.approx(value_expected)

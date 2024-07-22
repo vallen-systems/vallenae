@@ -20,9 +20,12 @@ def test_hook(tmp_path):
     work_path = tmp_path / "build"
     dist_path = tmp_path / "dist"
     args = [
-        "--workpath", str(work_path),
-        "--distpath", str(dist_path),
-        "--specpath", str(tmp_path),
+        "--workpath",
+        str(work_path),
+        "--distpath",
+        str(dist_path),
+        "--specpath",
+        str(tmp_path),
         str(app_path),
     ]
     pyi_main.run(args)

@@ -65,7 +65,8 @@ def get_channel_positions(setup_file: str) -> Dict[int, Tuple[float, float]]:
         raise RuntimeError("Can not retrieve channel positions from %s", setup_file)
     return {
         int(elem.get("Chan")): (float(elem.get("X")), float(elem.get("Y")))  # type: ignore
-        for elem in nodes if elem is not None
+        for elem in nodes
+        if elem is not None
     }
 
 

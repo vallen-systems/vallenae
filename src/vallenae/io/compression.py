@@ -4,6 +4,7 @@ import numpy as np
 
 try:
     import soundfile as sf
+
     _FLAC_CODEC = True
 except OSError:
     _FLAC_CODEC = False
@@ -32,6 +33,7 @@ def decode_data_blob(
     Returns:
         Array of voltage values or ADC values if `raw` is `True`
     """
+
     def get_data_int16():
         if data_format == 0:  # uncompressed
             return np.frombuffer(data_blob, dtype=np.int16)

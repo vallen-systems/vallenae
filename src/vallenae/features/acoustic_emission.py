@@ -84,15 +84,9 @@ def rise_time(
     """
     # save some computations if pre-results are provided
     n_first_crossing = (
-        first_crossing
-        if first_crossing is not None
-        else first_threshold_crossing(data, threshold)
+        first_crossing if first_crossing is not None else first_threshold_crossing(data, threshold)
     )
-    n_max = (
-        index_peak
-        if index_peak is not None
-        else peak_amplitude_index(data)
-    )
+    n_max = index_peak if index_peak is not None else peak_amplitude_index(data)
     if n_first_crossing is None:
         return 0
     return (n_max - n_first_crossing) / samplerate
@@ -112,7 +106,7 @@ def energy(data: np.ndarray, samplerate: int) -> float:
     Returns:
         Energy of input array (hit)
     """
-    return np.sum(data ** 2) * 1e14 / samplerate
+    return np.sum(data**2) * 1e14 / samplerate
 
 
 def signal_strength(data: np.ndarray, samplerate: int) -> float:
@@ -160,4 +154,4 @@ def rms(data: np.ndarray) -> float:
     References:
         https://en.wikipedia.org/wiki/Root_mean_square
     """
-    return np.sqrt(np.mean(data ** 2))
+    return np.sqrt(np.mean(data**2))

@@ -19,7 +19,7 @@ TRADB = HERE / "steel_plate" / "sample_plain.tradb"
 TRFDB = HERE / "steel_plate" / "sample.trfdb"
 TRFDB_TMP = Path(gettempdir()) / "sample.trfdb"
 
-#%%
+# %%
 # Open tradb (readonly) and trfdb (readwrite)
 # -------------------------------------------
 copyfile(TRFDB, TRFDB_TMP)  # copy trfdb, so we don't overwrite it
@@ -27,12 +27,13 @@ copyfile(TRFDB, TRFDB_TMP)  # copy trfdb, so we don't overwrite it
 tradb = vae.io.TraDatabase(TRADB)
 trfdb = vae.io.TrfDatabase(TRFDB_TMP, mode="rw")  # allow writing
 
-#%%
+# %%
 # Read current trfdb
 # ------------------
 print(trfdb.read())
 
-#%%
+
+# %%
 # Compute arrival time offsets with different timepickers
 # -------------------------------------------------------
 # To improve localisation, time of arrival estimates
@@ -50,7 +51,8 @@ def dt_from_timepicker(timepicker_func, tra: vae.io.TraRecord):
     # Compute offset in µs
     return (index_timepicker - index_ref) * 1e6 / tra.samplerate
 
-#%%
+
+# %%
 # Transient data is streamed from the database row by row using `vallenae.io.TraDatabase.iread`.
 # Only one transient data set is loaded into memory at a time.
 # That makes the streaming interface ideal for batch processing.
@@ -65,17 +67,17 @@ for tra in tradb.iread():
             "ATO_AIC": dt_from_timepicker(vae.timepicker.aic, tra),
             "ATO_ER": dt_from_timepicker(vae.timepicker.energy_ratio, tra),
             "ATO_MER": dt_from_timepicker(vae.timepicker.modified_energy_ratio, tra),
-        }
+        },
     )
     # Save results to trfdb
     trfdb.write(feature_set)
 
-#%%
+# %%
 # Read results from trfdb
 # -----------------------
 print(trfdb.read().filter(regex="ATO"))
 
-#%%
+# %%
 # Plot results
 # ------------
 ax = trfdb.read()[["ATO_Hinkley", "ATO_AIC", "ATO_ER", "ATO_MER"]].plot.barh()
@@ -83,7 +85,7 @@ ax.invert_yaxis()
 ax.set_xlabel("Arrival time offset [µs]")
 plt.show()
 
-#%%
+# %%
 # Plot waveforms and arrival times
 # --------------------------------
 _, axes = plt.subplots(4, 1, tight_layout=True, figsize=(8, 8))
@@ -108,7 +110,7 @@ for row, ax in zip(trfdb.read().itertuples(), axes):
 axes[0].legend(["Waveform", "Hinkley", "AIC", "ER", "MER"])
 plt.show()
 
-#%%
+# %%
 # Use results in VisualAE
 # -----------------------
 # The computed arrival time offsets can be directly used in VisualAE.
@@ -117,11 +119,11 @@ plt.show()
 # Field infos can be retrieved with `vallenae.io.TrfDatabase.fieldinfo`:
 print(trfdb.fieldinfo())
 
-#%%
+# %%
 # Show results as table:
 print(pd.DataFrame(trfdb.fieldinfo()))
 
-#%%
+# %%
 # Write units to trfdb
 # ~~~~~~~~~~~~~~~~~~~~
 # Field infos can be written with `vallenae.io.TrfDatabase.write_fieldinfo`:
@@ -134,7 +136,7 @@ trfdb.write_fieldinfo("ATO_MER", {"Unit": "[µs]", "LongName": "Arrival Time Off
 print(pd.DataFrame(trfdb.fieldinfo()).filter(regex="ATO"))
 
 
-#%%
+# %%
 # Load results in VisualAE
 # ~~~~~~~~~~~~~~~~~~~~~~~~
 # Time arrival offsets can be specified in the settings of `Location Processors` - `Channel Positions` - `Arrival Time Offset`.

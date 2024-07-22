@@ -18,7 +18,7 @@ TRAI = 4
 SAMPLES = 2000
 
 
-#%%
+# %%
 # Read waveform from tradb
 # ------------------------
 tradb = vae.io.TraDatabase(TRADB)
@@ -31,7 +31,8 @@ y = y[:SAMPLES]
 t *= 1e6  # convert to µs
 y *= 1e3  # convert to mV
 
-#%%
+
+# %%
 # Prepare plotting with time-picker results
 # -----------------------------------------
 def plot(t_wave, y_wave, y_picker, index_picker, name_picker):
@@ -49,38 +50,39 @@ def plot(t_wave, y_wave, y_picker, index_picker, name_picker):
     plt.axvline(t_wave[index_picker], color="k", linestyle=":")
     plt.show()
 
-#%%
+
+# %%
 # Hinkley Criterion
 # -----------------
 hc_arr, hc_index = vae.timepicker.hinkley(y, alpha=5)
 plot(t, y, hc_arr, hc_index, "Hinkley Criterion")
 
-#%%
+# %%
 # The negative trend correlates to the chosen alpha value
 # and can influence the results strongly.
 # Results with **alpha = 50** (less negative trend):
 hc_arr, hc_index = vae.timepicker.hinkley(y, alpha=50)
 plot(t, y, hc_arr, hc_index, "Hinkley Criterion")
 
-#%%
+# %%
 # Akaike Information Criterion (AIC)
 # ----------------------------------
 aic_arr, aic_index = vae.timepicker.aic(y)
 plot(t, y, aic_arr, aic_index, "Akaike Information Criterion")
 
-#%%
+# %%
 # Energy Ratio
 # ------------
 er_arr, er_index = vae.timepicker.energy_ratio(y)
 plot(t, y, er_arr, er_index, "Energy Ratio")
 
-#%%
+# %%
 # Modified Energy Ratio
 # ---------------------
 mer_arr, mer_index = vae.timepicker.modified_energy_ratio(y)
 plot(t, y, mer_arr, mer_index, "Modified Energy Ratio")
 
-#%%
+# %%
 # Performance comparison
 # ----------------------
 # All timepicker implementations are using Numba for just-in-time (JIT) compilations.
@@ -94,6 +96,7 @@ def timeit(func, loops=100):
     for _ in range(loops):
         func()
     return 1e6 * (time.perf_counter() - time_start) / loops  # elapsed time in µs
+
 
 timer_results = {
     "Hinkley": timeit(lambda: vae.timepicker.hinkley(y, 5)),

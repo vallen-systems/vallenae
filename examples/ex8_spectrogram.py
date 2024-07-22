@@ -17,7 +17,7 @@ from scipy import signal
 HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
 TRADB = HERE / "bearing" / "bearing_plain.tradb"
 
-#%%
+# %%
 # Read transient data as continous array
 # --------------------------------------
 # The signal is exactly cropped to the given time range (`time_start`, `time_stop`).
@@ -32,14 +32,14 @@ with vae.io.TraDatabase(TRADB) as tradb:
     )
     t = np.arange(0, len(y)) / fs  # generate time axis
 
-#%%
+# %%
 # Compute Short-Time Fourier Transform (STFT)
 # -------------------------------------------
 nfft = 4096
 noverlap = 2048
 fz, tz, zxx = signal.stft(y, fs=fs, window="hann", nperseg=nfft, noverlap=noverlap)
 
-#%%
+# %%
 # Plot time data and spectrogram
 # ------------------------------
 fig, ax = plt.subplots(

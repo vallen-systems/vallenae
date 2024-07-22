@@ -40,6 +40,7 @@ def check_monotonic_time(func):
                 )
             )
         return func(self, record, *args, **kwargs)
+
     return wrapper
 
 
@@ -58,7 +59,10 @@ class PriDatabase(Database):
                 **"rwc"** (read-write and create empty database if it does not exist)
         """
         super().__init__(
-            filename, mode=mode, table_prefix="ae", required_file_ext=".pridb",
+            filename,
+            mode=mode,
+            table_prefix="ae",
+            required_file_ext=".pridb",
         )
         self._timebase = self.globalinfo()["TimeBase"]
 
@@ -91,7 +95,9 @@ class PriDatabase(Database):
             Pandas DataFrame with hit data
         """
         return iter_to_dataframe(
-            self.iread_hits(**kwargs), desc="Hits", index_column="set_id",
+            self.iread_hits(**kwargs),
+            desc="Hits",
+            index_column="set_id",
         )
 
     def read_markers(self, **kwargs) -> pd.DataFrame:
@@ -108,12 +114,11 @@ class PriDatabase(Database):
             "number": pd.Int64Dtype(),
             "data": str,
         }
-        return (
-            iter_to_dataframe(
-                self.iread_markers(**kwargs), desc="Marker", index_column="set_id",
-            )
-            .apply(lambda x: x.astype(dtypes.get(x.name, x.dtype)))
-        )
+        return iter_to_dataframe(
+            self.iread_markers(**kwargs),
+            desc="Marker",
+            index_column="set_id",
+        ).apply(lambda x: x.astype(dtypes.get(x.name, x.dtype)))
 
     def read_parametric(self, **kwargs) -> pd.DataFrame:
         """
@@ -126,7 +131,9 @@ class PriDatabase(Database):
             Pandas DataFrame with parametric data
         """
         return iter_to_dataframe(
-            self.iread_parametric(**kwargs), desc="Parametric", index_column="set_id",
+            self.iread_parametric(**kwargs),
+            desc="Parametric",
+            index_column="set_id",
         )
 
     def read_status(self, **kwargs) -> pd.DataFrame:
@@ -140,7 +147,9 @@ class PriDatabase(Database):
             Pandas DataFrame with status data
         """
         return iter_to_dataframe(
-            self.iread_status(**kwargs), desc="Status", index_column="set_id",
+            self.iread_status(**kwargs),
+            desc="Status",
+            index_column="set_id",
         )
 
     def read(self, **kwargs) -> pd.DataFrame:
@@ -183,9 +192,7 @@ class PriDatabase(Database):
 
         # concat all dataframes, restore types and sort by index
         return (
-            pd.concat(
-                [df_markers, df_hits, df_status, df_parametric], sort=False, copy=False
-            )
+            pd.concat([df_markers, df_hits, df_status, df_parametric], sort=False, copy=False)
             .apply(lambda x: x.astype(dtypes[x.name]))
             .sort_index()
             .rename_axis(df_hits.index.name)
@@ -429,29 +436,20 @@ class PriDatabase(Database):
                     "Status": hit.status,
                     "ParamID": int(hit.param_id),
                     "Thr": (
-                        int(hit.threshold * 1e6 / parameter["ADC_µV"])
-                        if hit.threshold else None
+                        int(hit.threshold * 1e6 / parameter["ADC_µV"]) if hit.threshold else None
                     ),
                     "Amp": int(hit.amplitude * 1e6 / parameter["ADC_µV"]),
-                    "RiseT": (
-                        int(hit.rise_time * self._timebase)
-                        if hit.rise_time else None
-                    ),
+                    "RiseT": int(hit.rise_time * self._timebase) if hit.rise_time else None,
                     "Dur": int(hit.duration * self._timebase),
                     "Eny": int(hit.energy / parameter["ADC_TE"]),
                     "SS": (
                         int(hit.signal_strength / parameter["ADC_SS"])
-                        if hit.signal_strength and "ADC_SS" in parameter else None
+                        if hit.signal_strength and "ADC_SS" in parameter
+                        else None
                     ),
                     "RMS": int(hit.rms * 1e6 / parameter["ADC_µV"] / 0.0065536),
-                    "Counts": (
-                        int(hit.counts)
-                        if hit.counts else None
-                    ),
-                    "TRAI": (
-                        int(hit.trai)
-                        if hit.trai else None
-                    ),
+                    "Counts": int(hit.counts) if hit.counts else None,
+                    "TRAI": int(hit.trai) if hit.trai else None,
                 },
             )
 
@@ -483,10 +481,7 @@ class PriDatabase(Database):
                 "ae_markers",
                 {
                     "SetID": int(set_id),
-                    "Number": (
-                        int(marker.number)
-                        if marker.number else None
-                    ),
+                    "Number": (int(marker.number) if marker.number else None),
                     "Data": marker.data,
                 },
             )
@@ -519,7 +514,8 @@ class PriDatabase(Database):
                     "ParamID": int(status.param_id),
                     "Thr": (
                         int(status.threshold * 1e6 / parameter["ADC_µV"])
-                        if status.threshold else None
+                        if status.threshold
+                        else None
                     ),
                     "Eny": int(status.energy / parameter["ADC_TE"]),
                     "SS": int(status.signal_strength / parameter["ADC_SS"]),
@@ -542,6 +538,7 @@ class PriDatabase(Database):
             Index (SetID) of inserted row
         """
         parameter = self._parameter(parametric.param_id)
+
         def try_convert(value: Optional[int], conv_id: str):
             """Try to scale with conversion parameter 'PAx_mV', otherwise scale = 1."""
             return int(value / parameter.get(conv_id, 1)) if value else None
@@ -555,14 +552,8 @@ class PriDatabase(Database):
                     "Time": int(parametric.time * self._timebase),
                     "Status": 0,
                     "ParamID": int(parametric.param_id),
-                    "PCTD": (
-                        int(parametric.pctd)
-                        if parametric.pctd else None
-                    ),
-                    "PCTA": (
-                        int(parametric.pcta)
-                        if parametric.pcta else None
-                    ),
+                    "PCTD": (int(parametric.pctd) if parametric.pctd else None),
+                    "PCTA": (int(parametric.pcta) if parametric.pcta else None),
                     "PA0": try_convert(parametric.pa0, "PA0_mV"),
                     "PA1": try_convert(parametric.pa1, "PA1_mV"),
                     "PA2": try_convert(parametric.pa2, "PA2_mV"),
