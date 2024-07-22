@@ -44,7 +44,7 @@ def check_monotonic_time(func):
 
 
 class PriDatabase(Database):
-    """IO Wrapper for pridb database file."""
+    """IO wrapper for pridb database file."""
 
     def __init__(self, filename: str, mode: str = "ro"):
         """

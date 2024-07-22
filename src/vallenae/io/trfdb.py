@@ -20,7 +20,7 @@ from .types import SizedIterable
 
 
 class TrfDatabase(Database):
-    """IO Wrapper for trfdb (transient feature) database file."""
+    """IO wrapper for trfdb (transient feature) database file."""
 
     def __init__(self, filename: str, mode: str = "ro"):
         """

@@ -52,8 +52,8 @@ dependencies = [
 docs = [
     "sphinx>=5",
     "sphinx-autodoc-typehints",
-    "sphinx-rtd-theme",
     "sphinx-gallery",
+    "furo",
     "pillow",  # required by sphinx-gallery
     "myst-parser",  # include markdown files
     "matplotlib",  # used in examples

@@ -7,7 +7,7 @@ Usually, arrival times are determined by the first threshold crossing (either fi
 Following popular methods have been proposed in the past to automatically pick time of arrivals:
 
 .. autosummary::
-    :toctree: generated
+    :toctree: timepicker
 
     hinkley
     aic
