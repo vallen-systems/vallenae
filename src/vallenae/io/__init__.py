@@ -2,12 +2,6 @@
 IO
 ==
 
-Read/write Vallen Systeme SQLite database files:
-
-- `**\*.pridb**`: Primary database
-- `**\*.tradb**`: Transient data
-- `**\*.trfdb**`: Transient features
-
 Database classes
 ----------------
 
