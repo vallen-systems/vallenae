@@ -426,7 +426,7 @@ class PriDatabase(Database):
                     "SetType": 2,
                     "Time": int(hit.time * self._timebase),
                     "Chan": int(hit.channel),
-                    "Status": 0,
+                    "Status": hit.status,
                     "ParamID": int(hit.param_id),
                     "Thr": (
                         int(hit.threshold * 1e6 / parameter["ADC_µV"])
