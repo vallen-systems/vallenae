@@ -14,27 +14,29 @@ The remaining modules are system-independent and try to comprise the most common
 - :mod:`vallenae.features`: Extraction of Acoustic Emission features
 - :mod:`vallenae.timepicker`: Timepicking algorithms for arrival time estimations
 
+Library modules
+---------------
 
-.. toctree::
-    :maxdepth: 2
+.. autosummary::
     :caption: Library documentation
-    :hidden:
+    :toctree: generated
 
-    io
-    features
-    timepicker
+    vallenae.io
+    vallenae.features
+    vallenae.timepicker
 
 .. toctree::
-    :maxdepth: 1
     :caption: Examples
+    :maxdepth: 1
     :hidden:
 
     _examples/index
 
 .. toctree::
     :caption: Development
+    :maxdepth: 1
     :hidden:
-    
+
     changelog
 
 Indices and tables

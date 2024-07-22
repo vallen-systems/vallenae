@@ -31,7 +31,7 @@ def _create_time_vector(
 
 
 class TraDatabase(Database):
-    """IO Wrapper for tradb database file."""
+    """IO wrapper for tradb database file."""
 
     def __init__(
         self, filename: str, mode: str = "ro", *, compression: bool = False,

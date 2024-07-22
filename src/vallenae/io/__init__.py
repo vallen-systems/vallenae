@@ -2,7 +2,10 @@
 IO
 ==
 
-Read/write Vallen Systeme database and setup files.
+Read/write Vallen Systeme SQLite database files:
+- `**\*.pridb**`: Primary database
+- `**\*.tradb**`: Transient data
+- `**\*.trfdb**`: Transient features
 
 Database classes
 ----------------
@@ -12,7 +15,8 @@ Classes to read/write pridb, tradb and trfdb database files.
 .. warning:: Writing is still experimental
 
 .. autosummary::
-    :toctree: generated
+    :toctree: io
+    :nosignatures:
 
     PriDatabase
     TraDatabase
@@ -64,7 +68,8 @@ Each record implements a class method ``from_sql`` to init from a SQLite
 row dictionary (column name: value).
 
 .. autosummary::
-    :toctree: generated
+    :toctree: io
+    :nosignatures:
 
     HitRecord
     MarkerRecord
@@ -85,7 +90,8 @@ either uncompressed or compressed (`FLAC <https://xiph.org/flac/>`_).
 Following functions convert between BLOBs and arrays of voltage values.
 
 .. autosummary::
-    :toctree: generated
+    :toctree: io
+    :nosignatures:
 
     decode_data_blob
     encode_data_blob

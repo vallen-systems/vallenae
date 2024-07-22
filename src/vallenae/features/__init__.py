@@ -6,7 +6,7 @@ Acoustic Emission
 -----------------
 
 .. autosummary::
-    :toctree: generated
+    :toctree: features
 
     peak_amplitude
     peak_amplitude_index
@@ -22,7 +22,7 @@ Conversion
 ----------
 
 .. autosummary::
-    :toctree: generated
+    :toctree: features
 
     amplitude_to_db
     db_to_amplitude
