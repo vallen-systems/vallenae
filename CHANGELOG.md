@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2024-07-22
+
+### Added
+
+- Status attribute for record types (#24)
+  - `HitRecord.status` of type `HitFlags`
+  - `StatusRecord.status` of type `StatusFlags`
+  - `ParametricRecord.status` of type `StatusFlags`
+  - `TraRecord.status` of type `HitFlags`
+- `SetType` enum (#26)
+
 ## [0.9.0] - 2024-02-14
 
 ### Added
@@ -182,7 +193,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial public release
 
-[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.9.0...HEAD
+[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.10.0...HEAD
+[0.10.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.9.0...0.10.0
 [0.9.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.8.0...0.9.0
 [0.8.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.7.0...0.8.0
 [0.7.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.6.0...0.7.0
