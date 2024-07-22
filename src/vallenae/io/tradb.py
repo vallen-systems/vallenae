@@ -385,7 +385,7 @@ class TraDatabase(Database):
                 {
                     "Time": int(tra.time * self._timebase),
                     "Chan": int(tra.channel),
-                    "Status": 32768,
+                    "Status": tra.status,
                     "ParamID": int(tra.param_id),
                     "Pretrigger": int(tra.pretrigger),
                     "Thr": int(tra.threshold * 1e6 / parameter["ADC_µV"]),
