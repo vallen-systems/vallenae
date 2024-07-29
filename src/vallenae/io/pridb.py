@@ -436,20 +436,24 @@ class PriDatabase(Database):
                     "Status": hit.status,
                     "ParamID": int(hit.param_id),
                     "Thr": (
-                        int(hit.threshold * 1e6 / parameter["ADC_µV"]) if hit.threshold else None
+                        int(hit.threshold * 1e6 / parameter["ADC_µV"])
+                        if hit.threshold is not None
+                        else None
                     ),
                     "Amp": int(hit.amplitude * 1e6 / parameter["ADC_µV"]),
-                    "RiseT": int(hit.rise_time * self._timebase) if hit.rise_time else None,
+                    "RiseT": (
+                        int(hit.rise_time * self._timebase) if hit.rise_time is not None else None
+                    ),
                     "Dur": int(hit.duration * self._timebase),
                     "Eny": int(hit.energy / parameter["ADC_TE"]),
                     "SS": (
                         int(hit.signal_strength / parameter["ADC_SS"])
-                        if hit.signal_strength and "ADC_SS" in parameter
+                        if hit.signal_strength is not None and "ADC_SS" in parameter
                         else None
                     ),
                     "RMS": int(hit.rms * 1e6 / parameter["ADC_µV"] / 0.0065536),
-                    "Counts": int(hit.counts) if hit.counts else None,
-                    "TRAI": int(hit.trai) if hit.trai else None,
+                    "Counts": int(hit.counts) if hit.counts is not None else None,
+                    "TRAI": int(hit.trai) if hit.trai is not None else None,
                 },
             )
 
@@ -481,7 +485,7 @@ class PriDatabase(Database):
                 "ae_markers",
                 {
                     "SetID": int(set_id),
-                    "Number": (int(marker.number) if marker.number else None),
+                    "Number": (int(marker.number) if marker.number is not None else None),
                     "Data": marker.data,
                 },
             )
@@ -514,13 +518,13 @@ class PriDatabase(Database):
                     "ParamID": int(status.param_id),
                     "Thr": (
                         int(status.threshold * 1e6 / parameter["ADC_µV"])
-                        if status.threshold
+                        if status.threshold is not None
                         else None
                     ),
                     "Eny": int(status.energy / parameter["ADC_TE"]),
                     "SS": (
                         int(status.signal_strength / parameter["ADC_SS"])
-                        if status.signal_strength and "ADC_SS" in parameter
+                        if status.signal_strength is not None and "ADC_SS" in parameter
                         else None
                     ),
                     "RMS": int(status.rms * 1e6 / parameter["ADC_µV"] / 0.0065536),
@@ -545,7 +549,7 @@ class PriDatabase(Database):
 
         def try_convert(value: Optional[int], conv_id: str):
             """Try to scale with conversion parameter 'PAx_mV', otherwise scale = 1."""
-            return int(value / parameter.get(conv_id, 1)) if value else None
+            return int(value / parameter.get(conv_id, 1)) if value is not None else None
 
         with self.connection() as con:  # commit/rollback transaction
             return insert_from_dict(
@@ -556,8 +560,8 @@ class PriDatabase(Database):
                     "Time": int(parametric.time * self._timebase),
                     "Status": 0,
                     "ParamID": int(parametric.param_id),
-                    "PCTD": (int(parametric.pctd) if parametric.pctd else None),
-                    "PCTA": (int(parametric.pcta) if parametric.pcta else None),
+                    "PCTD": (int(parametric.pctd) if parametric.pctd is not None else None),
+                    "PCTA": (int(parametric.pcta) if parametric.pcta is not None else None),
                     "PA0": try_convert(parametric.pa0, "PA0_mV"),
                     "PA1": try_convert(parametric.pa1, "PA1_mV"),
                     "PA2": try_convert(parametric.pa2, "PA2_mV"),

@@ -411,6 +411,6 @@ class TraDatabase(Database):
                     "Samples": int(tra.samples),
                     "DataFormat": int(self._data_format),
                     "Data": encode_data_blob(tra.data, self._data_format, parameter["TR_mV"]),
-                    "TRAI": int(tra.trai) if tra.trai else None,
+                    "TRAI": int(tra.trai) if tra.trai is not None else None,
                 },
             )
