@@ -518,7 +518,11 @@ class PriDatabase(Database):
                         else None
                     ),
                     "Eny": int(status.energy / parameter["ADC_TE"]),
-                    "SS": int(status.signal_strength / parameter["ADC_SS"]),
+                    "SS": (
+                        int(status.signal_strength / parameter["ADC_SS"])
+                        if status.signal_strength and "ADC_SS" in parameter
+                        else None
+                    ),
                     "RMS": int(status.rms * 1e6 / parameter["ADC_µV"] / 0.0065536),
                 },
             )
