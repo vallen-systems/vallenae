@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.1] - 2024-07-29
+
+### Fixed
+
+- Handle optional `StatusRecord.signal_strength` in `PriDatabase.write_status`
+
 ## [0.10.0] - 2024-07-22
 
 ### Added
@@ -193,7 +199,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial public release
 
-[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.10.0...HEAD
+[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.10.1...HEAD
+[0.10.1]: https://github.com/vallen-systems/pyVallenAE/compare/0.10.0...0.10.1
 [0.10.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.9.0...0.10.0
 [0.9.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.8.0...0.9.0
 [0.8.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.7.0...0.8.0
