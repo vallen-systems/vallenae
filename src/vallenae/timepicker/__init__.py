@@ -15,15 +15,16 @@ Following popular methods have been proposed in the past to automatically pick t
     modified_energy_ratio
 """
 
+from __future__ import annotations
+
 import math
-from typing import Tuple
 
 import numpy as np
 
 from .._numba import USE_NUMBA, njit
 
 
-def _hinkley_numpy(arr: np.ndarray, alpha: int = 5) -> Tuple[np.ndarray, int]:
+def _hinkley_numpy(arr: np.ndarray, alpha: int = 5) -> tuple[np.ndarray, int]:
     n = len(arr)
     energy_cum = np.cumsum(arr**2, dtype=np.float64)
     negative_trend = energy_cum[-1] / (alpha * n)
@@ -32,7 +33,7 @@ def _hinkley_numpy(arr: np.ndarray, alpha: int = 5) -> Tuple[np.ndarray, int]:
 
 
 @njit
-def _hinkley_numba(arr: np.ndarray, alpha: int = 5) -> Tuple[np.ndarray, int]:
+def _hinkley_numba(arr: np.ndarray, alpha: int = 5) -> tuple[np.ndarray, int]:
     n = len(arr)
     result = np.zeros(n, dtype=np.float32)
 
@@ -56,7 +57,7 @@ def _hinkley_numba(arr: np.ndarray, alpha: int = 5) -> Tuple[np.ndarray, int]:
     return result, min_index
 
 
-def hinkley(arr: np.ndarray, alpha: int = 5) -> Tuple[np.ndarray, int]:
+def hinkley(arr: np.ndarray, alpha: int = 5) -> tuple[np.ndarray, int]:
     """
     Hinkley criterion for arrival time estimation.
 
@@ -89,7 +90,7 @@ def hinkley(arr: np.ndarray, alpha: int = 5) -> Tuple[np.ndarray, int]:
 
 
 @njit
-def _aic_numba(arr: np.ndarray) -> Tuple[np.ndarray, int]:
+def _aic_numba(arr: np.ndarray) -> tuple[np.ndarray, int]:
     n = len(arr)
     result = np.full(n, np.nan, dtype=np.float32)
     safety_eps = np.finfo(np.float32).tiny
@@ -134,7 +135,7 @@ def _aic_numba(arr: np.ndarray) -> Tuple[np.ndarray, int]:
     return result, min_index
 
 
-def _aic_numpy(arr: np.ndarray) -> Tuple[np.ndarray, int]:
+def _aic_numpy(arr: np.ndarray) -> tuple[np.ndarray, int]:
     n = len(arr)
     safety_eps = np.finfo(np.float32).tiny
 
@@ -160,7 +161,7 @@ def _aic_numpy(arr: np.ndarray) -> Tuple[np.ndarray, int]:
 
 
 @njit
-def aic(arr: np.ndarray) -> Tuple[np.ndarray, int]:
+def aic(arr: np.ndarray) -> tuple[np.ndarray, int]:
     """
     Akaike Information Criterion (AIC) for arrival time estimation.
 
@@ -195,7 +196,7 @@ def aic(arr: np.ndarray) -> Tuple[np.ndarray, int]:
 
 
 @njit
-def _energy_ratio_numba(arr: np.ndarray, win_len: int = 100) -> Tuple[np.ndarray, int]:
+def _energy_ratio_numba(arr: np.ndarray, win_len: int = 100) -> tuple[np.ndarray, int]:
     n = len(arr)
     result = np.zeros(n, dtype=np.float32)
 
@@ -224,7 +225,7 @@ def _energy_ratio_numba(arr: np.ndarray, win_len: int = 100) -> Tuple[np.ndarray
     return result, max_index
 
 
-def _energy_ratio_numpy(arr: np.ndarray, win_len: int = 100) -> Tuple[np.ndarray, int]:
+def _energy_ratio_numpy(arr: np.ndarray, win_len: int = 100) -> tuple[np.ndarray, int]:
     squaresum_cum = np.cumsum(arr**2, dtype=np.float64)
 
     l_squaresum = squaresum_cum[win_len:-win_len] - squaresum_cum[0 : -2 * win_len]
@@ -235,7 +236,7 @@ def _energy_ratio_numpy(arr: np.ndarray, win_len: int = 100) -> Tuple[np.ndarray
     return result, np.argmax(result)
 
 
-def energy_ratio(arr: np.ndarray, win_len: int = 100) -> Tuple[np.ndarray, int]:
+def energy_ratio(arr: np.ndarray, win_len: int = 100) -> tuple[np.ndarray, int]:
     """
     Energy ratio for arrival time estimation.
 
@@ -259,7 +260,7 @@ def energy_ratio(arr: np.ndarray, win_len: int = 100) -> Tuple[np.ndarray, int]:
     return _energy_ratio_numpy(arr, win_len)
 
 
-def modified_energy_ratio(arr: np.ndarray, win_len: int = 100) -> Tuple[np.ndarray, int]:
+def modified_energy_ratio(arr: np.ndarray, win_len: int = 100) -> tuple[np.ndarray, int]:
     """
     Modified energy ratio method for arrival time estimation.
 

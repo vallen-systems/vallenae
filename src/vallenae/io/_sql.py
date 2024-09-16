@@ -1,17 +1,19 @@
+from __future__ import annotations
+
 import collections.abc
 import contextlib
 import logging
 import sqlite3
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterator, Optional, Sequence, Tuple, TypeVar, Union
+from typing import Any, Callable, Iterator, Sequence, TypeVar
 
 from .types import SizedIterable
 
 logger = logging.getLogger(__name__)
 
 
-def create_uri(filename: Union[str, Path], *, mode: str = "ro") -> str:
+def create_uri(filename: str | Path, *, mode: str = "ro") -> str:
     """Create SQLite URI (https://www.sqlite.org/uri.html)."""
 
     filepath = Path(filename)
@@ -129,13 +131,13 @@ class QueryIterable(SizedIterable[T]):
         self,
         connection_wrapper: ConnectionWrapper,
         query: str,
-        dict_to_type: Callable[[Dict[str, Any]], T],
+        dict_to_type: Callable[[dict[str, Any]], T],
     ):
         super().__init__()
         self._connection_wrapper = connection_wrapper
         self._query = query
         self._dict_to_type = dict_to_type
-        self._count_result: Optional[int] = None  # cache result of __len__
+        self._count_result: int | None = None  # cache result of __len__
 
     def __len__(self) -> int:
         if self._count_result is None:
@@ -152,19 +154,15 @@ class QueryIterable(SizedIterable[T]):
             yield self._dict_to_type(row)
 
 
-TIsIn = Dict[str, Union[float, Sequence[float], None]]
-TComparison = Dict[str, Optional[float]]
-
-
 def query_conditions(
     *,
-    isin: Optional[TIsIn] = None,
-    equal: Optional[TComparison] = None,
-    less: Optional[TComparison] = None,
-    less_equal: Optional[TComparison] = None,
-    greater: Optional[TComparison] = None,
-    greater_equal: Optional[TComparison] = None,
-    custom_filter: Optional[str] = None,
+    isin: dict[str, float | Sequence[float] | None] | None = None,
+    equal: dict[str, float | None] | None = None,
+    less: dict[str, float | None] | None = None,
+    less_equal: dict[str, float | None] | None = None,
+    greater: dict[str, float | None] | None = None,
+    greater_equal: dict[str, float | None] | None = None,
+    custom_filter: str | None = None,
 ) -> str:
     cond = []
 
@@ -206,7 +204,7 @@ def read_sql_generator(
     connection: sqlite3.Connection,
     query: str,
     *parameter,
-) -> Iterator[Dict[str, Any]]:
+) -> Iterator[dict[str, Any]]:
     """
     Generator to query data from a SQLite connection as a dictionary.
 
@@ -241,7 +239,7 @@ def sql_binary_search(
     fun_compare: Callable[[float], bool],
     *,
     lower_bound: bool = True,
-) -> Optional[int]:
+) -> int | None:
     """
     Helper function to find the boundary index for given condition on a sorted column.
 
@@ -324,13 +322,13 @@ def create_new_database(filename: str, schema: str):
         con.executescript(schema)
 
 
-def remove_none_values_from_dict(dictionary: Dict[Any, Any]):
+def remove_none_values_from_dict(dictionary: dict[Any, Any]):
     """Helper function to remove None values from dict."""
     return {k: v for k, v in dictionary.items() if v is not None}
 
 
 @lru_cache(maxsize=128, typed=True)
-def generate_insert_query(table: str, columns: Tuple[str, ...]) -> str:
+def generate_insert_query(table: str, columns: tuple[str, ...]) -> str:
     """
     Generate INSERT query with named placeholders.
 
@@ -352,7 +350,7 @@ def generate_insert_query(table: str, columns: Tuple[str, ...]) -> str:
 def insert_from_dict(
     connection: sqlite3.Connection,
     table: str,
-    row_dict: Dict[str, Any],
+    row_dict: dict[str, Any],
 ) -> int:
     """INSERT row for given dict of column names -> values in SQLite table."""
     row_dict = remove_none_values_from_dict(row_dict)
@@ -363,7 +361,7 @@ def insert_from_dict(
 
 
 @lru_cache(maxsize=128, typed=True)
-def generate_update_query(table: str, columns: Tuple[str, ...], key_column: str) -> str:
+def generate_update_query(table: str, columns: tuple[str, ...], key_column: str) -> str:
     """
     Generate UPDATE query with named placeholders.
 
@@ -392,7 +390,7 @@ def generate_update_query(table: str, columns: Tuple[str, ...], key_column: str)
 def update_from_dict(
     connection: sqlite3.Connection,
     table: str,
-    row_dict: Dict[str, Any],
+    row_dict: dict[str, Any],
     key_column: str,
 ) -> int:
     """UPDATE row for given key and dict of column names -> values in SQLite table."""

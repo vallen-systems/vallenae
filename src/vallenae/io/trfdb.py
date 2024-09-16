@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import sqlite3
 from pathlib import Path
 from time import sleep
-from typing import Iterable, Optional, Sequence, Union
+from typing import Iterable, Sequence
 
 import pandas as pd
 
@@ -75,8 +77,8 @@ class TrfDatabase(Database):
     def iread(
         self,
         *,
-        trai: Union[None, int, Sequence[int]] = None,
-        query_filter: Optional[str] = None,
+        trai: int | Sequence[int] | None = None,
+        query_filter: str | None = None,
     ) -> SizedIterable[FeatureRecord]:
         """
         Stream features with returned iterable.
@@ -105,7 +107,7 @@ class TrfDatabase(Database):
         self,
         existing: bool = False,
         wait: bool = False,
-        query_filter: Optional[str] = None,
+        query_filter: str | None = None,
     ) -> Iterable[FeatureRecord]:
         """
         Listen to database changes and return new records.

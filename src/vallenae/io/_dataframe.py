@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from __future__ import annotations
 
 import pandas as pd
 from tqdm import tqdm
@@ -23,10 +23,10 @@ def _convert_to_nullable_types(df: pd.DataFrame):
 
 
 def iter_to_dataframe(
-    iterable: SizedIterable[Tuple],
+    iterable: SizedIterable[tuple],
     show_progress: bool = True,
     desc: str = "",
-    index_column: Optional[str] = None,
+    index_column: str | None = None,
 ) -> pd.DataFrame:
     """
     Helper function to save iterator results in Pandas DataFrame.

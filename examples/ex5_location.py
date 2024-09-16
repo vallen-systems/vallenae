@@ -3,10 +3,11 @@ Localisation
 ============
 """
 
+from __future__ import annotations
+
 import math
 import time
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 from xml.etree import ElementTree
 
 import matplotlib.pyplot as plt
@@ -59,7 +60,7 @@ def lucy_error_fun(
     return norm(theo_delta_dists - measured_delta_dists) / math.sqrt(n - 1)
 
 
-def get_channel_positions(setup_file: str) -> Dict[int, Tuple[float, float]]:
+def get_channel_positions(setup_file: str) -> dict[int, tuple[float, float]]:
     tree = ElementTree.parse(setup_file)
     nodes = tree.getroot().findall(".//ChannelPos")
     if nodes is None:
@@ -71,7 +72,7 @@ def get_channel_positions(setup_file: str) -> Dict[int, Tuple[float, float]]:
     }
 
 
-def get_velocity(setup_file: str) -> Optional[float]:
+def get_velocity(setup_file: str) -> float | None:
     tree = ElementTree.parse(setup_file)
     node = tree.getroot().find(".//Location")
     if node is not None:

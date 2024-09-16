@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from functools import lru_cache, partial
 from itertools import chain
 from pathlib import Path
 from time import sleep
-from typing import Iterable, Optional, Sequence, Set, Tuple, Union
+from typing import Iterable, Sequence
 
 import numpy as np
 import pandas as pd
@@ -70,7 +72,7 @@ class TraDatabase(Database):
         schema = schema_path.read_text("utf-8").format(timebase=int(1e7))  # fill placeholder
         create_new_database(filename, schema)
 
-    def channel(self) -> Set[int]:
+    def channel(self) -> set[int]:
         """Get list of channels."""
         con = self.connection()
         cur = con.execute("SELECT DISTINCT Chan FROM tr_data WHERE Chan IS NOT NULL")
@@ -92,7 +94,7 @@ class TraDatabase(Database):
             index_column="trai",
         )
 
-    def _get_total_time_range(self) -> Tuple[float, float]:
+    def _get_total_time_range(self) -> tuple[float, float]:
         """Return total time range [min, max] of tradb."""
 
         def get_time(func: str):
@@ -108,8 +110,8 @@ class TraDatabase(Database):
         return get_time("MIN"), get_time("MAX")
 
     def _get_trai_range_from_time_range(
-        self, time_start: Optional[float], time_stop: Optional[float]
-    ) -> Tuple[Optional[int], Optional[int]]:
+        self, time_start: float | None, time_stop: float | None
+    ) -> tuple[int | None, int | None]:
         """Use binary search to find indexes (TRAI) of a given time range."""
         con = self.connection()
         trai_start = None
@@ -137,11 +139,11 @@ class TraDatabase(Database):
     def iread(
         self,
         *,
-        channel: Union[None, int, Sequence[int]] = None,
-        time_start: Optional[float] = None,
-        time_stop: Optional[float] = None,
-        trai: Union[None, int, Sequence[int]] = None,
-        query_filter: Optional[str] = None,
+        channel: int | Sequence[int] | None = None,
+        time_start: float | None = None,
+        time_stop: float | None = None,
+        trai: int | Sequence[int] | None = None,
+        query_filter: str | None = None,
         raw: bool = False,
     ) -> SizedIterable[TraRecord]:
         """
@@ -197,7 +199,7 @@ class TraDatabase(Database):
         time_axis: bool = True,
         *,
         raw: bool = False,
-    ) -> Union[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, int]]:
+    ) -> tuple[np.ndarray, np.ndarray] | tuple[np.ndarray, int]:
         """
         Read transient signal for a given TRAI (transient recorder index).
 
@@ -231,7 +233,7 @@ class TraDatabase(Database):
             )
         return tra.data, tra.samplerate
 
-    def _get_previous_trai(self, channel: int, trai: int) -> Optional[int]:
+    def _get_previous_trai(self, channel: int, trai: int) -> int | None:
         """Find previous tra record index for given channel and TRAI."""
         result = (
             self.connection()
@@ -246,13 +248,13 @@ class TraDatabase(Database):
     def read_continuous_wave(  # pylint: disable=too-many-locals
         self,
         channel: int,
-        time_start: Optional[float] = None,
-        time_stop: Optional[float] = None,
+        time_start: float | None = None,
+        time_stop: float | None = None,
         *,
         time_axis: bool = True,
         show_progress: bool = True,
         raw: bool = False,
-    ) -> Union[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, int]]:
+    ) -> tuple[np.ndarray, np.ndarray] | tuple[np.ndarray, int]:
         """
         Read transient signal of specified channel to a single, continuous array.
 
@@ -345,7 +347,7 @@ class TraDatabase(Database):
         self,
         existing: bool = False,
         wait: bool = False,
-        query_filter: Optional[str] = None,
+        query_filter: str | None = None,
         raw: bool = False,
     ) -> Iterable[TraRecord]:
         """

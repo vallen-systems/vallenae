@@ -1,21 +1,23 @@
 # ruff: noqa: E501
 
+from __future__ import annotations
+
 from enum import IntEnum, IntFlag
-from typing import Any, Dict, NamedTuple, Optional
+from typing import Any, NamedTuple
 
 import numpy as np
 
 from .compression import decode_data_blob
 
 
-def _to_volts(value: Optional[float]):
+def _to_volts(value: float | None):
     """Convert µV to V if not None."""
     if value is None:
         return None
     return float(value) / 1e6
 
 
-def _to_seconds(value: Optional[float]):
+def _to_seconds(value: float | None):
     """Convert µs to s if not None."""
     if value is None:
         return None
@@ -78,21 +80,21 @@ class HitRecord(NamedTuple):
     energy: float  #: Energy (EN 1330-9) in eu (1e-14 V²s)
     rms: float  #: RMS of the noise before the hit in volts
     # optional for creating:
-    set_id: Optional[int] = None  #: Unique identifier for data set in pridb
+    set_id: int | None = None  #: Unique identifier for data set in pridb
     status: HitFlags = HitFlags(0)  #: Status flags
-    threshold: Optional[float] = None  #: Threshold amplitude in volts
-    rise_time: Optional[float] = None  #: Rise time in seconds
-    signal_strength: Optional[float] = None  #: Signal strength in nVs (1e-9 Vs)
-    counts: Optional[int] = None  #: Number of positive threshold crossings
-    trai: Optional[int] = None  #: Transient recorder index (foreign key between pridb and tradb)
-    cascade_hits: Optional[int] = None  #: Total number of hits in the same hit-cascade
-    cascade_counts: Optional[int] = None  #: Summed counts of hits in the same hit-cascade
-    cascade_energy: Optional[int] = None  #: Summed energy of hits in the same hit-cascade
-    cascade_signal_strength: Optional[int] = None  #: Summed signal strength of hits in the same hit-cascade
+    threshold: float | None = None  #: Threshold amplitude in volts
+    rise_time: float | None = None  #: Rise time in seconds
+    signal_strength: float | None = None  #: Signal strength in nVs (1e-9 Vs)
+    counts: int | None = None  #: Number of positive threshold crossings
+    trai: int | None = None  #: Transient recorder index (foreign key between pridb and tradb)
+    cascade_hits: int | None = None  #: Total number of hits in the same hit-cascade
+    cascade_counts: int | None = None  #: Summed counts of hits in the same hit-cascade
+    cascade_energy: int | None = None  #: Summed energy of hits in the same hit-cascade
+    cascade_signal_strength: int | None = None  #: Summed signal strength of hits in the same hit-cascade
     # fmt: on
 
     @classmethod
-    def from_sql(cls, row: Dict[str, Any]) -> "HitRecord":
+    def from_sql(cls, row: dict[str, Any]) -> "HitRecord":
         """
         Create `HitRecord` from SQL row.
 
@@ -130,11 +132,11 @@ class MarkerRecord(NamedTuple):
     set_type: SetType  #: Marker type (see above)
     data: str  #: Content of marker (label text or datetime)
     # optional for creating:
-    number: Optional[int] = None  #: Marker number
-    set_id: Optional[int] = None  #: Unique identifier for data set in pridb
+    number: int | None = None  #: Marker number
+    set_id: int | None = None  #: Unique identifier for data set in pridb
 
     @classmethod
-    def from_sql(cls, row: Dict[str, Any]) -> "MarkerRecord":
+    def from_sql(cls, row: dict[str, Any]) -> "MarkerRecord":
         """
         Create `MarkerRecord` from SQL row.
 
@@ -161,13 +163,13 @@ class StatusRecord(NamedTuple):
     energy: float  #: Energy (EN 1330-9) in eu (1e-14 V²s)
     rms: float  #: RMS in volts
     # optional for creating:
-    set_id: Optional[int] = None  #: Unique identifier for data set in pridb
+    set_id: int | None = None  #: Unique identifier for data set in pridb
     status: StatusFlags = StatusFlags(0)  #: Status flags
-    threshold: Optional[float] = None  #: Threshold amplitude in volts
-    signal_strength: Optional[float] = None  #: Signal strength in nVs (1e-9 Vs)
+    threshold: float | None = None  #: Threshold amplitude in volts
+    signal_strength: float | None = None  #: Signal strength in nVs (1e-9 Vs)
 
     @classmethod
-    def from_sql(cls, row: Dict[str, Any]) -> "StatusRecord":
+    def from_sql(cls, row: dict[str, Any]) -> "StatusRecord":
         """
         Create `StatusRecord` from SQL row.
 
@@ -195,21 +197,21 @@ class ParametricRecord(NamedTuple):
     time: float  #: Time in seconds
     param_id: int  #: Parameter ID of table ae_params for ADC value conversion
     # optional for creating:
-    set_id: Optional[int] = None  #: Unique identifier for data set in pridb
+    set_id: int | None = None  #: Unique identifier for data set in pridb
     status: StatusFlags = StatusFlags(0)  #: Status flags
-    pctd: Optional[int] = None  #: Digital counter value
-    pcta: Optional[int] = None  #: Analog hysteresis counter
-    pa0: Optional[int] = None  #: Amplitude of parametric input 0 in volts
-    pa1: Optional[int] = None  #: Amplitude of parametric input 1 in volts
-    pa2: Optional[int] = None  #: Amplitude of parametric input 2 in volts
-    pa3: Optional[int] = None  #: Amplitude of parametric input 3 in volts
-    pa4: Optional[int] = None  #: Amplitude of parametric input 4 in volts
-    pa5: Optional[int] = None  #: Amplitude of parametric input 5 in volts
-    pa6: Optional[int] = None  #: Amplitude of parametric input 6 in volts
-    pa7: Optional[int] = None  #: Amplitude of parametric input 7 in volts
+    pctd: int | None = None  #: Digital counter value
+    pcta: int | None = None  #: Analog hysteresis counter
+    pa0: int | None = None  #: Amplitude of parametric input 0 in volts
+    pa1: int | None = None  #: Amplitude of parametric input 1 in volts
+    pa2: int | None = None  #: Amplitude of parametric input 2 in volts
+    pa3: int | None = None  #: Amplitude of parametric input 3 in volts
+    pa4: int | None = None  #: Amplitude of parametric input 4 in volts
+    pa5: int | None = None  #: Amplitude of parametric input 5 in volts
+    pa6: int | None = None  #: Amplitude of parametric input 6 in volts
+    pa7: int | None = None  #: Amplitude of parametric input 7 in volts
 
     @classmethod
-    def from_sql(cls, row: Dict[str, Any]) -> "ParametricRecord":
+    def from_sql(cls, row: dict[str, Any]) -> "ParametricRecord":
         """
         Create `ParametricRecord` from SQL row.
 
@@ -247,13 +249,13 @@ class TraRecord(NamedTuple):
     data: np.ndarray  #: Transient signal in volts or ADC values if `raw` = `True`
     # optional for writing
     status: HitFlags = HitFlags(0)  #: Status flags
-    trai: Optional[int] = None  #: Transient recorder index (foreign key between pridb and tradb)
-    rms: Optional[float] = None  #: RMS of the noise before the hit
+    trai: int | None = None  #: Transient recorder index (foreign key between pridb and tradb)
+    rms: float | None = None  #: RMS of the noise before the hit
     # optional
     raw: bool = False  #: `data` is stored as ADC values (int16)
 
     @classmethod
-    def from_sql(cls, row: Dict[str, Any], *, raw: bool = False) -> "TraRecord":
+    def from_sql(cls, row: dict[str, Any], *, raw: bool = False) -> "TraRecord":
         """
         Create `TraRecord` from SQL row.
 
@@ -282,10 +284,10 @@ class FeatureRecord(NamedTuple):
     """
 
     trai: int  #: Transient recorder index
-    features: Dict[str, float]  #: Feature dictionary (feature name -> value)
+    features: dict[str, float]  #: Feature dictionary (feature name -> value)
 
     @classmethod
-    def from_sql(cls, row: Dict[str, Any]) -> "FeatureRecord":
+    def from_sql(cls, row: dict[str, Any]) -> "FeatureRecord":
         """
         Create `FeatureRecord` from SQL row.
 
