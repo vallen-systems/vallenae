@@ -154,18 +154,14 @@ class QueryIterable(SizedIterable[T]):
             yield self._dict_to_type(row)
 
 
-TIsIn = dict[str, float | Sequence[float] | None]
-TComparison = dict[str, float | None]
-
-
 def query_conditions(
     *,
-    isin: TIsIn | None = None,
-    equal: TComparison | None = None,
-    less: TComparison | None = None,
-    less_equal: TComparison | None = None,
-    greater: TComparison | None = None,
-    greater_equal: TComparison | None = None,
+    isin: dict[str, float | Sequence[float] | None] | None = None,
+    equal: dict[str, float | None] | None = None,
+    less: dict[str, float | None] | None = None,
+    less_equal: dict[str, float | None] | None = None,
+    greater: dict[str, float | None] | None = None,
+    greater_equal: dict[str, float | None] | None = None,
     custom_filter: str | None = None,
 ) -> str:
     cond = []

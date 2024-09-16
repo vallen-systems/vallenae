@@ -19,8 +19,6 @@ from ._sql import (
 from .datatypes import HitRecord, MarkerRecord, ParametricRecord, SetType, StatusRecord
 from .types import SizedIterable
 
-RecordType = HitRecord | MarkerRecord | ParametricRecord | StatusRecord
-
 
 def check_monotonic_time(func):
     def get_max_time(database: "PriDatabase"):
@@ -32,7 +30,12 @@ def check_monotonic_time(func):
             return 0
 
     @wraps(func)
-    def wrapper(self: "PriDatabase", record: RecordType, *args, **kwargs):
+    def wrapper(
+        self: "PriDatabase",
+        record: HitRecord | MarkerRecord | ParametricRecord | StatusRecord,
+        *args,
+        **kwargs,
+    ):
         max_time = get_max_time(self)
         if record.time + 1e-9 < max_time:  # threshold of 1 ns to ignore rounding errors
             raise ValueError(
