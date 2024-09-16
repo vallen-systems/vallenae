@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import sqlite3
 from abc import ABCMeta, abstractmethod
 from ast import literal_eval
 from functools import wraps
 from pathlib import Path
-from typing import Any, Dict, Optional, Sequence, Set, Tuple, Union
+from typing import Any, Sequence
 
 from ._sql import ConnectionWrapper, insert_from_dict, read_sql_generator, update_from_dict
 
@@ -31,7 +33,7 @@ class Database:
         mode: str = "ro",
         *,
         table_prefix: str,
-        required_file_ext: Optional[str] = None,
+        required_file_ext: str | None = None,
     ):
         # check file extension
         if required_file_ext is not None:
@@ -59,7 +61,7 @@ class Database:
                 raise ValueError(f"Required table {table} not found in database")
 
         # cached results
-        self._parameter_table_cached: Dict[int, Dict[str, Any]] = {}
+        self._parameter_table_cached: dict[int, dict[str, Any]] = {}
 
     @staticmethod
     @abstractmethod
@@ -96,13 +98,13 @@ class Database:
         cur = con.execute(f"SELECT COUNT(*) FROM {self._table_main}")
         return cur.fetchone()[0]
 
-    def _columns(self, table: str) -> Tuple[str, ...]:
+    def _columns(self, table: str) -> tuple[str, ...]:
         """Columns of specified table."""
         con = self.connection()
         cur = con.execute(f"SELECT * FROM {table} LIMIT 0")  # empty dummy query
         return tuple(str(column[0]) for column in cur.description)
 
-    def columns(self) -> Tuple[str, ...]:
+    def columns(self) -> tuple[str, ...]:
         """Columns of data table."""
         return self._columns(self._table_main)
 
@@ -110,8 +112,8 @@ class Database:
     def _add_columns(
         self,
         table: str,
-        columns: Union[str, Sequence[str]],
-        dtype: Optional[str] = None,
+        columns: str | Sequence[str],
+        dtype: str | None = None,
     ):
         """Add columns to specified table."""
         if dtype is None:
@@ -122,13 +124,13 @@ class Database:
                 if column not in columns_exist:
                     con.execute(f"ALTER TABLE {table} ADD COLUMN {column} {dtype}")
 
-    def tables(self) -> Set[str]:
+    def tables(self) -> set[str]:
         """Get table names."""
         con = self.connection()
         cur = con.execute("SELECT name FROM sqlite_master WHERE type == 'table'")
         return {result[0] for result in cur.fetchall()}
 
-    def fieldinfo(self) -> Dict[str, Dict[str, Any]]:
+    def fieldinfo(self) -> dict[str, dict[str, Any]]:
         """
         Read fieldinfo table.
 
@@ -142,7 +144,7 @@ class Database:
         return {row.pop("field"): row for row in read_sql_generator(con, query)}
 
     @require_write_access
-    def write_fieldinfo(self, field: str, info: Dict[str, Any]):
+    def write_fieldinfo(self, field: str, info: dict[str, Any]):
         """
         Write to fieldinfo table.
 
@@ -168,7 +170,7 @@ class Database:
                 self._add_columns(self._table_fieldinfo, list(row_dict.keys()))
                 self.write_fieldinfo(field, info)  # try again
 
-    def globalinfo(self) -> Dict[str, Any]:
+    def globalinfo(self) -> dict[str, Any]:
         """Read globalinfo table."""
 
         def try_convert_string(value: str) -> Any:
@@ -212,7 +214,7 @@ class Database:
         )
         return int(result[0]) if result else 0
 
-    def _main_index_range(self) -> Tuple[int, int]:
+    def _main_index_range(self) -> tuple[int, int]:
         """Get range of main data table index (SetID for pridb/tradb or TRAI for trfdb)."""
         return (
             self.connection()
@@ -220,7 +222,7 @@ class Database:
             .fetchone()
         )
 
-    def _parameter_table(self) -> Dict[int, Dict[str, Any]]:
+    def _parameter_table(self) -> dict[int, dict[str, Any]]:
         """Read *_params table to dict."""
 
         def parameter_by_id():
@@ -235,7 +237,7 @@ class Database:
             self._parameter_table_cached = dict(parameter_by_id())
         return self._parameter_table_cached
 
-    def _parameter(self, param_id: int) -> Dict[str, Any]:
+    def _parameter(self, param_id: int) -> dict[str, Any]:
         """Read parameters from *_params by ID."""
         try:
             return self._parameter_table()[param_id]

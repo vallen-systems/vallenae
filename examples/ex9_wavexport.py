@@ -9,9 +9,10 @@ The signal can optionally be decimated to reduce the size of the generated WAV f
 (using the `scipy.signal.decimate` function).
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Optional
 
 import numpy as np
 from scipy import signal
@@ -26,8 +27,8 @@ def export_wav(
     filename_wav: Path,
     tradb: vae.io.TraDatabase,
     channel: int,
-    time_start: Optional[float] = None,
-    time_stop: Optional[float] = None,
+    time_start: float | None = None,
+    time_stop: float | None = None,
     decimation_factor: int = 1,
 ):
     """

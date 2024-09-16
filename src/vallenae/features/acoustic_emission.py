@@ -1,4 +1,4 @@
-from typing import Optional
+from __future__ import annotations
 
 import numpy as np
 
@@ -47,7 +47,7 @@ def is_above_threshold(data: np.ndarray, threshold: float) -> bool:
     return np.any(_mask_above_threshold(data, threshold))
 
 
-def first_threshold_crossing(data: np.ndarray, threshold: float) -> Optional[int]:
+def first_threshold_crossing(data: np.ndarray, threshold: float) -> int | None:
     """
     Compute index of first threshold crossing.
 
@@ -67,8 +67,8 @@ def rise_time(
     data: np.ndarray,
     threshold: float,
     samplerate: int,
-    first_crossing: Optional[int] = None,
-    index_peak: Optional[int] = None,
+    first_crossing: int | None = None,
+    index_peak: int | None = None,
 ) -> float:
     """
     Compute the rise time.

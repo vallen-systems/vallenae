@@ -11,7 +11,6 @@ memory at once.
 
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Optional
 
 from soundfile import SoundFile
 
@@ -24,8 +23,8 @@ def export_wav_incremental(
     filename_wav: Path,
     tradb: vae.io.TraDatabase,
     channel: int,
-    time_start: Optional[float] = None,
-    time_stop: Optional[float] = None,
+    time_start: float | None = None,
+    time_stop: float | None = None,
     time_block: int = 1,
 ):
     """

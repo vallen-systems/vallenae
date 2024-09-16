@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import math
 import random
-from typing import Optional, Tuple
 
 import numpy as np
 import pytest
@@ -20,7 +21,7 @@ from vallenae.features import (
 )
 
 LEN: int = 100
-SAMPLERATES: Tuple[int] = (1, 10, int(1e6))
+SAMPLERATES: tuple[int] = (1, 10, int(1e6))
 
 
 @pytest.fixture(name="random_array", scope="module")
@@ -71,7 +72,7 @@ def test_is_above_threshold():
 
 
 def test_first_threshold_crossing():
-    def naive(data: np.ndarray, threshold: float) -> Optional[int]:
+    def naive(data: np.ndarray, threshold: float) -> int | None:
         above_threshold = np.abs(data) >= threshold
         index = np.argmax(
             above_threshold

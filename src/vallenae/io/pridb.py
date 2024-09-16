@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from functools import wraps
 from pathlib import Path
 from time import sleep
-from typing import Iterable, Optional, Sequence, Set, Union
+from typing import Iterable, Sequence
 
 import pandas as pd
 
@@ -17,7 +19,7 @@ from ._sql import (
 from .datatypes import HitRecord, MarkerRecord, ParametricRecord, SetType, StatusRecord
 from .types import SizedIterable
 
-RecordType = Union[HitRecord, MarkerRecord, ParametricRecord, StatusRecord]
+RecordType = HitRecord | MarkerRecord | ParametricRecord | StatusRecord
 
 
 def check_monotonic_time(func):
@@ -78,7 +80,7 @@ class PriDatabase(Database):
         schema = schema_path.read_text("utf-8").format(timebase=int(1e7))  # fill placeholder
         create_new_database(filename, schema)
 
-    def channel(self) -> Set[int]:
+    def channel(self) -> set[int]:
         """Get list of channels."""
         con = self.connection()
         cur = con.execute("SELECT DISTINCT Chan FROM ae_data WHERE Chan IS NOT NULL")
@@ -201,11 +203,11 @@ class PriDatabase(Database):
     def iread_hits(
         self,
         *,
-        channel: Union[None, int, Sequence[int]] = None,
-        time_start: Optional[float] = None,
-        time_stop: Optional[float] = None,
-        set_id: Union[None, int, Sequence[int]] = None,
-        query_filter: Optional[str] = None,
+        channel: int | Sequence[int] | None = None,
+        time_start: float | None = None,
+        time_stop: float | None = None,
+        set_id: int | Sequence[int] | None = None,
+        query_filter: str | None = None,
     ) -> SizedIterable[HitRecord]:
         """
         Stream hits with returned iterable.
@@ -245,10 +247,10 @@ class PriDatabase(Database):
     def iread_markers(
         self,
         *,
-        time_start: Optional[float] = None,
-        time_stop: Optional[float] = None,
-        set_id: Union[None, int, Sequence[int]] = None,
-        query_filter: Optional[str] = None,
+        time_start: float | None = None,
+        time_stop: float | None = None,
+        set_id: int | Sequence[int] | None = None,
+        query_filter: str | None = None,
     ) -> SizedIterable[MarkerRecord]:
         """
         Stream markers with returned iterable.
@@ -281,10 +283,10 @@ class PriDatabase(Database):
     def iread_parametric(
         self,
         *,
-        time_start: Optional[float] = None,
-        time_stop: Optional[float] = None,
-        set_id: Union[None, int, Sequence[int]] = None,
-        query_filter: Optional[str] = None,
+        time_start: float | None = None,
+        time_stop: float | None = None,
+        set_id: int | Sequence[int] | None = None,
+        query_filter: str | None = None,
     ) -> SizedIterable[ParametricRecord]:
         """
         Stream parametric data with returned iterable.
@@ -322,11 +324,11 @@ class PriDatabase(Database):
     def iread_status(
         self,
         *,
-        channel: Union[None, int, Sequence[int]] = None,
-        time_start: Optional[float] = None,
-        time_stop: Optional[float] = None,
-        set_id: Union[None, int, Sequence[int]] = None,
-        query_filter: Optional[str] = None,
+        channel: int | Sequence[int] | None = None,
+        time_start: float | None = None,
+        time_stop: float | None = None,
+        set_id: int | Sequence[int] | None = None,
+        query_filter: str | None = None,
     ) -> SizedIterable[StatusRecord]:
         """
         Stream status data with returned iterable.
@@ -367,8 +369,8 @@ class PriDatabase(Database):
         self,
         existing: bool = False,
         wait: bool = False,
-        query_filter: Optional[str] = None,
-    ) -> Iterable[Union[HitRecord, MarkerRecord, ParametricRecord, StatusRecord]]:
+        query_filter: str | None = None,
+    ) -> Iterable[HitRecord | MarkerRecord | ParametricRecord | StatusRecord]:
         """
         Listen to database changes and return new records.
 
@@ -547,7 +549,7 @@ class PriDatabase(Database):
         """
         parameter = self._parameter(parametric.param_id)
 
-        def try_convert(value: Optional[int], conv_id: str):
+        def try_convert(value: int | None, conv_id: str):
             """Try to scale with conversion parameter 'PAx_mV', otherwise scale = 1."""
             return int(value / parameter.get(conv_id, 1)) if value is not None else None
 
