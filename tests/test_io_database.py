@@ -3,6 +3,7 @@ import sqlite3
 from pathlib import Path
 
 import pytest
+
 from vallenae.io import PriDatabase
 from vallenae.io._database import Database
 

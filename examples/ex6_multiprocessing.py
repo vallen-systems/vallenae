@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Iterable
 
 import matplotlib.pyplot as plt
+
 import vallenae as vae
 
 HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()

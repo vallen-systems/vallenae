@@ -1,9 +1,10 @@
 from pathlib import Path
 
 import pytest
-import vallenae as vae
 from numpy import dtype, float64, int64
 from pandas import Int64Dtype
+
+import vallenae as vae
 from vallenae.io import HitRecord, MarkerRecord, ParametricRecord, SetType, StatusRecord
 
 STEEL_PLATE_DIR = Path(__file__).resolve().parent / "../examples/steel_plate"

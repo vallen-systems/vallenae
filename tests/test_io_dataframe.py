@@ -1,5 +1,6 @@
 import pandas as pd
 from numpy import dtype
+
 from vallenae.io._dataframe import _convert_to_nullable_types
 
 

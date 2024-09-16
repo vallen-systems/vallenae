@@ -4,6 +4,7 @@ from typing import Optional, Tuple
 
 import numpy as np
 import pytest
+
 from vallenae.features import (
     amplitude_to_db,
     counts,

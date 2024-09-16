@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+
 import vallenae as vae
 from vallenae.io import FeatureRecord
 from vallenae.io._sql import read_sql_generator
