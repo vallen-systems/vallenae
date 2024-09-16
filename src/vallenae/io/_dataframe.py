@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import pandas as pd
 from tqdm import tqdm
 
@@ -23,7 +25,7 @@ def _convert_to_nullable_types(df: pd.DataFrame):
 
 
 def iter_to_dataframe(
-    iterable: SizedIterable[tuple],
+    iterable: SizedIterable[Any],
     show_progress: bool = True,
     desc: str = "",
     index_column: str | None = None,
@@ -32,10 +34,10 @@ def iter_to_dataframe(
     Helper function to save iterator results in Pandas DataFrame.
 
     Args:
-        iterable: Iterable generating `NamedTuple`s
-        show_progress: Show progress bar. Default: `True`
+        iterable: Iterable generating dataclasses
+        show_progress: Show progress bar
         desc: Description shown left to the progress bar
-        index_column: Set column as index. Default: `None`
+        index_column: Set column as index
     Returns:
         Pandas DataFrame
     """

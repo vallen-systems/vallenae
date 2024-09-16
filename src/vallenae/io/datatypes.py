@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from enum import IntEnum, IntFlag
-from typing import Any, NamedTuple
+from typing import Any
 
 import numpy as np
 
@@ -66,7 +67,8 @@ class StatusFlags(IntFlag):
     # fmt: on
 
 
-class HitRecord(NamedTuple):
+@dataclass
+class HitRecord:
     """
     Hit record in pridb (`SetType.HIT`).
     """
@@ -81,7 +83,7 @@ class HitRecord(NamedTuple):
     rms: float  #: RMS of the noise before the hit in volts
     # optional for creating:
     set_id: int | None = None  #: Unique identifier for data set in pridb
-    status: HitFlags = HitFlags(0)  #: Status flags
+    status: HitFlags = field(default=HitFlags(0))  #: Status flags
     threshold: float | None = None  #: Threshold amplitude in volts
     rise_time: float | None = None  #: Rise time in seconds
     signal_strength: float | None = None  #: Signal strength in nVs (1e-9 Vs)
@@ -123,7 +125,8 @@ class HitRecord(NamedTuple):
         )
 
 
-class MarkerRecord(NamedTuple):
+@dataclass
+class MarkerRecord:
     """
     Marker record in pridb (`SetType.LABEL`, `SetType.DATETIME`, `SetType.SECTION`).
     """
@@ -152,7 +155,8 @@ class MarkerRecord(NamedTuple):
         )
 
 
-class StatusRecord(NamedTuple):
+@dataclass
+class StatusRecord:
     """
     Status data record in pridb (`SetType.STATUS`).
     """
@@ -164,7 +168,7 @@ class StatusRecord(NamedTuple):
     rms: float  #: RMS in volts
     # optional for creating:
     set_id: int | None = None  #: Unique identifier for data set in pridb
-    status: StatusFlags = StatusFlags(0)  #: Status flags
+    status: StatusFlags = field(default=StatusFlags(0))  #: Status flags
     threshold: float | None = None  #: Threshold amplitude in volts
     signal_strength: float | None = None  #: Signal strength in nVs (1e-9 Vs)
 
@@ -189,7 +193,8 @@ class StatusRecord(NamedTuple):
         )
 
 
-class ParametricRecord(NamedTuple):
+@dataclass
+class ParametricRecord:
     """
     Parametric data record in pridb (`SetType.PARAMETRIC`).
     """
@@ -198,7 +203,7 @@ class ParametricRecord(NamedTuple):
     param_id: int  #: Parameter ID of table ae_params for ADC value conversion
     # optional for creating:
     set_id: int | None = None  #: Unique identifier for data set in pridb
-    status: StatusFlags = StatusFlags(0)  #: Status flags
+    status: StatusFlags = field(default=StatusFlags(0))  #: Status flags
     pctd: int | None = None  #: Digital counter value
     pcta: int | None = None  #: Analog hysteresis counter
     pa0: int | None = None  #: Amplitude of parametric input 0 in volts
@@ -236,7 +241,8 @@ class ParametricRecord(NamedTuple):
         )
 
 
-class TraRecord(NamedTuple):
+@dataclass
+class TraRecord:
     """Transient data record in tradb."""
 
     time: float  #: Time in seconds
@@ -248,7 +254,7 @@ class TraRecord(NamedTuple):
     samples: int  #: Number of samples
     data: np.ndarray  #: Transient signal in volts or ADC values if `raw` = `True`
     # optional for writing
-    status: HitFlags = HitFlags(0)  #: Status flags
+    status: HitFlags = field(default=HitFlags(0))  #: Status flags
     trai: int | None = None  #: Transient recorder index (foreign key between pridb and tradb)
     rms: float | None = None  #: RMS of the noise before the hit
     # optional
@@ -278,7 +284,8 @@ class TraRecord(NamedTuple):
         )
 
 
-class FeatureRecord(NamedTuple):
+@dataclass
+class FeatureRecord:
     """
     Transient feature record in trfdb.
     """
