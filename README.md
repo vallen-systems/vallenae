@@ -1,8 +1,8 @@
 # Vallen AE Python Tools
 
-[![CI](https://github.com/vallen-systems/pyVallenAE/workflows/CI/badge.svg)](https://github.com/vallen-systems/pyVallenAE/actions)
+[![CI](https://github.com/vallen-systems/vallenae/workflows/CI/badge.svg)](https://github.com/vallen-systems/vallenae/actions)
 [![Documentation Status](https://readthedocs.org/projects/pyvallenae/badge/?version=latest)](https://pyvallenae.readthedocs.io/en/latest/?badge=latest)
-[![Coverage Status](https://coveralls.io/repos/github/vallen-systems/pyVallenAE/badge.svg?branch=master)](https://coveralls.io/github/vallen-systems/pyVallenAE)
+[![Coverage Status](https://coveralls.io/repos/github/vallen-systems/vallenae/badge.svg?branch=master)](https://coveralls.io/github/vallen-systems/vallenae)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PyPI](https://img.shields.io/pypi/v/vallenae)](https://pypi.org/project/vallenae)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/vallenae)](https://pypi.org/project/vallenae)
@@ -36,9 +36,9 @@ $ pip install vallenae
 If you want to run the latest version of the code, you can install from the master branch directly:
 
 ```shell
-$ pip install -U git+https://github.com/vallen-systems/pyVallenAE.git
+$ pip install -U git+https://github.com/vallen-systems/vallenae.git
 # Or if you don't have git installed
-$ pip install -U https://github.com/vallen-systems/pyVallenAE/zipball/master
+$ pip install -U https://github.com/vallen-systems/vallenae/zipball/master
 ```
 
 Please note, that `vallenae` requires Python 3.7 or newer. On Linux systems, `pip` is usually mapped to Python 2, so use `pip<version>` (e.g. `pip3` or `pip3.7`) instead. Alternatively, you can run `pip` from your specific Python version with `python<version> -m pip`.
@@ -46,14 +46,14 @@ Please note, that `vallenae` requires Python 3.7 or newer. On Linux systems, `pi
 ## Contributing
 
 Feature requests, bug reports and fixes are always welcome!
-Just [create an issue](https://github.com/vallen-systems/pyVallenAE/issues/new) or make a pull-request.
+Just [create an issue](https://github.com/vallen-systems/vallenae/issues/new) or make a pull-request.
 
 ### Development setup
 
 ```shell
 # Clone this repository
-$ git clone https://github.com/vallen-systems/pyVallenAE.git
-$ cd pyVallenAE
+$ git clone https://github.com/vallen-systems/vallenae.git
+$ cd vallenae
 
 # Install package and dependencies
 $ pip install -e .[dev]
