@@ -1,10 +1,11 @@
 import numpy as np
 import pytest
+
 from vallenae import features, timepicker
 from vallenae.io import compression
 
 
-@pytest.fixture()
+@pytest.fixture
 def random_array():
     rng = np.random.default_rng(42)
     return rng.random(65536)

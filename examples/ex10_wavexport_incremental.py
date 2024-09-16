@@ -13,8 +13,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional
 
-import vallenae as vae
 from soundfile import SoundFile
+
+import vallenae as vae
 
 HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
 

@@ -3,6 +3,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose
+
 from vallenae import timepicker
 from vallenae.io import TraDatabase
 

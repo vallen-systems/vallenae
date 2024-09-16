@@ -2,8 +2,9 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-import vallenae as vae
 from numpy.testing import assert_allclose
+
+import vallenae as vae
 from vallenae.io import TraRecord
 from vallenae.io.tradb import _create_time_vector
 

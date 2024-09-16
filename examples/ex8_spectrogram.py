@@ -10,9 +10,10 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import vallenae as vae
 from matplotlib.colors import LogNorm
 from scipy import signal
+
+import vallenae as vae
 
 HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
 TRADB = HERE / "bearing" / "bearing_plain.tradb"

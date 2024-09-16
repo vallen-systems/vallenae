@@ -3,6 +3,7 @@ import sqlite3
 from math import sin
 
 import pytest
+
 from vallenae.io._sql import (
     ConnectionWrapper,
     QueryIterable,

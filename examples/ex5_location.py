@@ -11,10 +11,11 @@ from xml.etree import ElementTree
 
 import matplotlib.pyplot as plt
 import numpy as np
-import vallenae as vae
 from numba import f8, njit
 from numpy.linalg import norm
 from scipy.optimize import differential_evolution
+
+import vallenae as vae
 
 HERE = Path(__file__).parent if "__file__" in locals() else Path.cwd()
 PRIDB = HERE / "steel_plate" / "sample.pridb"
