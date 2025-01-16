@@ -20,9 +20,9 @@ from ._sql import (
     read_sql_generator,
     sql_binary_search,
 )
+from ._types import SizedIterable
 from .compression import encode_data_blob
 from .datatypes import TraRecord
-from .types import SizedIterable
 
 
 @lru_cache(maxsize=32, typed=True)
