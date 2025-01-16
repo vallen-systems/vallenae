@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -161,6 +162,26 @@ def test_create(tmp_path):
 
 def test_channel(sample_pridb):
     assert sample_pridb.channel() == {1, 2, 3, 4}
+
+
+def test_to_datetime(fresh_pridb):
+    with pytest.raises(RuntimeError):
+        fresh_pridb.to_datetime(0.0)
+
+    fresh_pridb.write_marker(
+        MarkerRecord(time=0.0, set_type=SetType.DATETIME, number=1, data="2025-01-02 12:13:14")
+    )
+    dt1 = datetime(year=2025, month=1, day=2, hour=12, minute=13, second=14)
+
+    fresh_pridb.write_marker(
+        MarkerRecord(time=10.0, set_type=SetType.DATETIME, number=1, data="2025-01-02 15:16:17")
+    )
+    dt2 = datetime(year=2025, month=1, day=2, hour=15, minute=16, second=17)
+
+    assert fresh_pridb.to_datetime(0.0) == dt1
+    assert fresh_pridb.to_datetime(1.1) == dt1 + timedelta(seconds=1.1)
+    assert fresh_pridb.to_datetime(10.0) == dt2
+    assert fresh_pridb.to_datetime(11.1) == dt2 + timedelta(seconds=1.1)
 
 
 def test_iread_markers(sample_pridb):

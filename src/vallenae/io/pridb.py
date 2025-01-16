@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timedelta
 from functools import wraps
 from pathlib import Path
 from time import sleep
@@ -88,6 +89,30 @@ class PriDatabase(Database):
         con = self.connection()
         cur = con.execute("SELECT DISTINCT Chan FROM ae_data WHERE Chan IS NOT NULL")
         return {result[0] for result in cur.fetchall()}
+
+    def to_datetime(self, time: float) -> datetime:
+        """
+        Convert a relative time to an absolute `datetime` object.
+
+        Args:
+            timestamp: Relative time in seconds
+        """
+        con = self.connection()
+        cur = con.execute(
+            """
+            SELECT Time, Data
+            FROM view_ae_markers
+            WHERE SetType == 5 AND Time <= ?
+            ORDER BY SetID DESC
+            LIMIT 1
+            """,
+            (time,),
+        )
+        try:
+            time_marker, data = cur.fetchone()
+        except TypeError:
+            raise RuntimeError("No datetime marker in pridb") from None
+        return datetime.strptime(data, "%Y-%m-%d %H:%M:%S") + timedelta(seconds=time - time_marker)
 
     def read_hits(self, **kwargs) -> pd.DataFrame:
         """
