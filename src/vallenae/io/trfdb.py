@@ -17,8 +17,8 @@ from ._sql import (
     read_sql_generator,
     update_from_dict,
 )
+from ._types import SizedIterable
 from .datatypes import FeatureRecord
-from .types import SizedIterable
 
 
 class TrfDatabase(Database):

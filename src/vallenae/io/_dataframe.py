@@ -5,7 +5,7 @@ from typing import Any
 import pandas as pd
 from tqdm import tqdm
 
-from .types import SizedIterable
+from ._types import SizedIterable
 
 
 def _convert_to_nullable_types(df: pd.DataFrame):

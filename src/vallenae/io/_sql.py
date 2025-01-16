@@ -8,7 +8,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Iterator, Sequence, TypeVar
 
-from .types import SizedIterable
+from ._types import SizedIterable
 
 logger = logging.getLogger(__name__)
 

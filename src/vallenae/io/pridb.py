@@ -16,8 +16,8 @@ from ._sql import (
     query_conditions,
     read_sql_generator,
 )
+from ._types import SizedIterable
 from .datatypes import HitRecord, MarkerRecord, ParametricRecord, SetType, StatusRecord
-from .types import SizedIterable
 
 
 def check_monotonic_time(func):

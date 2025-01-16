@@ -99,6 +99,5 @@ from .datatypes import *
 from .pridb import *
 from .tradb import *
 from .trfdb import *
-from .types import *
 
 __all__ = [_ for _ in dir() if not _.startswith("_")]
