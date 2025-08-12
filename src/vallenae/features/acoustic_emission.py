@@ -59,8 +59,44 @@ def first_threshold_crossing(data: np.ndarray, threshold: float) -> int | None:
         Index of first threshold crossing. None if threshold was not exceeded
     """
     above_threshold = _mask_above_threshold(data, threshold)
+    if above_threshold.size == 0:
+        return None
     index = np.argmax(above_threshold)
     return index if above_threshold[index] else None
+
+
+def last_threshold_crossing(data: np.ndarray, threshold: float) -> int | None:
+    """
+    Compute index of last threshold crossing.
+
+    Args:
+        data: Input array
+        threshold: Threshold amplitude
+
+    Returns:
+        Index of last threshold crossing. None if threshold was not exceeded
+    """
+    index = first_threshold_crossing(data[::-1], threshold)
+    return len(data) - 1 - index if index is not None else None
+
+
+def duration(data: np.ndarray, threshold: float, samplerate: int) -> float:
+    """
+    Compute the duration of a hit.
+
+    Args:
+        data: Input array (hit)
+        threshold: Threshold amplitude
+        samplerate: Sample rate of input array in Hz
+
+    Returns:
+        Duration in seconds
+    """
+    index_first = first_threshold_crossing(data, threshold)
+    index_last = last_threshold_crossing(data, threshold)
+    if index_first is None or index_last is None:
+        return 0.0
+    return (index_last - index_first) / samplerate
 
 
 def rise_time(
@@ -81,6 +117,9 @@ def rise_time(
         samplerate: Sample rate of the input array
         first_crossing: Precomputed index of first threshold crossing to save computation time
         index_peak: Precomputed index of peak amplitude to save computation time
+
+    Returns:
+        Rise time in seconds
     """
     # save some computations if pre-results are provided
     n_first_crossing = (

@@ -10,9 +10,11 @@ from vallenae.features import (
     amplitude_to_db,
     counts,
     db_to_amplitude,
+    duration,
     energy,
     first_threshold_crossing,
     is_above_threshold,
+    last_threshold_crossing,
     peak_amplitude,
     peak_amplitude_index,
     rise_time,
@@ -95,6 +97,36 @@ def test_first_threshold_crossing():
     arr[-1] = 2
     thr = 2
     assert first_threshold_crossing(arr, thr) == LEN - 1
+
+
+@pytest.mark.parametrize(
+    ("array", "threshold", "index_expected"),
+    [
+        (np.array([]), 1, None),
+        (np.array([0, 0, 0]), 1, None),
+        (np.array([0, 1, 0]), 1.1, None),
+        (np.array([0, 1, 0]), 1, 1),
+        (np.array([0, -1, 0]), 1, 1),
+        (np.array([0, -1, 1]), 1, 2),
+    ],
+)
+def test_last_threshold_crossing(array, threshold, index_expected):
+    assert last_threshold_crossing(array, threshold) == index_expected
+
+
+@pytest.mark.parametrize(
+    ("array", "threshold", "samplerate", "duration_expected"),
+    [
+        (np.array([]), 1, 1, 0.0),
+        (np.array([0, 0, 0, 0, 0]), 1, 1, 0.0),
+        (np.array([0, 1, 0, 0, 0]), 1, 1, 0.0),
+        (np.array([0, 1, -1, 0, 0]), 1, 1, 1.0),
+        (np.array([0, 1, -1, 0, 0]), 1, 2, 0.5),
+        (np.array([0, 1, -1, 2, 0.5]), 1, 1, 2.0),
+    ],
+)
+def test_duration(array, threshold, samplerate, duration_expected):
+    assert duration(array, threshold, samplerate) == duration_expected
 
 
 @pytest.mark.parametrize("samplerate", SAMPLERATES)
