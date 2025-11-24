@@ -19,10 +19,6 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
-      - uses: actions/cache@v4
-        with:
-          path: .tox
-          key: ${{ matrix.os }}-${{ matrix.python }}-tox-${{ hashFiles('pyproject.toml', 'setup.py') }}
       - name: Install libsndfile
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt install -y libsndfile1
