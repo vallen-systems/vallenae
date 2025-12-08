@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from functools import lru_cache, partial
+from functools import partial
 from itertools import chain
 from pathlib import Path
 from time import sleep
@@ -25,7 +25,6 @@ from .compression import encode_data_blob
 from .datatypes import TraRecord
 
 
-@lru_cache(maxsize=32, typed=True)
 def _create_time_vector(samples: int, samplerate: int, pretrigger: int = 0) -> np.ndarray:
     return np.arange(-pretrigger, samples - pretrigger, dtype=np.float32) / samplerate
 
