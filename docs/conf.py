@@ -3,8 +3,11 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
+import re
 from datetime import date
 from importlib import metadata
+
+from sphinx_gallery.sorting import FileNameSortKey
 
 # -- Project information -----------------------------------------------------
 
@@ -49,12 +52,21 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 default_role = "autolink"
 add_function_parentheses = True
 
+
+class ExampleSortKey(FileNameSortKey):
+    def __call__(self, filename):
+        match = re.match(r"ex(\d+)", filename)
+        if match:
+            return (0, int(match.group(1)))
+        return (1, super().__call__(filename))
+
+
 sphinx_gallery_conf = {
     "examples_dirs": "../examples",  # path to your example scripts
     "gallery_dirs": "_examples",  # path to where to save gallery generated output
     "filename_pattern": r"[\\/]ex",
     "ignore_pattern": "__",
-    "within_subsection_order": "FileNameSortKey",
+    "within_subsection_order": ExampleSortKey,
     "download_all_examples": False,
 }
 
