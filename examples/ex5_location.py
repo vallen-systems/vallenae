@@ -12,7 +12,6 @@ from xml.etree import ElementTree
 
 import matplotlib.pyplot as plt
 import numpy as np
-from numba import f8, njit
 from numpy.linalg import norm
 from scipy.optimize import differential_evolution
 
@@ -24,7 +23,6 @@ SETUP = HERE / "steel_plate" / "sample.vaex"
 NUMBER_SENSORS = 4
 
 
-@njit(f8(f8[:], f8, f8[:, :], f8[:]))
 def lucy_error_fun(
     test_pos: np.ndarray,
     speed: float,
@@ -46,15 +44,10 @@ def lucy_error_fun(
     Returns:
         The LUCY value as a float. Ideally 0, in practice never 0, always positive.
     """
-    m = len(measured_delta_ts)
-    n = m + 1
+    n = len(measured_delta_ts) + 1
     measured_delta_dists = speed * measured_delta_ts
-    theo_dists = np.zeros(n)
-    theo_delta_dists = np.zeros(m)
-    for i in range(n):
-        theo_dists[i] = norm(test_pos - sens_poss[i, :])
-    for i in range(m):
-        theo_delta_dists[i] = theo_dists[i + 1] - theo_dists[0]
+    theo_dists = norm(test_pos - sens_poss, axis=1)
+    theo_delta_dists = theo_dists[1:] - theo_dists[0]
 
     # LUCY definition taken from the vallen online help:
     return norm(theo_delta_dists - measured_delta_dists) / math.sqrt(n - 1)
@@ -72,7 +65,7 @@ def get_channel_positions(setup_file: str) -> dict[int, tuple[float, float]]:
     }
 
 
-def get_velocity(setup_file: str) -> float | None:
+def get_velocity(setup_file: str) -> float:
     tree = ElementTree.parse(setup_file)
     node = tree.getroot().find(".//Location")
     if node is not None:

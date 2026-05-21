@@ -39,12 +39,9 @@ def test_benchmark_features(benchmark, random_array, function):
 @pytest.mark.parametrize(
     "function",
     [
-        timepicker._hinkley_numba,
-        timepicker._hinkley_numpy,
-        timepicker._aic_numba,
-        timepicker._aic_numpy,
-        timepicker._energy_ratio_numba,
-        timepicker._energy_ratio_numpy,
+        timepicker.hinkley,
+        timepicker.aic,
+        timepicker.energy_ratio,
         timepicker.modified_energy_ratio,
     ],
 )
