@@ -52,7 +52,7 @@ add_function_parentheses = True
 sphinx_gallery_conf = {
     "examples_dirs": "../examples",  # path to your example scripts
     "gallery_dirs": "_examples",  # path to where to save gallery generated output
-    "filename_pattern": "/ex",
+    "filename_pattern": r"[\\/]ex",
     "ignore_pattern": "__",
     "within_subsection_order": "FileNameSortKey",
     "download_all_examples": False,

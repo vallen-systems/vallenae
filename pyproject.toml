@@ -118,6 +118,7 @@ ignore = [
 "tests/*" = [
     "E501", # line too long
     "PLR0915", # too many statements
+    "PLW0108", # unnecessary lambda
     "PT011", # use a more specific exception in pytest.raises
 ]
 "examples/*" = [

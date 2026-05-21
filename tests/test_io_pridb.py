@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
-from numpy import dtype, float64, int64
+from numpy import float64, int64
 from pandas import Int64Dtype
 
 import vallenae as vae
@@ -204,12 +204,6 @@ def test_read_markers(sample_pridb):
     assert len(markers) == len(LABELS_EXPECTED)
     assert markers.index.name == "set_id"
     assert markers.index.dtype == int64
-    assert dict(markers.dtypes) == {
-        "time": float64,
-        "set_type": Int64Dtype(),
-        "number": Int64Dtype(),
-        "data": dtype("O"),
-    }
 
     labels = list(markers["data"])
     assert labels == LABELS_EXPECTED

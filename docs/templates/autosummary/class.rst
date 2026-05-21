@@ -5,6 +5,7 @@
 .. autoclass:: {{ objname }}
    :members:
    :inherited-members:
+   :exclude-members: to_bytes, from_bytes
 
    {% block methods %}
    .. automethod:: __init__
