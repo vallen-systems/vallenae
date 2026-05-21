@@ -86,10 +86,8 @@ plot(t, y, mer_arr, mer_index, "Modified Energy Ratio")
 # %%
 # Performance comparison
 # ----------------------
-# All timepicker implementations are using Numba for just-in-time (JIT) compilations.
-# Usually the first function call is slow, because it will trigger the JIT compiler.
-# To compare the performance to a native or numpy implementation,
-# the average of multiple executions should be compared.
+# All timepicker implementations are vectorized with NumPy.
+# The average of multiple executions is reported below.
 
 
 def timeit(func, loops=100):

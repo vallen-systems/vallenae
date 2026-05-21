@@ -2,7 +2,6 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from numpy.testing import assert_allclose
 
 from vallenae import timepicker
 from vallenae.io import TraDatabase
@@ -49,24 +48,3 @@ def test_modified_energy_ratio(waveform):
     assert len(result) == len(waveform)
     assert index == 821  # A0
     assert np.argmax(result) == index
-
-
-def numpy_version():
-    return tuple(int(v) for v in np.__version__.split("."))
-
-
-# TODO: fix test for numpy v2
-@pytest.mark.skipif(numpy_version() >= (2, 0), reason="fails with numpy v2")
-@pytest.mark.parametrize(
-    ("func_numba", "func_numpy"),
-    [
-        (timepicker._hinkley_numba, timepicker._hinkley_numpy),
-        (timepicker._aic_numba, timepicker._aic_numpy),
-        (timepicker._energy_ratio_numba, timepicker._energy_ratio_numpy),
-    ],
-)
-def test_implementations(waveform, func_numba, func_numpy):
-    result_numba, index_numba = func_numba(waveform)
-    result_numpy, index_numpy = func_numpy(waveform)
-    assert index_numba == index_numpy
-    assert_allclose(result_numba, result_numpy, rtol=1e-6, atol=1e-9)

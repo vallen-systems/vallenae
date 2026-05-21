@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Remove optional `numba` dependency. The `timepicker` functions now always use the pure-NumPy implementations (previously the fallback). The import-time `PerformanceWarning` is gone.
+
 ## [0.13.0] - 2025-12-08
 
 ### Added

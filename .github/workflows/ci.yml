@@ -30,15 +30,12 @@ jobs:
         run: tox -e mypy
       - name: Run pytest
         run: tox -e py
-      - name: Run pytest with numba
-        if: matrix.python != '3.14'
-        run: tox -e py-numba
       - name: Run PyInstaller test
         run: tox -e pyinstaller
       - name: Coverage report
         run: tox -e coverage-report
       - name: Upload coverage results to Coveralls
-        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.14'
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.13'
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

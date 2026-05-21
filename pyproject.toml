@@ -58,7 +58,6 @@ docs = [
     "pillow",  # required by sphinx-gallery
     "myst-parser",  # include markdown files
     "matplotlib",  # used in examples
-    "numba",  # used in location example
     "scipy",  # used in location and multiprocessing example
 ]
 tests = [
@@ -150,7 +149,6 @@ envlist =
     ruff
     mypy
     py{37, 38, 39, 310, 311, 312, 313, 314}
-    py{37, 38, 39, 310, 311, 312, 313, 314}-numba
     pyinstaller
     coverage-report
     docs
@@ -166,10 +164,6 @@ deps = mypy
 commands = mypy src/
 
 [testenv]
-setenv =
-    NUMBA_DISABLE_JIT = 1
-deps =
-    numba: numba
 extras = tests
 commands =
     coverage run -m pytest --benchmark-disable
