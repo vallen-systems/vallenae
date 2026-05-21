@@ -13,6 +13,7 @@ The remaining modules are system-independent and try to comprise the most common
 
 - :mod:`vallenae.features`: Extraction of Acoustic Emission features
 - :mod:`vallenae.timepicker`: Timepicking algorithms for arrival time estimations
+- :mod:`vallenae.processor`: Processors -- e.g. grouping hits into events
 
 Library modules
 ---------------
@@ -24,6 +25,7 @@ Library modules
     vallenae.io
     vallenae.features
     vallenae.timepicker
+    vallenae.processor
 
 .. toctree::
     :caption: Examples
