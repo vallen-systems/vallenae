@@ -241,76 +241,79 @@ def sql_binary_search(
     lower_bound: bool = True,
 ) -> int | None:
     """
-    Helper function to find the boundary index for given condition on a sorted column.
+    Find a boundary index for a monotonic condition on a value column sorted by an index column.
 
-    Especially using conditions on the pridb's and tradb's Time column are expensive (not indexed).
-    E.g.: SELECT * FROM view_tr_data WHERE Time > 10 AND Time < 100
+    Conditions on the pridb's and tradb's Time column are expensive (Time is not indexed),
+    e.g.: SELECT * FROM view_tr_data WHERE Time > 10 AND Time < 100
 
-    Because the Time column is monotonic increasing, a fast binary search can be applied.
-    The Time column is not *stricly* monotonic increasing; different channels might share the same
-    timestamp. To find the lower/upper bound of same values, a subsequent linear search is applied.
+    Because Time increases monotonically with the indexed column (e.g. the tradb's TRAI), a fast
+    binary search over the index column can locate the boundary instead. The index column is
+    monotonic but *not* dense - it may contain gaps (missing values) - so each probe is snapped
+    to the nearest existing row in the search direction; a missing index is never queried.
 
     Args:
         connection: SQLite connection
         table: Table name
-        column_value: Name of the sorted column, e.g. Time
-        column_index: Name of the indexed column
-        fun_compare: Lambda function of the condition, e.g. `lambda t: t > 10` (Time > 10)
-        lower_bound: Specify which index to return for ranges of same values.
-            Default: Return lower bound (`True`)
+        column_value: Name of the sorted (monotonic) column, e.g. Time
+        column_index: Name of the indexed column, e.g. TRAI
+        fun_compare: Lambda function of the condition, e.g. `lambda t: t > 10` (Time > 10).
+            The condition must be monotonic in `column_value`, i.e. switch from `False` to `True`
+            (use `lower_bound=True`) or from `True` to `False` (use `lower_bound=False`) exactly
+            once over the sorted range.
+        lower_bound: Search direction. `True` snaps probes upwards and returns the boundary at the
+            lower end of the matching range (for `False`->`True` conditions). `False` snaps
+            downwards and returns the boundary at the upper end (for `True`->`False` conditions).
+            Default: `True`.
+
+    Returns:
+        A threshold for the `column_index` that separates matching from non-matching rows, or
+        `None` if the condition is `False` for every row.
+
+        The returned value is meant to be used as an inclusive range bound on `column_index`
+        (`column_index >= result` for `lower_bound=True`, `column_index <= result` for
+        `lower_bound=False`). Because the index column may be sparse, the threshold is **not
+        guaranteed to be an existing index** - it can be any value within the gap that separates
+        the matching from the non-matching rows. All such values select the same set of rows, so
+        this is exact for range filtering; do not interpret the result as a concrete row key.
     """
 
     # two querys are way faster than one combined!
-    i_min_total = connection.execute(f"SELECT MIN({column_index}) FROM {table}").fetchone()[0]
-    i_max_total = connection.execute(f"SELECT MAX({column_index}) FROM {table}").fetchone()[0]
+    i_min = connection.execute(f"SELECT MIN({column_index}) FROM {table}").fetchone()[0]
+    i_max = connection.execute(f"SELECT MAX({column_index}) FROM {table}").fetchone()[0]
+    if i_min is None:  # empty table
+        return None
+
+    # Snap each probe to the nearest existing row in the search direction (ASC/DESC), so a gap in
+    # the index column never results in a missing-row lookup. Each snap is an O(log n) index seek.
+    op, order = (">=", "ASC") if lower_bound else ("<=", "DESC")
 
     def get_value(index):
-        cur = connection.execute(
-            f"SELECT {column_value} FROM {table} WHERE {column_index} == ?", (index,)
-        )
-        return cur.fetchone()[0]
+        return connection.execute(
+            f"SELECT {column_value} FROM {table} "
+            f"WHERE {column_index} {op} ? ORDER BY {column_index} {order} LIMIT 1",
+            (index,),
+        ).fetchone()[0]
 
-    def binary_search():
-        i_min, i_max = i_min_total, i_max_total
-        while True:
-            v_min = get_value(i_min)
-            v_max = get_value(i_max)
-            if v_min > v_max:
-                raise ValueError(f"Value column {column_value} not sorted")
-            c_min = fun_compare(v_min)
-            c_max = fun_compare(v_max)
+    while True:
+        v_min = get_value(i_min)
+        v_max = get_value(i_max)
+        if v_min > v_max:
+            raise ValueError(f"Value column {column_value} not sorted")
+        c_min = fun_compare(v_min)
+        c_max = fun_compare(v_max)
 
-            if c_min and c_max:  # condition true for both limits
-                return i_min if lower_bound else i_max
-            if not c_min and not c_max:  # condition false for both limits
-                return None
+        if c_min and c_max:  # condition true for the whole range
+            return i_min if lower_bound else i_max
+        if not c_min and not c_max:  # condition false for the whole range
+            return None
+        if i_max - i_min < 2:  # adjacent bounds straddle the transition
+            return i_min if c_min else i_max
 
-            if i_max - i_min < 2:
-                return i_min if c_min is True else i_max
-
-            i_mid = (i_max + i_min) // 2
-            c_mid = fun_compare(get_value(i_mid))
-
-            if c_mid == c_min:
-                i_min = i_mid
-            else:
-                i_max = i_mid
-
-    def bound_same_value(start: int):
-        """Find lower/upper bound of same values with linear search."""
-        v_start = get_value(start)
-        inc = -1 if lower_bound else 1
-        i = start
-        while i_min_total < i < i_max_total:
-            i += inc
-            if get_value(i) != v_start:
-                return i - inc
-        return i
-
-    i = binary_search()
-    if i is not None:
-        return bound_same_value(i)
-    return i
+        i_mid = (i_min + i_max) // 2
+        if fun_compare(get_value(i_mid)) == c_min:
+            i_min = i_mid
+        else:
+            i_max = i_mid
 
 
 def create_new_database(filename: str, schema: str):

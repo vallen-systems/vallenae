@@ -186,50 +186,75 @@ def test_read_sql_generator_parameter(memory_abc):
 def test_sql_binary_search():
     con = sqlite3.connect(":memory:")
     con.execute("CREATE TABLE squares (id INTEGER PRIMARY KEY, value REAL)")
-    con.execute("CREATE TABLE consts (id INTEGER PRIMARY KEY, value INT)")
-    con.execute("CREATE TABLE step (id INTEGER PRIMARY KEY, value INT)")
+    con.execute("CREATE TABLE consts (id INTEGER PRIMARY KEY, value REAL)")
     con.execute("CREATE TABLE sin (id INTEGER PRIMARY KEY, value REAL)")
     for i in range(100):
         con.execute("INSERT INTO squares (id, value) VALUES (?, ?)", (i, i**2))
         con.execute("INSERT INTO consts (id, value) VALUES (?, ?)", (i, 11))
-        con.execute("INSERT INTO step (id, value) VALUES (?, ?)", (i, int(i >= 33)))
         con.execute("INSERT INTO sin (id, value) VALUES (?, ?)", (i, sin(i)))
 
-    # squares table
-    # condition false for all values
+    # The condition must be monotonic in `value`: lower_bound=True for False->True conditions
+    # (`>`/`>=`, match at high end, used downstream as `id >= result`), lower_bound=False for
+    # True->False conditions (`<`/`<=`, match at low end, used as `id <= result`).
+
+    # squares table: strictly increasing, distinct values -> result is the exact boundary id
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 9) == 3  # id 3 -> 9
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x > 9) == 4  # id 4 -> 16
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 256) == 16
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 9, lower_bound=False) == 2
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x <= 9, lower_bound=False) == 3
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 256, lower_bound=False) == 15
+
+    # condition false for the whole range -> None
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 0) is None
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x > 99**2) is None
+    # condition true for the whole range -> first / last id
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 0) == 0
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 0, lower_bound=False) == 99
 
-    assert sql_binary_search(con, "squares", "value", "id", lambda x: x > 9) == 4
-    assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 9) == 3
-    assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 9) == 2
-
-    assert sql_binary_search(con, "squares", "value", "id", lambda x: x > 256) == 17
-    assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 256) == 16
-    assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 256) == 15
-
-    # consts table
-    # condition false for all values
-    assert sql_binary_search(con, "consts", "value", "id", lambda x: x < 11) is None
-    assert sql_binary_search(con, "consts", "value", "id", lambda x: x > 11) is None
-    # condition true for all values
+    # consts table: all values equal -> whole range matches or none
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x >= 11) == 0
-    assert sql_binary_search(con, "consts", "value", "id", lambda x: x == 11) == 0
-    assert sql_binary_search(con, "consts", "value", "id", lambda x: x <= 11) == 0
-    # return upper bound if condition is true for both bounds
-    assert (
-        sql_binary_search(con, "consts", "value", "id", lambda x: x == 11, lower_bound=False) == 99
-    )
-
-    # step table
-    assert sql_binary_search(con, "step", "value", "id", lambda x: x == 0) == 0
-    assert sql_binary_search(con, "step", "value", "id", lambda x: x == 0, lower_bound=False) == 32
-    assert sql_binary_search(con, "step", "value", "id", lambda x: x >= 1) == 33
-    assert sql_binary_search(con, "step", "value", "id", lambda x: x >= 1, lower_bound=False) == 99
+    assert sql_binary_search(con, "consts", "value", "id", lambda x: x >= 11, lower_bound=False) == 99
+    assert sql_binary_search(con, "consts", "value", "id", lambda x: x > 11) is None
+    assert sql_binary_search(con, "consts", "value", "id", lambda x: x < 11) is None
 
     # sin table, not sorted -> expect exception
     with pytest.raises(ValueError):
         sql_binary_search(con, "sin", "value", "id", lambda x: x >= 0.5)
+
+    con.close()
+
+
+def test_sql_binary_search_sparse_index():
+    """Regression: a sparse index column (like the tradb's TRAI) has gaps, so arithmetic midpoints
+    can hit missing rows - this used to raise `TypeError: 'NoneType' object is not subscriptable`.
+    The result is a threshold for range filtering, so it need not be an existing id: any value in
+    the gap between the last non-matching and the first matching row is correct."""
+    con = sqlite3.connect(":memory:")
+    con.execute("CREATE TABLE gapped (id INTEGER PRIMARY KEY, value REAL)")
+    for i in [1, 2, 3, 50, 51, 90, 91, 1000]:  # non-contiguous ids, value == id
+        con.execute("INSERT INTO gapped (id, value) VALUES (?, ?)", (i, float(i)))
+
+    # ids 3 and 50 straddle a gap: `value >= 50` matches from id 50, so any threshold in (3, 50]
+    # selects the right rows; `value < 50` ends at id 3, so any threshold in [3, 50) does.
+    upper = sql_binary_search(con, "gapped", "value", "id", lambda v: v >= 50)
+    lower = sql_binary_search(con, "gapped", "value", "id", lambda v: v < 50, lower_bound=False)
+    assert upper is not None
+    assert lower is not None
+    assert 3 < upper <= 50
+    assert 3 <= lower < 50
+    # across a different gap: `value >= 1000` matches only id 1000 -> threshold in (91, 1000]
+    far = sql_binary_search(con, "gapped", "value", "id", lambda v: v >= 1000)
+    assert far is not None
+    assert 91 < far <= 1000
+
+    # whole range matches / no match
+    assert sql_binary_search(con, "gapped", "value", "id", lambda v: v >= 0) == 1  # MIN(id)
+    assert sql_binary_search(con, "gapped", "value", "id", lambda v: v < 0) is None
+
+    # empty table
+    con.execute("CREATE TABLE empty (id INTEGER PRIMARY KEY, value REAL)")
+    assert sql_binary_search(con, "empty", "value", "id", lambda v: v >= 0) is None
 
     con.close()
 
