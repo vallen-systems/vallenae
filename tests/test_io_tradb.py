@@ -231,96 +231,148 @@ def test_read_continuous_wave_empty_tradb(fresh_tradb):
     assert fs == 0
 
 
-def test_read_continuous_wave(fresh_tradb):
-    trai = 0
+FS = 100  # sample rate of the time_signal_tradb fixture
+DATA_END = 3.0  # data spans t = [0, 1) and [2, 3); open bounds resolve to [0.0, 3.0)
 
-    def write_time_axis(samplerate, samples, sets, t_start=0):
-        # create time axis
-        y = t_start + np.arange(0, samples * sets, dtype=np.float32) / samplerate
-        # write time axis blockwise
-        for data in np.reshape(y, (-1, sets)):
-            nonlocal trai
+
+@pytest.fixture(name="time_signal_tradb")
+def fixture_time_signal_tradb(fresh_tradb):
+    """Channel 1 where each sample's value equals its time, over t = [0, 1) and [2, 3) (gap)."""
+    trai = 0
+    for t_offset in (0.0, 2.0):
+        times = t_offset + np.arange(100, dtype=np.float32) / FS  # 1 s of "value == time"
+        for block in np.split(times, 10):  # 10 records of 10 samples each
             trai += 1
-            t = data[0]
             fresh_tradb.write(
                 TraRecord(
-                    time=t,
+                    time=float(block[0]),
                     channel=1,
                     param_id=1,
                     pretrigger=0,
                     threshold=0,
-                    samplerate=samplerate,
-                    samples=samples,
-                    data=data,
+                    samplerate=FS,
+                    samples=len(block),
+                    data=block,
                     trai=trai,
                 )
             )
-        return y
+    return fresh_tradb
 
-    samplerate = 100
-    samples = 10
-    sets = 10
 
-    # write data from t = [0, 1)
-    ref1 = write_time_axis(samplerate, samples, sets)
+@pytest.mark.parametrize(
+    ("time_start", "time_stop"),
+    [
+        (None, None),  # full range (with gap)
+        (0.0, 1.0),  # first data block only
+        (2.18, 2.55),  # exact range inside the second block
+        (2.13, 2.18),  # sub-record range (< 0.1 s)
+        (1.9, 2.4),  # exceeds lower bound -> leading zeros across the gap
+        (-0.1, None),  # exceeds lower bound, open stop
+        (None, 4.0),  # open start, exceeds upper bound -> trailing zeros
+        (5.0, 6.0),  # window entirely after the data -> all zeros
+        (-2.0, -1.0),  # window entirely before the data -> all zeros
+    ],
+)
+def test_read_continuous_wave_content(time_signal_tradb, time_start, time_stop):
+    y, t = time_signal_tradb.read_continuous_wave(
+        1, time_start=time_start, time_stop=time_stop, show_progress=False
+    )
+    ts = 0.0 if time_start is None else time_start
+    tp = DATA_END if time_stop is None else time_stop
+    assert len(y) == round(tp * FS) - round(ts * FS)
+    assert t[0] == pytest.approx(ts)
+    # value == time where data exists (sample indices [0, 100) and [200, 300)), else 0
+    idx = round(ts * FS) + np.arange(len(y))
+    in_data = ((idx >= 0) & (idx < 100)) | ((idx >= 200) & (idx < 300))
+    assert_allclose(y[in_data], t[in_data], atol=1e-6)  # signal equals the time axis
+    assert_allclose(y[~in_data], 0, atol=1e-6)
 
-    # get total time range
-    y, t = fresh_tradb.read_continuous_wave(1)
+
+def test_read_continuous_wave_axis_and_rate(time_signal_tradb):
+    y, t = time_signal_tradb.read_continuous_wave(
+        1, time_start=0.0, time_stop=1.0, show_progress=False
+    )
     assert y.dtype == np.float32
     assert t.dtype == np.float32
-    assert y.shape == (samples * sets,)
-    assert t.shape == y.shape
-    assert_allclose(y, ref1, atol=1e-6)
-    assert_allclose(t, ref1, atol=1e-6)
+    assert_allclose(t, np.arange(100) / FS, atol=1e-6)  # time axis values
+    _, fs = time_signal_tradb.read_continuous_wave(1, time_axis=False, show_progress=False)
+    assert fs == FS
 
-    _, fs = fresh_tradb.read_continuous_wave(1, time_axis=False)
-    assert fs == samplerate
 
-    # get empty time range
-    y, t = fresh_tradb.read_continuous_wave(1, time_start=0.1, time_stop=0.1)
+@pytest.mark.parametrize("time", [0.1, -0.1])
+def test_read_continuous_wave_empty_range(time_signal_tradb, time):
+    # time_start == time_stop -> zero-length output
+    y, t = time_signal_tradb.read_continuous_wave(
+        1, time_start=time, time_stop=time, show_progress=False
+    )
     assert len(y) == 0
     assert len(t) == 0
-    y, t = fresh_tradb.read_continuous_wave(1, time_start=-0.1, time_stop=-0.1)
-    assert len(y) == 0
-    assert len(t) == 0
 
-    # write data from t = [2, 3) -> time gap
-    ref2 = write_time_axis(samplerate, samples, sets, t_start=2)
-    ref2_total = np.concatenate([ref1, np.zeros(samples * sets), ref2])
 
-    # get total time range (with gap)
-    y, _ = fresh_tradb.read_continuous_wave(1)
-    assert y.shape == ref2_total.shape
-    assert_allclose(y, ref2_total, atol=1e-6)
+def write_tra(tradb, trai, time, n_samples, samplerate, value):
+    """Write a single transient record with constant data == value."""
+    tradb.write(
+        TraRecord(
+            time=time,
+            channel=1,
+            param_id=1,
+            pretrigger=0,
+            threshold=0,
+            samplerate=samplerate,
+            samples=n_samples,
+            data=np.full(n_samples, float(value), dtype=np.float32),
+            trai=trai,
+        )
+    )
 
-    # get exact time range
-    y, t = fresh_tradb.read_continuous_wave(1, time_start=2.18, time_stop=2.55)
-    assert len(y) == 37  # = (2.55 - 2.18) * samplerate
-    assert y[0] == pytest.approx(2.18)
-    assert y[-1] == pytest.approx(2.54)  # = 2.55 - 1/fs
-    assert t[0] == pytest.approx(2.18)
 
-    # get exact time range < 1 block (0.1 s)
-    y, t = fresh_tradb.read_continuous_wave(1, time_start=2.13, time_stop=2.18)
-    assert len(y) == 5
-    assert y[0] == pytest.approx(2.13)
-    assert y[-1] == pytest.approx(2.17)  # = 2.18 - 1/fs
-    assert t[0] == pytest.approx(2.13)
+def test_iread_time_range_record_selection(fresh_tradb):
+    # records spanning t = [k*0.1, k*0.1 + 0.1) for k = 0..4 (fs=100, 10 samples each)
+    for k in range(5):
+        write_tra(fresh_tradb, trai=k + 1, time=k * 0.1, n_samples=10, samplerate=100, value=1)
 
-    # get time range exceeding lower bound
-    y, t = fresh_tradb.read_continuous_wave(1, time_start=1.9, time_stop=2.4)
-    assert len(y) == 50  # = (2.4 - 1.9) * samplerate
-    assert y[0] == 0  # zero padded
-    assert y[-1] == pytest.approx(2.39)  # = 2.4 - 1/fs
-    assert t[0] == pytest.approx(1.9)
+    def trais(time_start, time_stop):
+        return sorted(
+            t.trai for t in fresh_tradb.iread(channel=1, time_start=time_start, time_stop=time_stop)
+        )
 
-    # get time range exceeding lower / upper bounds
-    y, t = fresh_tradb.read_continuous_wave(1, time_start=-0.1)
-    assert_allclose(y, np.concatenate([np.zeros(10), ref2_total]), atol=1e-6)
-    assert t[0] == pytest.approx(-0.1)
-    y, t = fresh_tradb.read_continuous_wave(1, time_stop=4)
-    assert_allclose(y, np.concatenate([ref2_total, np.zeros(100)]), atol=1e-6)
-    assert t[0] == pytest.approx(0.0)
+    # include the record straddling time_start (0.1 contains 0.15) and the one at time_stop (0.3)
+    assert trais(0.15, 0.30) == [2, 3, 4]
+    # a window fully inside the last record must still return it (empty-range guard regression)
+    assert trais(0.43, 0.47) == [5]
+
+
+def test_read_continuous_wave_length_invariant(fresh_tradb):
+    # burst at an awkward (non sample-aligned) time, fs=1000
+    write_tra(fresh_tradb, trai=1, time=0.015837917, n_samples=4, samplerate=1000, value=1)
+    time_start, time_stop = 0.015347917, 0.022829461
+    y, _ = fresh_tradb.read_continuous_wave(
+        1, time_start=time_start, time_stop=time_stop, show_progress=False
+    )
+    expected = round(time_stop * 1000) - round(time_start * 1000)
+    assert len(y) == expected
+
+
+def test_read_continuous_wave_samplerate_differs_from_timebase(fresh_tradb):
+    # The DB TimeBase (1e7) is NOT the record SampleRate: length and time axis must
+    # be derived from the record SampleRate (not `samplerate = self._timebase`).
+    fs = 2_000_000  # 2 MHz, != TimeBase (1e7)
+    n = 100
+    write_tra(fresh_tradb, trai=1, time=0.0, n_samples=n, samplerate=fs, value=1)
+    y, t = fresh_tradb.read_continuous_wave(
+        1, time_start=0.0, time_stop=n / fs, show_progress=False
+    )
+    assert len(y) == n  # NOT n * (1e7 / fs)
+    assert_allclose(y, np.ones(n, dtype=np.float32))
+    assert t[1] - t[0] == pytest.approx(1 / fs)
+
+
+def test_read_continuous_wave_mixed_samplerate_raises(fresh_tradb):
+    # two records on one channel with different sample rates cannot form one array
+    write_tra(fresh_tradb, trai=1, time=0.0, n_samples=10, samplerate=100, value=1)
+    write_tra(fresh_tradb, trai=2, time=0.1, n_samples=10, samplerate=200, value=2)
+    with pytest.raises(RuntimeError):
+        fresh_tradb.read_continuous_wave(1, show_progress=False)
 
 
 def test_listen(sample_tradb):
