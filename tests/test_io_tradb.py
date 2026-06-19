@@ -293,7 +293,7 @@ def test_read_continuous_wave_axis_and_rate(time_signal_tradb):
         1, time_start=0.0, time_stop=1.0, show_progress=False
     )
     assert y.dtype == np.float32
-    assert t.dtype == np.float32
+    assert t.dtype == np.float64  # time axis is float64 (precision at high sample rates)
     assert_allclose(t, np.arange(100) / FS, atol=1e-6)  # time axis values
     _, fs = time_signal_tradb.read_continuous_wave(1, time_axis=False, show_progress=False)
     assert fs == FS

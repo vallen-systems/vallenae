@@ -25,7 +25,9 @@ from .datatypes import TraRecord
 
 
 def _create_time_vector(samples: int, samplerate: int, pretrigger: int = 0) -> np.ndarray:
-    return np.arange(-pretrigger, samples - pretrigger, dtype=np.float32) / samplerate
+    # float64: float32 cannot resolve a 1/fs step against a large absolute offset (e.g. 10 MHz
+    # at t = 100 s, where the float32 resolution ~1e-5 is far coarser than the 1e-7 sample step).
+    return np.arange(-pretrigger, samples - pretrigger, dtype=np.float64) / samplerate
 
 
 class TraDatabase(Database):
