@@ -7,9 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-06-19
+
+### Added
+
+- `vallenae.processor` module with `EventBuilder` to group time-sorted hits into acoustic-emission events (#46)
+- `show_progress` argument in all DataFrame `read` methods to toggle the progress bar (#51)
+
 ### Changed
 
-- Remove optional `numba` dependency. The `timepicker` functions now always use the pure-NumPy implementations (previously the fallback). The import-time `PerformanceWarning` is gone.
+- Remove optional `numba` dependency. The `timepicker` functions now always use the pure-NumPy implementations (previously the fallback). The import-time `PerformanceWarning` is gone (#47).
+
+### Fixed
+
+- Correct sample count and time-range mapping in `TraDatabase.read_continuous_wave` (#50)
+- Handle gaps in the TRAI column when reading by time range (#49)
 
 ## [0.13.0] - 2025-12-08
 
@@ -232,7 +244,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial public release
 
-[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.13.0...HEAD
+[Unreleased]: https://github.com/vallen-systems/pyVallenAE/compare/0.14.0...HEAD
+[0.14.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.13.0...0.14.0
 [0.13.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.12.0...0.13.0
 [0.12.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.11.0...0.12.0
 [0.11.0]: https://github.com/vallen-systems/pyVallenAE/compare/0.10.1...0.11.0
