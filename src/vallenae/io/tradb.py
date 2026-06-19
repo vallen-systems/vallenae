@@ -77,11 +77,12 @@ class TraDatabase(Database):
         cur = con.execute("SELECT DISTINCT Chan FROM tr_data WHERE Chan IS NOT NULL")
         return {result[0] for result in cur.fetchall()}
 
-    def read(self, **kwargs) -> pd.DataFrame:
+    def read(self, *, show_progress: bool = True, **kwargs) -> pd.DataFrame:
         """
         Read transient data to Pandas DataFrame.
 
         Args:
+            show_progress: Show progress bar. Default: `True`
             **kwargs: Arguments passed to `iread`
 
         Returns:
@@ -91,6 +92,7 @@ class TraDatabase(Database):
             self.iread(**kwargs),
             desc="Tra",
             index_column="trai",
+            show_progress=show_progress,
         )
 
     def _get_total_time_range(self) -> tuple[float, float]:

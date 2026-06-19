@@ -114,11 +114,12 @@ class PriDatabase(Database):
             raise RuntimeError("No datetime marker in pridb") from None
         return datetime.strptime(data, "%Y-%m-%d %H:%M:%S") + timedelta(seconds=time - time_marker)
 
-    def read_hits(self, **kwargs) -> pd.DataFrame:
+    def read_hits(self, *, show_progress: bool = True, **kwargs) -> pd.DataFrame:
         """
         Read hits to Pandas DataFrame.
 
         Args:
+            show_progress: Show progress bar. Default: `True`
             **kwargs: Arguments passed to `iread_hits`
 
         Returns:
@@ -128,13 +129,15 @@ class PriDatabase(Database):
             self.iread_hits(**kwargs),
             desc="Hits",
             index_column="set_id",
+            show_progress=show_progress,
         )
 
-    def read_markers(self, **kwargs) -> pd.DataFrame:
+    def read_markers(self, *, show_progress: bool = True, **kwargs) -> pd.DataFrame:
         """
         Read marker to Pandas DataFrame.
 
         Args:
+            show_progress: Show progress bar. Default: `True`
             **kwargs: Arguments passed to `iread_markers`
 
         Returns:
@@ -148,13 +151,15 @@ class PriDatabase(Database):
             self.iread_markers(**kwargs),
             desc="Marker",
             index_column="set_id",
+            show_progress=show_progress,
         ).apply(lambda x: x.astype(dtypes.get(x.name, x.dtype)))
 
-    def read_parametric(self, **kwargs) -> pd.DataFrame:
+    def read_parametric(self, *, show_progress: bool = True, **kwargs) -> pd.DataFrame:
         """
         Read parametric data to Pandas DataFrame.
 
         Args:
+            show_progress: Show progress bar. Default: `True`
             **kwargs: Arguments passed to `iread_parametric`
 
         Returns:
@@ -164,13 +169,15 @@ class PriDatabase(Database):
             self.iread_parametric(**kwargs),
             desc="Parametric",
             index_column="set_id",
+            show_progress=show_progress,
         )
 
-    def read_status(self, **kwargs) -> pd.DataFrame:
+    def read_status(self, *, show_progress: bool = True, **kwargs) -> pd.DataFrame:
         """
         Read status data to Pandas DataFrame.
 
         Args:
+            show_progress: Show progress bar. Default: `True`
             **kwargs: Arguments passed to `iread_status`
 
         Returns:
@@ -180,14 +187,16 @@ class PriDatabase(Database):
             self.iread_status(**kwargs),
             desc="Status",
             index_column="set_id",
+            show_progress=show_progress,
         )
 
-    def read(self, **kwargs) -> pd.DataFrame:
+    def read(self, *, show_progress: bool = True, **kwargs) -> pd.DataFrame:
         """
         Read all data set types (hits, markers, parametric data, status data)
         from pridb to Pandas DataFrame.
 
         Args:
+            show_progress: Show progress bar. Default: `True`
             **kwargs: Arguments passed to `iread_hits`, `iread_markers`, `iread_parametric`
                 and `iread_status`
 
@@ -195,10 +204,10 @@ class PriDatabase(Database):
             Pandas DataFrame with all pridb data set types
         """
         # read to separate dataframes
-        df_hits = self.read_hits(**kwargs)
-        df_markers = self.read_markers(**kwargs)
-        df_parametric = self.read_parametric(**kwargs)
-        df_status = self.read_status(**kwargs)
+        df_hits = self.read_hits(show_progress=show_progress, **kwargs)
+        df_markers = self.read_markers(show_progress=show_progress, **kwargs)
+        df_parametric = self.read_parametric(show_progress=show_progress, **kwargs)
+        df_status = self.read_status(show_progress=show_progress, **kwargs)
 
         # add missing set_types
         column_set_type = 0
