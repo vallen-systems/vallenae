@@ -309,13 +309,13 @@ def test_read_continuous_wave_empty_range(time_signal_tradb, time):
     assert len(t) == 0
 
 
-def write_tra(tradb, trai, time, n_samples, samplerate, value):
+def write_tra(tradb, trai, time, n_samples, samplerate, value, channel=1):
     """Write a single transient record with constant data == value."""
     tradb.write(
         TraRecord(
             time=time,
-            channel=1,
-            param_id=1,
+            channel=channel,
+            param_id=channel,
             pretrigger=0,
             threshold=0,
             samplerate=samplerate,
@@ -373,6 +373,28 @@ def test_read_continuous_wave_mixed_samplerate_raises(fresh_tradb):
     write_tra(fresh_tradb, trai=2, time=0.1, n_samples=10, samplerate=200, value=2)
     with pytest.raises(RuntimeError):
         fresh_tradb.read_continuous_wave(1, show_progress=False)
+
+
+def test_simultaneous_channels_at_time_boundary(fresh_tradb):
+    # Two channels with records sharing the SAME Time tick (simultaneous hits):
+    # TRAI 1->1@0.10, 2->2@0.10, 3->1@0.20, 4->2@0.20, 5->1@0.30, 6->2@0.30 (fs=100, 10 samples).
+    fresh_tradb.connection().execute(
+        "INSERT INTO tr_params (ID, SetupID, Chan, ADC_µV, TR_mV) VALUES (2, 1, 2, 1, 1)"
+    )
+    trai = 0
+    for time in (0.10, 0.20, 0.30):
+        for channel in (1, 2):
+            trai += 1
+            write_tra(fresh_tradb, trai, time, 10, 100, value=channel, channel=channel)
+
+    # time_start lands on a timestamp shared by both channels; channel 1's record at 0.20
+    # (TRAI 3) must not be dropped by the lower TRAI bound.
+    trais = sorted(t.trai for t in fresh_tradb.iread(channel=1, time_start=0.20, time_stop=0.35))
+    assert trais == [3, 5]  # channel-1 records at 0.20 and 0.30
+
+    # a window starting exactly on a shared timestamp must return channel 1's data, not 0
+    y, _ = fresh_tradb.read_continuous_wave(1, time_start=0.20, time_stop=0.30, show_progress=False)
+    assert_allclose(y, np.ones(10, dtype=np.float32))  # the channel-1 hit at 0.20
 
 
 def test_listen(sample_tradb):

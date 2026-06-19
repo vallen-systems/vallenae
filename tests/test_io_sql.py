@@ -202,19 +202,27 @@ def test_sql_binary_search():
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x > 9) == 4  # id 4 -> 16
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 256) == 16
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 9, lower_bound=False) == 2
-    assert sql_binary_search(con, "squares", "value", "id", lambda x: x <= 9, lower_bound=False) == 3
-    assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 256, lower_bound=False) == 15
+    assert (
+        sql_binary_search(con, "squares", "value", "id", lambda x: x <= 9, lower_bound=False) == 3
+    )
+    assert (
+        sql_binary_search(con, "squares", "value", "id", lambda x: x < 256, lower_bound=False) == 15
+    )
 
     # condition false for the whole range -> None
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 0) is None
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x > 99**2) is None
     # condition true for the whole range -> first / last id
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 0) == 0
-    assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 0, lower_bound=False) == 99
+    assert (
+        sql_binary_search(con, "squares", "value", "id", lambda x: x >= 0, lower_bound=False) == 99
+    )
 
     # consts table: all values equal -> whole range matches or none
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x >= 11) == 0
-    assert sql_binary_search(con, "consts", "value", "id", lambda x: x >= 11, lower_bound=False) == 99
+    assert (
+        sql_binary_search(con, "consts", "value", "id", lambda x: x >= 11, lower_bound=False) == 99
+    )
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x > 11) is None
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x < 11) is None
 
@@ -255,6 +263,26 @@ def test_sql_binary_search_sparse_index():
     # empty table
     con.execute("CREATE TABLE empty (id INTEGER PRIMARY KEY, value REAL)")
     assert sql_binary_search(con, "empty", "value", "id", lambda v: v >= 0) is None
+
+    con.close()
+
+
+def test_sql_binary_search_duplicate_values():
+    """Regression: with duplicate values at the boundary (e.g. simultaneous hits sharing a
+    timestamp), the search must return the exact lower/upper edge of the equal-value run, so the
+    result is safe to use as an inclusive range bound."""
+    con = sqlite3.connect(":memory:")
+    con.execute("CREATE TABLE data (id INTEGER PRIMARY KEY, trai INTEGER, value REAL)")
+    for i, trai, value in zip([0, 1, 2, 3], [1, 2, 3, 4], [10.0, 20.0, 20.0, 40.0]):
+        con.execute("INSERT INTO data (id, trai, value) VALUES (?, ?, ?)", (i, trai, value))
+
+    # value 20.0 spans trai 2 and 3: lower_bound returns the first, upper bound the last
+    assert (
+        sql_binary_search(con, "data", "value", "trai", lambda x: x <= 20.0, lower_bound=True) == 2
+    )
+    assert (
+        sql_binary_search(con, "data", "value", "trai", lambda x: x <= 20.0, lower_bound=False) == 3
+    )
 
     con.close()
 

@@ -266,15 +266,15 @@ def sql_binary_search(
             Default: `True`.
 
     Returns:
-        A threshold for the `column_index` that separates matching from non-matching rows, or
-        `None` if the condition is `False` for every row.
+        The existing `column_index` value at the boundary of the matching rows, or `None` if the
+        condition is `False` for every row.
 
-        The returned value is meant to be used as an inclusive range bound on `column_index`
-        (`column_index >= result` for `lower_bound=True`, `column_index <= result` for
-        `lower_bound=False`). Because the index column may be sparse, the threshold is **not
-        guaranteed to be an existing index** - it can be any value within the gap that separates
-        the matching from the non-matching rows. All such values select the same set of rows, so
-        this is exact for range filtering; do not interpret the result as a concrete row key.
+        When several rows share the boundary value (e.g. simultaneous records on different
+        channels sharing a timestamp), `lower_bound=True` returns the **first** of them and
+        `lower_bound=False` the **last**, so the result is safe as an inclusive bound on
+        `column_index` (`column_index >= result` / `column_index <= result`). The index column
+        may be sparse (contain gaps); the search never queries a missing index and always
+        returns an existing one.
     """
 
     # two querys are way faster than one combined!
@@ -283,37 +283,53 @@ def sql_binary_search(
     if i_min is None:  # empty table
         return None
 
-    # Snap each probe to the nearest existing row in the search direction (ASC/DESC), so a gap in
-    # the index column never results in a missing-row lookup. Each snap is an O(log n) index seek.
-    op, order = (">=", "ASC") if lower_bound else ("<=", "DESC")
-
-    def get_value(index):
+    def value_at(index):
         return connection.execute(
-            f"SELECT {column_value} FROM {table} "
-            f"WHERE {column_index} {op} ? ORDER BY {column_index} {order} LIMIT 1",
-            (index,),
+            f"SELECT {column_value} FROM {table} WHERE {column_index} == ?", (index,)
         ).fetchone()[0]
 
+    def neighbour(index, op, order):
+        """Nearest existing row in a direction, snapping over index gaps."""
+        return connection.execute(
+            f"SELECT {column_index}, {column_value} FROM {table} "
+            f"WHERE {column_index} {op} ? ORDER BY {column_index} {order} LIMIT 1",
+            (index,),
+        ).fetchone()
+
+    # i_low/i_high are existing indices; condition differs between them once narrowed
+    i_low, i_high = i_min, i_max
+    v_low, v_high = value_at(i_low), value_at(i_high)
+    if v_low > v_high:
+        raise ValueError(f"Value column {column_value} not sorted")
+    c_low, c_high = fun_compare(v_low), fun_compare(v_high)
+    if c_low == c_high:  # condition constant over the whole range
+        if not c_low:
+            return None  # never matches
+        return i_min if lower_bound else i_max  # always matches
+
+    # Binary search for two adjacent *existing* rows that straddle the transition. Each probe is
+    # snapped to an existing index near the midpoint, so a gap in the index column is never queried.
     while True:
-        v_min = get_value(i_min)
-        v_max = get_value(i_max)
-        if v_min > v_max:
-            raise ValueError(f"Value column {column_value} not sorted")
-        c_min = fun_compare(v_min)
-        c_max = fun_compare(v_max)
-
-        if c_min and c_max:  # condition true for the whole range
-            return i_min if lower_bound else i_max
-        if not c_min and not c_max:  # condition false for the whole range
-            return None
-        if i_max - i_min < 2:  # adjacent bounds straddle the transition
-            return i_min if c_min else i_max
-
-        i_mid = (i_min + i_max) // 2
-        if fun_compare(get_value(i_mid)) == c_min:
-            i_min = i_mid
+        i_mid = (i_low + i_high) // 2
+        row = neighbour(i_mid, "<=", "DESC")  # existing index in (i_low, i_mid]
+        if row is None or row[0] <= i_low:
+            row = neighbour(i_mid, ">", "ASC")  # else the next existing index above i_mid
+        if row is None or row[0] >= i_high:
+            break  # i_low and i_high are adjacent existing rows
+        if fun_compare(row[1]) == c_low:
+            i_low = row[0]
         else:
-            i_max = i_mid
+            i_high = row[0]
+
+    # Walk to the requested edge of the run of rows sharing the boundary (True-side) value.
+    boundary = i_low if c_low else i_high
+    value = value_at(boundary)
+    op, order = ("<", "DESC") if lower_bound else (">", "ASC")
+    while True:
+        row = neighbour(boundary, op, order)
+        if row is None or row[1] != value:
+            return boundary
+        boundary = row[0]
 
 
 def create_new_database(filename: str, schema: str):

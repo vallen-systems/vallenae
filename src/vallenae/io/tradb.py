@@ -94,25 +94,41 @@ class TraDatabase(Database):
 
     def _get_total_time_range(self) -> tuple[float, float]:
         """Return total time range [first sample time, end of last sample] in seconds."""
-        # view_tr_data.Time is already in seconds; the end of a record is
-        # Time + Samples / SampleRate (the `* 1.0` forces float division).
-        row = (
-            self.connection()
-            .execute("SELECT MIN(Time), MAX(Time + Samples * 1.0 / SampleRate) FROM view_tr_data")
-            .fetchone()
-        )
-        if row is None or row[0] is None:  # empty table
+        con = self.connection()
+        # Time is monotonic with TRAI, so the first/last sample come from the records with the
+        # min/max TRAI - indexed point lookups instead of a full-table scan over the data.
+        first = con.execute(
+            "SELECT Time FROM tr_data WHERE TRAI == (SELECT MIN(TRAI) FROM tr_data)"
+        ).fetchone()
+        if first is None or first[0] is None:  # empty table
             return 0.0, 0.0
-        return row[0], row[1]
+        last = con.execute(
+            "SELECT Time, Samples, SampleRate FROM tr_data "
+            "WHERE TRAI == (SELECT MAX(TRAI) FROM tr_data)"
+        ).fetchone()
+        return first[0] / self._timebase, last[0] / self._timebase + last[1] / last[2]
+
+    def _first_trai_at_same_time(self, trai: int) -> int:
+        """Return the smallest TRAI sharing the same Time as `trai` (simultaneous records)."""
+        # Stream existing rows backwards from `trai` (indexed primary-key scan) and stop as soon as
+        # Time changes. The run spans at most one record per channel, so only a few rows are read.
+        cursor = self.connection().execute(
+            "SELECT TRAI, Time FROM tr_data WHERE TRAI <= ? ORDER BY TRAI DESC", (trai,)
+        )
+        first, time = cursor.fetchone()  # the row for `trai` itself (highest TRAI <= trai)
+        for row_trai, row_time in cursor:
+            if row_time != time:
+                break
+            first = row_trai
+        return first
 
     def _get_trai_range_from_time_range(
         self, time_start: float | None, time_stop: float | None
     ) -> tuple[int | None, int | None]:
-        """Binary-search the TRAI range of records overlapping a time range.
+        """Binary-search the inclusive TRAI range of records overlapping a time range.
 
-        Records have a duration, so the range includes the record straddling
-        time_start (start <= time_start) and the record starting at time_stop.
-        view_tr_data.Time is in seconds, so the conditions compare seconds directly.
+        Records have a duration, so the bounds are the last record starting at/before each
+        endpoint. view_tr_data.Time is in seconds, so the conditions compare seconds directly.
         """
         search = partial(
             sql_binary_search,
@@ -121,13 +137,15 @@ class TraDatabase(Database):
             column_value="Time",
             column_index="TRAI",
         )
-        trai_start = None
-        trai_stop = None
-        if time_start is not None:  # last record starting at/before time_start
+        trai_start = trai_stop = None
+        if time_start is not None:
+            # last record starting at/before time_start, widened to the first record sharing that
+            # timestamp so simultaneous records on other channels are not dropped by TRAI >=
             trai_start = search(fun_compare=lambda t: t <= time_start, lower_bound=False)
-        if time_stop is not None:  # (first record starting after time_stop) - 1
-            trai_after = search(fun_compare=lambda t: t > time_stop, lower_bound=True)
-            trai_stop = None if trai_after is None else trai_after - 1
+            if trai_start is not None:
+                trai_start = self._first_trai_at_same_time(trai_start)
+        if time_stop is not None:  # last record starting at/before time_stop
+            trai_stop = search(fun_compare=lambda t: t <= time_stop, lower_bound=False)
         return trai_start, trai_stop
 
     def iread(
@@ -266,26 +284,28 @@ class TraDatabase(Database):
         dtype = np.int16 if raw else np.float32
         con = self.connection()
 
-        # Assume a uniform sample rate per channel; take the first record's.
-        # Indexed LIMIT 1 lookup - avoids scanning every row (e.g. DISTINCT SampleRate would).
-        row = con.execute(
-            "SELECT SampleRate FROM view_tr_data WHERE Chan == ? ORDER BY TRAI LIMIT 1", (channel,)
+        # Channel's first record (indexed point lookup): sample rate + channel start time.
+        # A `WHERE Chan == ? ORDER BY TRAI` query cannot use the TRAI index (Chan is unindexed)
+        # and would scan+sort the whole table on every call.
+        first = con.execute(
+            "SELECT Time, SampleRate FROM tr_data "
+            "WHERE TRAI == (SELECT MIN(TRAI) FROM tr_data WHERE Chan == ?)",
+            (channel,),
         ).fetchone()
-        if row is None:  # no data for this channel
+        if first is None or first[0] is None:  # no data for this channel
             empty = np.empty(0, dtype=dtype)
-            return (empty, np.empty(0, dtype=np.float32)) if time_axis else (empty, 0)
-        samplerate = row[0]
+            return (empty, np.empty(0)) if time_axis else (empty, 0)
+        samplerate = first[1]
 
-        if time_start is None or time_stop is None:  # fill open bounds from channel extent
-            extent = con.execute(
-                "SELECT MIN(Time), MAX(Time + Samples * 1.0 / SampleRate) "
-                "FROM view_tr_data WHERE Chan == ?",
+        if time_start is None:
+            time_start = first[0] / self._timebase
+        if time_stop is None:  # channel's last sample (indexed point lookup)
+            last = con.execute(
+                "SELECT Time, Samples, SampleRate FROM tr_data "
+                "WHERE TRAI == (SELECT MAX(TRAI) FROM tr_data WHERE Chan == ?)",
                 (channel,),
             ).fetchone()
-            if time_start is None:
-                time_start = extent[0]
-            if time_stop is None:
-                time_stop = extent[1]
+            time_stop = last[0] / self._timebase + last[1] / last[2]
 
         iterable = self.iread(channel=channel, time_start=time_start, time_stop=time_stop, raw=raw)
         iterator = iter(iterable)
