@@ -193,36 +193,28 @@ def test_sql_binary_search():
         con.execute("INSERT INTO consts (id, value) VALUES (?, ?)", (i, 11))
         con.execute("INSERT INTO sin (id, value) VALUES (?, ?)", (i, sin(i)))
 
-    # The condition must be monotonic in `value`: lower_bound=True for False->True conditions
-    # (`>`/`>=`, match at high end, used downstream as `id >= result`), lower_bound=False for
+    # The condition must be monotonic in `value`: bound="lower" for False->True conditions
+    # (`>`/`>=`, match at high end, used downstream as `id >= result`), bound="upper" for
     # True->False conditions (`<`/`<=`, match at low end, used as `id <= result`).
 
     # squares table: strictly increasing, distinct values -> result is the exact boundary id
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 9) == 3  # id 3 -> 9
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x > 9) == 4  # id 4 -> 16
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 256) == 16
-    assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 9, lower_bound=False) == 2
-    assert (
-        sql_binary_search(con, "squares", "value", "id", lambda x: x <= 9, lower_bound=False) == 3
-    )
-    assert (
-        sql_binary_search(con, "squares", "value", "id", lambda x: x < 256, lower_bound=False) == 15
-    )
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 9, "upper") == 2
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x <= 9, "upper") == 3
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 256, "upper") == 15
 
     # condition false for the whole range -> None
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x < 0) is None
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x > 99**2) is None
     # condition true for the whole range -> first / last id
     assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 0) == 0
-    assert (
-        sql_binary_search(con, "squares", "value", "id", lambda x: x >= 0, lower_bound=False) == 99
-    )
+    assert sql_binary_search(con, "squares", "value", "id", lambda x: x >= 0, "upper") == 99
 
     # consts table: all values equal -> whole range matches or none
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x >= 11) == 0
-    assert (
-        sql_binary_search(con, "consts", "value", "id", lambda x: x >= 11, lower_bound=False) == 99
-    )
+    assert sql_binary_search(con, "consts", "value", "id", lambda x: x >= 11, "upper") == 99
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x > 11) is None
     assert sql_binary_search(con, "consts", "value", "id", lambda x: x < 11) is None
 
@@ -246,7 +238,7 @@ def test_sql_binary_search_sparse_index():
     # ids 3 and 50 straddle a gap: `value >= 50` matches from id 50, so any threshold in (3, 50]
     # selects the right rows; `value < 50` ends at id 3, so any threshold in [3, 50) does.
     upper = sql_binary_search(con, "gapped", "value", "id", lambda v: v >= 50)
-    lower = sql_binary_search(con, "gapped", "value", "id", lambda v: v < 50, lower_bound=False)
+    lower = sql_binary_search(con, "gapped", "value", "id", lambda v: v < 50, "upper")
     assert upper is not None
     assert lower is not None
     assert 3 < upper <= 50
@@ -276,13 +268,9 @@ def test_sql_binary_search_duplicate_values():
     for i, trai, value in zip([0, 1, 2, 3], [1, 2, 3, 4], [10.0, 20.0, 20.0, 40.0]):
         con.execute("INSERT INTO data (id, trai, value) VALUES (?, ?, ?)", (i, trai, value))
 
-    # value 20.0 spans trai 2 and 3: lower_bound returns the first, upper bound the last
-    assert (
-        sql_binary_search(con, "data", "value", "trai", lambda x: x <= 20.0, lower_bound=True) == 2
-    )
-    assert (
-        sql_binary_search(con, "data", "value", "trai", lambda x: x <= 20.0, lower_bound=False) == 3
-    )
+    # value 20.0 spans trai 2 and 3: "lower" returns the first, "upper" the last
+    assert sql_binary_search(con, "data", "value", "trai", lambda x: x <= 20.0, "lower") == 2
+    assert sql_binary_search(con, "data", "value", "trai", lambda x: x <= 20.0, "upper") == 3
 
     con.close()
 

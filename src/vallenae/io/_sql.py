@@ -6,7 +6,7 @@ import logging
 import sqlite3
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Iterator, Sequence, TypeVar
+from typing import Any, Callable, Iterator, Literal, Sequence, TypeVar
 
 from ._types import SizedIterable
 
@@ -237,8 +237,7 @@ def sql_binary_search(
     column_value: str,
     column_index: str,
     fun_compare: Callable[[float], bool],
-    *,
-    lower_bound: bool = True,
+    bound: Literal["lower", "upper"] = "lower",
 ) -> int | None:
     """
     Find a boundary index for a monotonic condition on a value column sorted by an index column.
@@ -258,24 +257,26 @@ def sql_binary_search(
         column_index: Name of the indexed column, e.g. TRAI
         fun_compare: Lambda function of the condition, e.g. `lambda t: t > 10` (Time > 10).
             The condition must be monotonic in `column_value`, i.e. switch from `False` to `True`
-            (use `lower_bound=True`) or from `True` to `False` (use `lower_bound=False`) exactly
+            (use `bound="lower"`) or from `True` to `False` (use `bound="upper"`) exactly
             once over the sorted range.
-        lower_bound: Search direction. `True` snaps probes upwards and returns the boundary at the
-            lower end of the matching range (for `False`->`True` conditions). `False` snaps
+        bound: Search direction. `"lower"` snaps probes upwards and returns the boundary at the
+            lower end of the matching range (for `False`->`True` conditions). `"upper"` snaps
             downwards and returns the boundary at the upper end (for `True`->`False` conditions).
-            Default: `True`.
+            Default: `"lower"`.
 
     Returns:
         The existing `column_index` value at the boundary of the matching rows, or `None` if the
         condition is `False` for every row.
 
         When several rows share the boundary value (e.g. simultaneous records on different
-        channels sharing a timestamp), `lower_bound=True` returns the **first** of them and
-        `lower_bound=False` the **last**, so the result is safe as an inclusive bound on
+        channels sharing a timestamp), `bound="lower"` returns the **first** of them and
+        `bound="upper"` the **last**, so the result is safe as an inclusive bound on
         `column_index` (`column_index >= result` / `column_index <= result`). The index column
         may be sparse (contain gaps); the search never queries a missing index and always
         returns an existing one.
     """
+
+    is_lower = bound == "lower"
 
     # two querys are way faster than one combined!
     i_min = connection.execute(f"SELECT MIN({column_index}) FROM {table}").fetchone()[0]
@@ -305,7 +306,7 @@ def sql_binary_search(
     if c_low == c_high:  # condition constant over the whole range
         if not c_low:
             return None  # never matches
-        return i_min if lower_bound else i_max  # always matches
+        return i_min if is_lower else i_max  # always matches
 
     # Binary search for two adjacent *existing* rows that straddle the transition. Each probe is
     # snapped to an existing index near the midpoint, so a gap in the index column is never queried.
@@ -324,7 +325,7 @@ def sql_binary_search(
     # Walk to the requested edge of the run of rows sharing the boundary (True-side) value.
     boundary = i_low if c_low else i_high
     value = value_at(boundary)
-    op, order = ("<", "DESC") if lower_bound else (">", "ASC")
+    op, order = ("<", "DESC") if is_lower else (">", "ASC")
     while True:
         row = neighbour(boundary, op, order)
         if row is None or row[1] != value:

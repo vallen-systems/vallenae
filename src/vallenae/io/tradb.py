@@ -143,11 +143,11 @@ class TraDatabase(Database):
         if time_start is not None:
             # last record starting at/before time_start, widened to the first record sharing that
             # timestamp so simultaneous records on other channels are not dropped by TRAI >=
-            trai_start = search(fun_compare=lambda t: t <= time_start, lower_bound=False)
+            trai_start = search(fun_compare=lambda t: t <= time_start, bound="upper")
             if trai_start is not None:
                 trai_start = self._first_trai_at_same_time(trai_start)
         if time_stop is not None:  # last record starting at/before time_stop
-            trai_stop = search(fun_compare=lambda t: t <= time_stop, lower_bound=False)
+            trai_stop = search(fun_compare=lambda t: t <= time_stop, bound="upper")
         return trai_start, trai_stop
 
     def iread(
