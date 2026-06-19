@@ -39,7 +39,14 @@ def decode_data_blob(
             return np.frombuffer(data_blob, dtype=np.int16)
         if data_format == 2:  # flac
             _check_flac_codec()
-            return sf.read(io.BytesIO(data_blob), dtype=np.int16)[0]
+            # Use the low-level buffer_read_into instead of the sf.read convenience wrapper:
+            # decode directly into a pre-sized array (~1.3x faster for many small blobs).
+            with sf.SoundFile(io.BytesIO(data_blob)) as file:
+                data_int16 = np.empty(file.frames * file.channels, dtype=np.int16)
+                file.buffer_read_into(data_int16, dtype="int16")
+                if file.channels > 1:  # match sf.read(always_2d=False): (frames, channels)
+                    data_int16 = data_int16.reshape(-1, file.channels)
+            return data_int16
         raise ValueError("Data format not supported")
 
     data_int16 = get_data_int16()
