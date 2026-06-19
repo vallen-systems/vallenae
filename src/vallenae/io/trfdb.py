@@ -54,11 +54,12 @@ class TrfDatabase(Database):
         schema = schema_path.read_text("utf-8")
         create_new_database(filename, schema)
 
-    def read(self, **kwargs) -> pd.DataFrame:
+    def read(self, *, show_progress: bool = True, **kwargs) -> pd.DataFrame:
         """
         Read features to Pandas DataFrame.
 
         Args:
+            show_progress: Show progress bar. Default: `True`
             **kwargs: Arguments passed to `iread`
 
         Returns:
@@ -72,6 +73,7 @@ class TrfDatabase(Database):
             [record_to_dict(r) for r in self.iread(**kwargs)],
             desc="Trf",
             index_column="trai",
+            show_progress=show_progress,
         )
 
     def iread(
