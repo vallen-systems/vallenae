@@ -18,6 +18,7 @@ The package includes following modules:
 - vallenae.**io**: Reading (and writing) of Vallen Systeme SQLite database files (*.pridb, *.tradb, *.trfdb)
 - vallenae.**features**: Extraction of Acoustic Emission features
 - vallenae.**timepicker**: Timepicking algorithms for arrival time estimations
+- vallenae.**processor**: Processing of Acoustic Emission data, e.g. grouping hits into events
 
 > **Note**:
 > A free/lite version of the Vallen AE Suite is available since the release R2020.
