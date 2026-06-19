@@ -75,6 +75,7 @@ jobs:
         with:
           repository-url: https://test.pypi.org/legacy/
           skip-existing: true
+          attestations: false
           verbose: true
       - name: Publish package to PyPI
         if: github.event_name == 'release'
