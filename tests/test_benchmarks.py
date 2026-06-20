@@ -52,3 +52,9 @@ def test_benchmark_timepicker(benchmark, random_array, function):
 @pytest.mark.parametrize("data_format", [0, 2])
 def test_benchmark_encode(benchmark, random_array, data_format):
     benchmark(compression.encode_data_blob, random_array, data_format, 0.1)
+
+
+@pytest.mark.parametrize("data_format", [0, 2])
+def test_benchmark_decode(benchmark, random_array, data_format):
+    data_blob = compression.encode_data_blob(random_array, data_format, 0.1)
+    benchmark(compression.decode_data_blob, data_blob, data_format, 0.1)
