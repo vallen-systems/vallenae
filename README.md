@@ -55,8 +55,8 @@ Just [create an issue](https://github.com/vallen-systems/vallenae/issues/new) or
 $ git clone https://github.com/vallen-systems/vallenae.git
 $ cd vallenae
 
-# Install package and dependencies
-$ pip install -e .[dev]
+# Install package and dependencies (requires pip >= 25.1)
+$ pip install -e . --group dev
 
 # Run the test suite with tox
 $ tox
