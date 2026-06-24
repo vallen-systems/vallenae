@@ -1,5 +1,4 @@
 import pickle
-import sqlite3
 from pathlib import Path
 
 import pytest
@@ -36,7 +35,7 @@ def fixture_empty_pridb(tmp_path):
 
 def test_init():
     # try open not existing database
-    with pytest.raises(sqlite3.OperationalError):
+    with pytest.raises(FileNotFoundError):
         Database("file_does_not_exist.database", table_prefix="ae")
 
     # open existing database
