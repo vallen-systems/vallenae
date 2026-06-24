@@ -46,6 +46,9 @@ class Database:
         if mode == "rwc" and not Path(filename).exists():
             self.create(filename)  # call abstract method (implemented by child class)
 
+        if not Path(filename).exists():
+            raise FileNotFoundError(f"Database file does not exist: {filename}")
+
         self._readonly = mode == "ro"
         self._connection_wrapper = ConnectionWrapper(filename, mode)
 
