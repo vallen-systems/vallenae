@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Migrate development dependencies from optional dependencies (extras) to PEP 735 dependency groups.
+  Use `pip install -e . --group dev` (pip >= 25.1) instead of `pip install -e .[dev]`.
+
 ## [0.14.0] - 2026-06-19
 
 ### Added

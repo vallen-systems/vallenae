@@ -3,16 +3,12 @@ version: 2
 formats: all
 
 build:
-  os: ubuntu-22.04
+  os: ubuntu-lts-latest
   tools:
-    python: "3.11"
-
-python:
-  install:
-    - method: pip
-      path: .
-      extra_requirements:
-        - docs
+    python: "3.14"
+  jobs:
+    install:
+      - pip install . --group docs
 
 sphinx:
   configuration: docs/conf.py

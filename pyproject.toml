@@ -49,7 +49,7 @@ dependencies = [
     "typing_extensions",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 docs = [
     "sphinx>=5",
     "sphinx-autodoc-typehints",
@@ -68,10 +68,12 @@ tests = [
 tools = [
     "mypy>=0.9",  # pyproject.toml support
     "ruff>=0.5",
-    "tox>=3.4",  # pyproject.toml support
+    "tox>=4.22",  # PEP 735 dependency_groups support
 ]
 dev = [
-    "vallenae[docs,tests,tools]", # recursive dependency since pip 21.2
+    {include-group = "docs"},
+    {include-group = "tests"},
+    {include-group = "tools"},
 ]
 
 [project.entry-points.pyinstaller40]
@@ -164,7 +166,7 @@ deps = mypy
 commands = mypy src/
 
 [testenv]
-extras = tests
+dependency_groups = tests
 commands =
     coverage run -m pytest --benchmark-disable
 
@@ -181,7 +183,7 @@ deps = pyinstaller>=4
 commands = python -m PyInstaller.utils.run_tests --include_only vallenae.
 
 [testenv:docs]
-extras = docs
+dependency_groups = docs
 changedir = docs
 commands =
     sphinx-build -b dummy . _build
