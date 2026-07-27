@@ -112,6 +112,7 @@ select = [
 ignore = [
     "PLR0911", # too many return statements
     "PLR0913", # too many arguments in function call
+    "PLR0917", # too many positional arguments
     "PLR2004", # magic value used in comparison
 ]
 
